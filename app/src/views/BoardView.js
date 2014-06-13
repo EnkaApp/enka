@@ -8,6 +8,7 @@ define(function(require, exports, module) {
   var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
+  var GridLayout    = require('famous/view/GridLayout');
 
   function _createBackground() {
     var bgSurface = new Surface({
@@ -18,6 +19,8 @@ define(function(require, exports, module) {
 
     this.add(bgSurface);
   }
+
+
 
   function BoardView() {
     View.apply(this, arguments);
