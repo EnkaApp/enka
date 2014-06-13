@@ -8,7 +8,9 @@ define(function(require, exports, module) {
   var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
-  var GridLayout    = require('famous/view/GridLayout');
+  var GridLayout    = require('famous/views/GridLayout');
+
+  var boardDimensions = [5,7];
 
   function _createBackground() {
     var bgSurface = new Surface({
@@ -20,12 +22,44 @@ define(function(require, exports, module) {
     this.add(bgSurface);
   }
 
+  function _createSurfaces() {
+    var size = boardDimensions[0] * boardDimensions[1];
+    var surfaces = [];
+    for(var i = 0; i < size; i++){
+      surfaces.push(new Surface({
+        content: 'panel ' + (i + 1),
+        size: undefined,
+        properties: {
+          color: 'black',
+          backgroundColor: 'hsl(100, 100%, 100%)',
+          textAlign: 'center'
+        }
 
+      }));
+    }
+
+    return surfaces;
+  }
+
+  function _createGrid(dimensions) {
+    var grid = new GridLayout({
+      dimensions: dimensions
+    });
+
+    var surfaces = _createSurfaces();
+    grid.sequenceFrom(surfaces);
+    this.add(grid);
+
+
+  }
 
   function BoardView() {
     View.apply(this, arguments);
 
+    // add background
     _createBackground.call(this);
+    // add grid
+    _createGrid.call(this, boardDimensions);
   }
 
   BoardView.prototype = Object.create(View.prototype);
