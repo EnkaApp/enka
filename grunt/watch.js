@@ -23,6 +23,10 @@ module.exports = function (grunt) {
         interrupt: true
       }
     },
+    less: {
+      files: ['<%= config.app %>/assets/styles/{,*/}*.less'],
+      tasks: ['less:development']
+    },
     css: {
       files: ['<%= config.app %>/styles/{,*/}*.css']
     },

@@ -41,5 +41,9 @@
   },
   "scripts": {
     "test": "grunt test"
+  },
+  "dependencies": {
+    "grunt-contrib-less": "^0.11.2",
+    "less": "^1.7.1"
   }
 }
