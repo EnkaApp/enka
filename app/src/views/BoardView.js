@@ -17,7 +17,8 @@ define(function(require, exports, module) {
   var TouchSync     = require('famous/inputs/TouchSync');
   var GenericSync   = require('famous/inputs/GenericSync');
   var Transitionable = require('famous/transitions/Transitionable');
-  
+  var PieceView     = require('./PieceView');
+  var GridController = require('../GridController');
 
   GenericSync.register({
     'touch': TouchSync
@@ -39,46 +40,46 @@ define(function(require, exports, module) {
     this.add(bgSurface);
   }
 
-  function _createSurfaces() {
-    var size = boardDimensions[0] * boardDimensions[1];
+  // function _createSurfaces() {
+  //   var size = boardDimensions[0] * boardDimensions[1];
 
-    for(var i = 0; i < size; i++){
-      // var x = getX(i);
-      // var y = getY(i);
-      surfaces.push(new Surface({
-        content: '' + i,
-        size: [undefined, undefined],
-        properties: {
-          color: 'black',
-          backgroundColor: 'hsl(100, 100%, 50%)',
-          textAlign: 'center',
-          pointerEvents: 'none'
-        }
-      }));
-    }
+  //   for(var i = 0; i < size; i++){
+  //     // var x = getX(i);
+  //     // var y = getY(i);
+  //     surfaces.push(new Surface({
+  //       content: '' + i,
+  //       size: [undefined, undefined],
+  //       properties: {
+  //         color: 'black',
+  //         backgroundColor: 'hsl(100, 100%, 50%)',
+  //         textAlign: 'center',
+  //         pointerEvents: 'none'
+  //       }
+  //     }));
+  //   }
 
-    return surfaces;
-  }
+  //   return surfaces;
+  // }
+  // remove grid layout
   
-  function _createGrid(dimensions) {
-    var grid = new GridLayout({
-      dimensions: dimensions
-    });
+  // function _createGrid(dimensions) {
+  //   var grid = new GridLayout({
+  //     dimensions: dimensions
+  //   });
 
-    var surfaces = _createSurfaces();
-    grid.sequenceFrom(surfaces);
-    this.add(grid);
-  }
-
-  function pieceView(){
-    View.apply(this, arguments);
-  }
+  //   var surfaces = _createSurfaces();
+  //   grid.sequenceFrom(surfaces);
+  //   console.log();
+  //   this.add(grid);
+  // }
 
   function BoardView() {
     View.apply(this, arguments);
+    // var piece = new PieceView();
+    // console.log(piece);
 
     _createBackground.call(this);
-    _createGrid.call(this, boardDimensions); 
+    // _createGrid.call(this, boardDimensions); 
     Engine.pipe(sync);
 
     sync.on('start', function(data){
@@ -112,7 +113,7 @@ define(function(require, exports, module) {
         return 'up';
       }
     });
-    
+
   }
 
   BoardView.prototype = Object.create(View.prototype);
