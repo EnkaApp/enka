@@ -1,5 +1,7 @@
 /* globals define */
-
+ var boardDimensions = [5, 7];
+ var surfaces = [];
+ var xStart, yStart, xEnd, yEnd;  
 /**
  * BoardView is basically a grid layout with a bunch of views
  */
@@ -26,12 +28,7 @@ define(function(require, exports, module) {
     "touch"  : {},
     "scroll" : {scale : .5}
   });
-
-  var boardDimensions = [5, 7];
-  var surfaces = [];
-  
-  var xStart, yStart, xEnd, yEnd;    
-    
+   
   function _createBackground() {
     var bgSurface = new Surface({
       properties: {
