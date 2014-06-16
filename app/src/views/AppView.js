@@ -21,6 +21,7 @@ define(function(require, exports, module) {
     View.apply(this, arguments);
 
     _createGameView.call(this);
+    
   }
 
   AppView.prototype = Object.create(View.prototype);
