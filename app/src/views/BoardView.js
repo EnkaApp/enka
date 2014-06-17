@@ -75,7 +75,10 @@ define(function(require, exports, module) {
     _createBackground.call(this);
     
     var gridController = new GridController();
-    gridController.getCoords();
+    for(var i = 0; i < 35; i++){
+
+      gridController.getCoords(i);
+    }
 
     Engine.pipe(sync);
 

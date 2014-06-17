@@ -3,9 +3,19 @@ define(function(require, exports, module) {
   var rows;
   var columns;
 
+ function getY(index){
+    for(var row = 0; row < rows; row++){
+      if(index < columns){
+        return row;
+      }else if( (index >= (columns * row)) && index < ( columns * (row + 1) )){
+        return row;
+      } 
+    }
+  }
+
   function getX(index){
-    
-  };
+    return index % columns;
+  }
 
   function GridController(dimensions) {
     if(!dimensions) dimensions = [];
@@ -27,13 +37,17 @@ define(function(require, exports, module) {
   GridController.prototype.getCoords = function(index){
     // return xy coords
     var coords = {
-      x: 0,
-      y: 0
+      x: getX(index),
+      y: getY(index)
     }
     var size = this.getPieceSize();
-    coords.x = size * index;
-    coords.y = size * index;
-    console.log(size);
+    xPix = getX(index) * size;
+    yPix = getY(index) * size;
+
+
+    console.log('index ' + index + ': (' + coords.x + ', ' + coords.y + ')');
+    console.log('index ' + index + ': (' + xPix + ', ' + yPix + ')')
+
   }
   GridController.prototype.isEmpty = function(index){
     return boolean 
