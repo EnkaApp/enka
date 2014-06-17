@@ -71,6 +71,8 @@ define(function(require, exports, module) {
 
     var complete = function(){
       Engine.removeListener('prerender', prerender);
+
+      // TODO use a callback to chain animation sequences
       // if (callback) callback();
     };
 
@@ -105,6 +107,10 @@ define(function(require, exports, module) {
     }
   }
 
+  // @NOTE Keep this canvas code here as an example...
+  // @TODO Figure out why canvas animations tied into the 'prerender'
+  // event don't actually appear on the screen
+  // 
   // function _createLetter(letter) {
 
   //   var options = {
@@ -140,21 +146,18 @@ define(function(require, exports, module) {
   //     context.rect(options.x, options.y, height, height);
   //     context.fillStyle = options.fill;
   //     context.fill();
-
-  //     // redraw
-  //     // Engine.nextTick(_render);
   //   }
 
   //   Engine.on('prerender', _render);
-
-  //   // start the drawing process
-  //   // _render();
 
   //   var complete = function(){
   //     Engine.removeListener('prerender', _render);
   //     // this.letter = canvas;
   //     // if (callback) callback();
   //   };
+
+  //   // start the drawing process
+  //   // _render();
 
   //   transitionable.set(end, transition, complete);
 
