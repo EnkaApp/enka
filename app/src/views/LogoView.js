@@ -56,13 +56,6 @@ define(function(require, exports, module) {
   }
 
   function _createLogoBrand() {
-    // create the A
-
-    // create the N
-
-    // create the K
-
-    // create the F
     var letterF = new LetterView('F');
     
     var fModifier = new StateModifier({
@@ -79,7 +72,7 @@ define(function(require, exports, module) {
     _createLogoBg.call(this);
     this.showLogo();
 
-    // Uncomment for testing logo
+    // Uncomment for testing logo background
     // var open = true;
     // Engine.on('click', function() {
     //   _toggleBg.call(this, open);

@@ -29,19 +29,6 @@ define(function(require, exports, module) {
     this.layout.menu.add(menu);
   }
 
-  // This places itself on top of all other elements... why?
-  // function _createPageBg() {
-  //   this.bgHome = new Surface();
-
-  //   this.bgHome.setClasses(['bg-home']);
-
-  //   var mod = new StateModifier({
-  //     Transform: Transform.behind
-  //   });
-
-  //   this.add(mod).add(this.bgHome);
-  // }
-
   function HomeView() {
     View.apply(this, arguments);
 
