@@ -44,19 +44,17 @@ define(function(require, exports, module) {
     xPix = getX(index) * size;
     yPix = getY(index) * size;
 
-
     console.log('index ' + index + ': (' + coords.x + ', ' + coords.y + ')');
     console.log('index ' + index + ': (' + xPix + ', ' + yPix + ')')
 
   }
   GridController.prototype.isEmpty = function(index){
-    return boolean 
-  }
-  GridController.prototype.updateState = function(index, piece){
-    // pushes piece to index
+    return this._state === null;
   }
   GridController.prototype.findSameColorWithPath = function(index, piece){
     // return array of connected pieces of same color, not including piece
+    
+
   }
   GridController.prototype.canMove = function(index){
     // returns bool

@@ -121,7 +121,7 @@ define(function(require, exports, module) {
     height: 100,
     frontBgColor: 'blue',
     backBgColor: 'red',
-    direction: 'right',
+    direction: 'left',
     obstacle: false
   };
 

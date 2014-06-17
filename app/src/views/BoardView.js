@@ -70,9 +70,14 @@ define(function(require, exports, module) {
   //   this.add(grid);
   // }
 
+  function addPiece(index){
+    var piece = new PieceView();
+    this.add(piece)
+  }
   function BoardView() {
     View.apply(this, arguments);
     _createBackground.call(this);
+    addPiece.call(this);
     
     var gridController = new GridController();
     for(var i = 0; i < 35; i++){
