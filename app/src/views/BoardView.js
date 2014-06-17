@@ -1,17 +1,14 @@
 /* globals define */
- var boardDimensions = [5, 7];
  var surfaces = [];
  var xStart, yStart, xEnd, yEnd;  
-/**
- * BoardView is basically a grid layout with a bunch of views
- */
+ // var boardDimensions = [10, 10]
+
 define(function(require, exports, module) {
   var Engine        = require('famous/core/Engine')
   var View          = require('famous/core/View');
   var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
-  var GridLayout    = require('famous/views/GridLayout');
   var EventHandler  = require('famous/core/EventHandler');
   var MouseSync     = require('famous/inputs/MouseSync');
   var TouchSync     = require('famous/inputs/TouchSync');
@@ -75,20 +72,20 @@ define(function(require, exports, module) {
 
   function BoardView() {
     View.apply(this, arguments);
-    // var piece = new PieceView();
-    // console.log(piece);
-
     _createBackground.call(this);
-    // _createGrid.call(this, boardDimensions); 
+    
+    var gridController = new GridController();
+    gridController.getCoords();
+
     Engine.pipe(sync);
 
     sync.on('start', function(data){
       xStart = data.clientX;
       yStart = data.clientY;
+      console.log(xStart + ' ' + yStart);
     });
 
     sync.on('end', function(data){
-      
       xEnd = data.clientX;
       yEnd = data.clientY;
 

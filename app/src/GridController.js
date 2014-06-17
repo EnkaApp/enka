@@ -1,16 +1,39 @@
 
 define(function(require, exports, module) {
-  
-  function GridController() {
+  var rows;
+  var columns;
+
+  function getX(index){
+    
+  };
+
+  function GridController(dimensions) {
+    if(!dimensions) dimensions = [];
     this._state = [];
+    createGrid.call(this, dimensions);
   }
-  
-  function createGrid(){
-
+  function createGrid(dimensions){
+    if(!dimensions) dimensions = [];
+    rows = dimensions[0] || GridController.DEFAULT_OPTIONS.rows;
+    columns = dimensions[1] || GridController.DEFAULT_OPTIONS.columns;
+    var length = rows * columns;
+    for(var i = 0; i < length; i++){
+      this._state.push(null);
+    }
   }
-
+  GridController.prototype.getPieceSize = function(dimensions){
+    return window.innerWidth / columns;
+  };
   GridController.prototype.getCoords = function(index){
     // return xy coords
+    var coords = {
+      x: 0,
+      y: 0
+    }
+    var size = this.getPieceSize();
+    coords.x = size * index;
+    coords.y = size * index;
+    console.log(size);
   }
   GridController.prototype.isEmpty = function(index){
     return boolean 
@@ -26,8 +49,8 @@ define(function(require, exports, module) {
   }
 
   GridController.DEFAULT_OPTIONS = {
-    columns: 5,
-    rows: 5
+    rows: 7,
+    columns: 5
   };
 
   module.exports = GridController;
