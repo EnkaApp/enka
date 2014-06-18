@@ -192,27 +192,6 @@ define(function(require, exports, module) {
 
 
 
-
-
-
-      // lastPiece.reflect()
-
-
-      // create another piece of same color with correct direction
-      // then add piece to centerNode as well on top of other piece
-      
-
-      // and reflect to indicated position
-      // piece.reflect();
-      // lastPiece = piece;
-
-      // now i need to add another piece
-      // to the position of the latestIndex
-      // with the same color as the backBG of the last piece added
-
-      // the problem is, i need to assign the direction to 
-      // this piece, only on the next swipe
-
       var piece = gridController.newPiece({
         width: pieceSize[0],
         height: pieceSize[1],
@@ -248,25 +227,8 @@ define(function(require, exports, module) {
 //-------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
-
-    // CREATING PIECEMODIFIER TO ADD TO BOARD BASED OFF OF ABOVE COORDINATES,
-    // THEN ADDING THAT MODIFIER TO THE BOARD 
-    // THEN ADDING THE LAST PIECE CREATED TO THAT MODIFIER
-//-------------------------------------------------------------------------
-
       
 
-//-------------------------------------------------------------------------
 
 
     }); // <---- END SYNC.ON('END')********************************************
