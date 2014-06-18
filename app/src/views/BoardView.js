@@ -1,6 +1,5 @@
 /* globals define */
- var xStart, yStart, xEnd, yEnd;  
- var boardDimensions = [5, 7];
+var xStart, yStart, xEnd, yEnd;  
 
 define(function(require, exports, module) {
   var Engine        = require('famous/core/Engine')
@@ -41,12 +40,16 @@ define(function(require, exports, module) {
   function BoardView() {
     View.apply(this, arguments);
 
+    var currentIndex;
+    var previousIndex;
+    var nextIndex;
+
     _createBackground.call(this);
     var viewSize = this.getSize();
-    var gridController = new GridController(boardDimensions);
+    var gridController = new GridController(this.dimensions);
 
     var pieceSize = gridController.getPieceSize(viewSize);
-    var piecePosition = gridController.getXYCoords(17, pieceSize[0]);
+    var piecePosition = gridController.getXYCoords(this.getCenterIndex(), pieceSize[0]);
     console.log('piecePosition: ', piecePosition);
 
     var pieceModifier = new StateModifier({
@@ -128,8 +131,13 @@ define(function(require, exports, module) {
 
   BoardView.prototype = Object.create(View.prototype);
   BoardView.prototype.constructor = BoardView;
+  BoardView.prototype.getCenterIndex = function(){
+    var length = this.options.dimensions[0] * this.options.dimensions[1];
+    return (length - 1) / 2;
+  }
 
   BoardView.DEFAULT_OPTIONS = {
+    dimensions: [5, 7]
   };
 
   module.exports = BoardView;
