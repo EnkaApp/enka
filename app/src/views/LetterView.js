@@ -9,6 +9,7 @@ define(function(require, exports, module) {
   var Modifier      = require('famous/core/Modifier');
   var Transitionable = require('famous/transitions/Transitionable');
   var Easing        = require('famous/transitions/Easing');
+  var Timer         = require('famous/utilities/Timer');
 
   var letters = {
     F: {
@@ -54,32 +55,34 @@ define(function(require, exports, module) {
   }
 
   function _animateLetterSurface(node, options) {
-    var transition = {duration: 400, curve: Easing.inOutQuad };
+    Timer.setTimeout(function(i) {
+      var transition = {duration: 300, curve: Easing.inOutQuad };
 
-    var start = 0;
-    var end = !options.width && options.size[0] || !options.height && options.size[1];
+      var start = 0;
+      var end = !options.width && options.size[0] || !options.height && options.size[1];
 
-    var transitionable = new Transitionable(start);
+      var transitionable = new Transitionable(start);
 
-    var prerender = function(){
-      var width = options.width || transitionable.get();
-      var height = options.height || transitionable.get();
+      var prerender = function(){
+        var width = options.width || transitionable.get();
+        var height = options.height || transitionable.get();
 
-      node.setOptions({
-        size: [width, height]
-      });
-    }.bind(this);
+        node.setOptions({
+          size: [width, height]
+        });
+      }.bind(this);
 
-    var complete = function(){
-      Engine.removeListener('prerender', prerender);
+      var complete = function(){
+        Engine.removeListener('prerender', prerender);
 
-      // TODO use a callback to chain animation sequences
-      // if (callback) callback();
-    };
+        // TODO use a callback to chain animation sequences
+        // if (callback) callback();
+      };
 
-    Engine.on('prerender', prerender);
+      Engine.on('prerender', prerender);
 
-    transitionable.set(end, transition, complete);
+      transitionable.set(end, transition, complete);
+    }.bind(this, options.index), options.index * 300);
   }
 
   function _createLetter(letter) {
@@ -90,6 +93,8 @@ define(function(require, exports, module) {
 
     for (var i = 0; i < letter.surfaces.length; i++) {
       var options = _.extend({}, letter.surfaces[i]);
+
+      options.index = i;
 
       if (letter.animationChain[i] === 'width') {
         options.height = options.size[1];
