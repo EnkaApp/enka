@@ -17,7 +17,9 @@ define(function(require, exports, module) {
   function _createLogoBg() {
     this.bg = new Surface({
       size: [0, this.options.height],
-      properties: {},
+      properties: {
+        pointerEvents: 'none'
+      }
     });
 
     this.bg.setClasses(['bg-logo']);

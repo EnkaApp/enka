@@ -13,7 +13,8 @@ module.exports =  function (grunt) {
         open: true,
         base: [
           '.tmp',
-          '<%= config.app %>'
+          '<%= config.app %>',
+          '<%= config.app %>/assets'
         ]
       }
     },

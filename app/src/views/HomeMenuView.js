@@ -31,11 +31,20 @@ define(function(require, exports, module) {
     this.add(mod).add(this.btnAbout);
   }
 
+  function _setListeners() {
+    this.btnPlay.on('nav:loadStages', function() {
+      this._eventOutput.emit('nav:loadStages');
+    }.bind(this));
+  }
+
   function HomeMenuView() {
     View.apply(this, arguments);
 
     _createPlayButton.call(this);
     _createAboutButton.call(this);
+
+    // Pipe the event up
+    _setListeners.call(this);
   }
 
   HomeMenuView.prototype = Object.create(View.prototype);
