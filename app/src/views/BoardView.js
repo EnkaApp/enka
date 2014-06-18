@@ -189,9 +189,6 @@ define(function(require, exports, module) {
         direction = 'up';
       }
 
-
-
-
       var piece = gridController.newPiece({
         width: pieceSize[0],
         height: pieceSize[1],
@@ -209,7 +206,7 @@ define(function(require, exports, module) {
 
       self.add(pieceModifier).add(piece);
       console.log(piece);
-      piece.reflect();
+      console.log('broken: ', piece.reflect());
 
 
 

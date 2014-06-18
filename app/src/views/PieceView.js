@@ -124,11 +124,12 @@ define(function(require, exports, module) {
     obstacle: false
   };
 
-  var toggle = false;
   PieceView.prototype.reflect = function () {
-    var angle = toggle ? 0 : Math.PI;
+    // var toggle = false;
+    // var angle = toggle ? 0 : Math.PI;
+    var angle = Math.PI;
     this.reflector.setAngle(angle, {curve : 'linear', duration : 500});
-    toggle = !toggle;
+    // toggle = !toggle;
   };
 
   module.exports = PieceView;
