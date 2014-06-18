@@ -40,7 +40,8 @@ define(function(require, exports, module) {
       size: [options.width, options.height],
       properties: {
         backgroundColor: options.backgroundColor,
-        zIndex: options.zIndex
+        zIndex: options.zIndex,
+        pointerEvents: 'none'
       }
     });
   }

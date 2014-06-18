@@ -7,23 +7,22 @@ define(function(require, exports, module) {
   var StateModifier = require('famous/modifiers/StateModifier');
 
   function _createBackground() {
-    var bg = new Surface({
+    this.buttonBackground = new Surface({
       size: [this.options.width, this.options.height]
     });
 
     var classes = ['btn-bg'].concat(this.options.classes);
-    bg.setClasses(classes);
+    this.buttonBackground.setClasses(classes);
 
-    this.add(bg);
+    this.add(this.buttonBackground);
   }
 
   function _createTitle() {
     
     var title = new Surface({
-      // size: [true, true],
       content: this.options.content,
       properties: {
-        pointerEvents : 'none'
+        pointerEvents: 'none'
       }
     });
 
@@ -37,11 +36,20 @@ define(function(require, exports, module) {
     this.add(mod).add(title);
   }
 
+  function _setListeners() {
+    this.buttonBackground.on('click', function() {
+      this._eventOutput.emit('nav:loadStages');
+    }.bind(this));
+  }
+
   function HomeButtonView() {
     View.apply(this, arguments);
 
     _createBackground.call(this);
     _createTitle.call(this);
+
+    // Pipe click event up
+    _setListeners.call(this);
   }
 
   HomeButtonView.prototype = Object.create(View.prototype);

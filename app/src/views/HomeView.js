@@ -17,6 +17,28 @@ define(function(require, exports, module) {
   var HomeMenuView = require('./HomeMenuView');
   var LogoView = require('./LogoView');
 
+  function _createLayout() {
+    this.layout = new HomeLayout();
+
+    var modifier = new StateModifier({
+      tranform: Transform.translate(0, 0, 0.1)
+    });
+
+    this.add(this.layout);
+  }
+
+  function _createBackground() {
+    this.bg = new Surface({
+      properties: {
+        backgroundColor: '#FFFFFF'
+      }
+    });
+
+    this.bg.setClasses(['bg-home']);
+
+    this.add(this.bg);
+  }
+
   function _createLogo() {
     var logo = new LogoView();
 
@@ -24,18 +46,30 @@ define(function(require, exports, module) {
   }
 
   function _createMenu() {
-    var menu = new HomeMenuView();
+    this.menuView = new HomeMenuView();
 
-    this.layout.menu.add(menu);
+    this.layout.menu.add(this.menuView);
+  }
+
+  function _setListeners() {
+    this.menuView.on('nav:loadStages', function() {
+      this._eventOutput.emit('nav:loadStages');
+    }.bind(this));
+
+    // Listen for event from AppView
+    this.bg.pipe(this._eventOutput);
   }
 
   function HomeView() {
     View.apply(this, arguments);
 
-    this.layout = new HomeLayout();
-
+    _createBackground.call(this);
+    _createLayout.call(this);
     _createLogo.call(this);
     _createMenu.call(this);
+
+    // Pipe button events to parent
+    _setListeners.call(this);
 
     this.add(this.layout);
   }
