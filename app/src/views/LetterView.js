@@ -55,8 +55,10 @@ define(function(require, exports, module) {
   }
 
   function _animateLetterSurface(node, options) {
+    var dur = 250;
+
     Timer.setTimeout(function(i) {
-      var transition = {duration: 300, curve: Easing.inOutQuad };
+      var transition = {duration: dur, curve: Easing.inOutQuad };
 
       var start = 0;
       var end = !options.width && options.size[0] || !options.height && options.size[1];
@@ -70,19 +72,16 @@ define(function(require, exports, module) {
         node.setOptions({
           size: [width, height]
         });
-      }.bind(this);
+      };
 
       var complete = function(){
         Engine.removeListener('prerender', prerender);
-
-        // TODO use a callback to chain animation sequences
-        // if (callback) callback();
       };
 
       Engine.on('prerender', prerender);
 
       transitionable.set(end, transition, complete);
-    }.bind(this, options.index), options.index * 300);
+    }.bind(this, options.index), options.index * dur);
   }
 
   function _createLetter(letter) {
