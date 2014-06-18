@@ -35,7 +35,6 @@ define(function(require, exports, module) {
     columns = dimensions[0] || GridController.DEFAULT_OPTIONS.columns;
     rows = dimensions[1] || GridController.DEFAULT_OPTIONS.rows;
     var length = rows * columns;
-    console.log(length);
     for(var i = 0; i < length; i++){
       state.push(null); 
     }
@@ -71,11 +70,7 @@ define(function(require, exports, module) {
   // }
 
   GridController.prototype.getPieceSize = function(viewSize){
-    console.log('viewPortWidth: ', viewSize[0]);
-    console.log('viewPortHeight: ', viewSize[1]);
-    console.log('columns: ', columns)
     var pSize =  viewSize[0] / columns;
-    console.log(pSize);
     return [pSize, pSize];
   };
 
@@ -92,8 +87,8 @@ define(function(require, exports, module) {
     yPix = getY(index) * size;
     xyCoords.push(xPix, yPix);
 
-    console.log('index ' + index + ': (' + coords.x + ', ' + coords.y + ')');
-    console.log('index ' + index + ': (' + xPix + ', ' + yPix + ')')
+    console.log('coordinates@index ' + index + ': ' + '(' + coords.x + ', ' + coords.y + ')');
+    console.log('pixelPosition@index ' + index + ': (' + xPix + ', ' + yPix + ')')
     console.log('xyCoords: ', xyCoords);
 
     return xyCoords;

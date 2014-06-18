@@ -38,60 +38,135 @@ define(function(require, exports, module) {
   
 
   function BoardView() {
-    View.apply(this, arguments);
 
-    var currentIndex;
+        // INITIAL SETUP
+// ----------------------------------------------------------------------
+
+    View.apply(this, arguments);
+    var self = this;
+    //store columns and rows
+    var columns = this.options.dimensions[0];
+    var rows = this.options.dimensions[1];
+    console.log('columns: ', columns);
+    console.log('rows: ', rows);
+
+    // index variables;
+    // currentIndex starts at center
+    var currentIndex = this.getCenterIndex();
+    console.log('startIndex (center): ', this.getCenterIndex())
     var previousIndex;
     var nextIndex;
 
+    // creates blackBackground
     _createBackground.call(this);
+
+    // size of viewport
     var viewSize = this.getSize();
+    console.log('viewPortSize: ', viewSize);
+
+    //creates array of state, set to null
+    //gives us access to gridControllerMethods
     var gridController = new GridController(this.dimensions);
 
-    var pieceSize = gridController.getPieceSize(viewSize);
-    var piecePosition = gridController.getXYCoords(this.getCenterIndex(), pieceSize[0]);
-    console.log('piecePosition: ', piecePosition);
 
-    var pieceModifier = new StateModifier({
+
+
+
+
+
+
+
+
+    // SETUP BOARD WITH FIRST PIECE IN CENTER
+// ----------------------------------------------------------------------
+
+    // sets piece size based off of view size
+    var pieceSize = gridController.getPieceSize(viewSize);
+    console.log('pieceSize: ', pieceSize);
+
+    // determines coordinates of piece on grid relative to (0, 0)
+    // based on index and pieceSize
+    var piecePosition = gridController.getXYCoords(currentIndex, pieceSize[0]);
+    console.log('piecePosition: ', piecePosition);
+    console.log('translatePosition x:' + piecePosition[0] +' y:'+ piecePosition[1] + ' z:' + '0' );
+
+    // responsible for placing piece at center (after attaching piece)
+    var centerModifier = new StateModifier({
       origin: [0,0],
       align: [0,0],
       size: pieceSize,
       transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
     });
 
+    // attach modifier to board
+    var centerNode = this.add(centerModifier);
 
-    var piece = new Surface({
-      size: [pieceSize[0], pieceSize[1]],
-      properties: {
-        backgroundColor: 'blue'
-      }
+    var centerPiece = gridController.newPiece({
+      width: pieceSize[0],
+      height: pieceSize[1],
+      frontBgColor: 'blue',
+      backBgColor: 'red',
+      direction: 'left'
     });
 
-    var node = this.add(pieceModifier);
-    node.add(piece);
-
-
-    // var piece = gridController.newPiece({
-    //   width: pieceSize[0],
-    //   height: pieceSize[1]
-    // });
-    // node.add(piece);
-
-
-
+    // attach piece to centerModifier to drop piece in middle
+    centerNode.add(centerPiece);
 
     Engine.pipe(sync);
+
+
+
+
+
+
+
+        // EVENT LISTENERS
+// ----------------------------------------------------------------------
+
+
+
+    // BEGIN SYNC.ON(START)
+// ----------------------------------------------------------------------
 
     sync.on('start', function(data){ // add same color piece here
       xStart = data.clientX;
       yStart = data.clientY;
-      console.log(xStart + ' ' + yStart);
     });
+    // END SYNC.ON(START)
+// ----------------------------------------------------------------------
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // BEGIN SYNC.ON(END)
+// ----------------------------------------------------------------------
     sync.on('end', function(data){ // animate 
       xEnd = data.clientX;
       yEnd = data.clientY;
       var direction;
+
+
+
+
+
+
+
+
+
+
+      // GET SWIPE DIRECTION
+// ----------------------------------------------------------------------
 
       // swipe right
       if(xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)){
@@ -113,28 +188,140 @@ define(function(require, exports, module) {
         console.log('up');
         direction = 'up';
       }
-      // get piece to swipe based on direction
+
+
+
+
+
+
+
+      // lastPiece.reflect()
+
+
+      // create another piece of same color with correct direction
+      // then add piece to centerNode as well on top of other piece
+      
+
+      // and reflect to indicated position
+      // piece.reflect();
+      // lastPiece = piece;
+
+      // now i need to add another piece
+      // to the position of the latestIndex
+      // with the same color as the backBG of the last piece added
+
+      // the problem is, i need to assign the direction to 
+      // this piece, only on the next swipe
+
       var piece = gridController.newPiece({
         width: pieceSize[0],
         height: pieceSize[1],
-        frontBgColor: 'green',
+        frontBgColor: 'blue',
         backBgColor: 'red',
         direction: direction
       });
+
+      var pieceModifier = new StateModifier({
+        origin: [0,0],
+        align: [0,0],
+        size: pieceSize,
+        transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
+      });
+
+      self.add(pieceModifier).add(piece);
       console.log(piece);
-      node.add(piece);
       piece.reflect();
 
-    });
 
-  }
+
+  // GETS NEW INDEX AND COORDINATES BASED OFF OF SWIPE DIRECTION
+//-------------------------------------------------------------------------
+      var newIndex = BoardView.prototype.getNewIndex(currentIndex, direction, columns);
+      console.log('oldIndex: ', currentIndex);
+      console.log('newIndex: ', newIndex);
+      currentIndex = newIndex;
+      // console.log('currentIndex: ', currentIndex);
+      // console.log('pieceSize: ', pieceSize);
+
+      piecePosition = gridController.getXYCoords(currentIndex, pieceSize[0]);
+      // console.log('newPiecePosition: ', piecePosition);
+//-------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // CREATING PIECEMODIFIER TO ADD TO BOARD BASED OFF OF ABOVE COORDINATES,
+    // THEN ADDING THAT MODIFIER TO THE BOARD 
+    // THEN ADDING THE LAST PIECE CREATED TO THAT MODIFIER
+//-------------------------------------------------------------------------
+
+      
+
+//-------------------------------------------------------------------------
+
+
+    }); // <---- END SYNC.ON('END')********************************************
+
+  }// <---- END BOARDVIEW FUNCTION
+// *********************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+    // ADD METHODS
+//-------------------------------------------------------------------------
 
   BoardView.prototype = Object.create(View.prototype);
   BoardView.prototype.constructor = BoardView;
+
   BoardView.prototype.getCenterIndex = function(){
     var length = this.options.dimensions[0] * this.options.dimensions[1];
     return (length - 1) / 2;
   }
+
+  BoardView.prototype.getNewIndex = function(currentIndex, direction, columns){
+    if(direction === 'left'){
+      return currentIndex - 1;
+    }
+    if(direction === 'right'){
+      return currentIndex + 1;
+    }
+    if(direction === 'up'){
+      return currentIndex - columns ;
+    }
+    if(direction === 'down'){
+      return currentIndex + columns;
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+// ADD DEFAULT OPTIONS TO BOARVIEW AND AND BOARDVIEW TO EXPORTS
+//-------------------------------------------------------------------------
+
 
   BoardView.DEFAULT_OPTIONS = {
     dimensions: [5, 7]
