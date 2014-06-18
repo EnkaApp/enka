@@ -17,7 +17,6 @@ define(function(require, exports, module) {
   // ## Custom Modifier Classes
   // var ReflectionModifier = require('../modifiers/ReflectionModifier');
 
-
   // ## Constants
 
   var DIRECTIONS = {
@@ -72,6 +71,7 @@ define(function(require, exports, module) {
   }
 
   function _createFront() {
+    // console.log(size)
     var front = new Surface({
       content: 'front',
       size: [this.options.width, this.options.height],
@@ -88,10 +88,10 @@ define(function(require, exports, module) {
 
 
   // Add Event Handlers
-  function _addEventHandlers() {
-    this.front.on('click', this.reflect.bind(this));
-    this.back.on('click', this.reflect.bind(this));
-  }
+  // function _addEventHandlers() { 
+  //   this.front.on('click', this.reflect.bind(this));
+  //   this.back.on('click', this.reflect.bind(this));
+  // }
 
   function PieceView() {
 
@@ -100,17 +100,16 @@ define(function(require, exports, module) {
     this.reflector = new Reflector({
       direction: DIRECTIONS[this.options.direction]
     });
-
     this.back = _createBack.call(this);
     this.front = _createFront.call(this);
     
     this.reflector.setFront(this.front);
     this.reflector.setBack(this.back);
 
-    var node = _addReflectionModifier.call(this);
+    var node = _addReflectionModifier.call(this); 
     node.add(this.reflector);
 
-    _addEventHandlers.call(this);
+    // _addEventHandlers.call(this);                 
   }
 
   PieceView.prototype = Object.create(View.prototype);

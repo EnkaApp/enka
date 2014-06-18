@@ -1,7 +1,6 @@
 /* globals define */
- var surfaces = [];
  var xStart, yStart, xEnd, yEnd;  
- // var boardDimensions = [10, 10]
+ var boardDimensions = [5, 7];
 
 define(function(require, exports, module) {
   var Engine        = require('famous/core/Engine')
@@ -14,7 +13,6 @@ define(function(require, exports, module) {
   var TouchSync     = require('famous/inputs/TouchSync');
   var GenericSync   = require('famous/inputs/GenericSync');
   var Transitionable = require('famous/transitions/Transitionable');
-  var PieceView     = require('./PieceView');
   var GridController = require('../GridController');
 
   GenericSync.register({
@@ -29,6 +27,7 @@ define(function(require, exports, module) {
    
   function _createBackground() {
     var bgSurface = new Surface({
+      size: [window.innerWidth, window.innerHeight],
       properties: {
         backgroundColor: 'black'
       }
@@ -37,86 +36,92 @@ define(function(require, exports, module) {
     this.add(bgSurface);
   }
 
-  // function _createSurfaces() {
-  //   var size = boardDimensions[0] * boardDimensions[1];
-
-  //   for(var i = 0; i < size; i++){
-  //     // var x = getX(i);
-  //     // var y = getY(i);
-  //     surfaces.push(new Surface({
-  //       content: '' + i,
-  //       size: [undefined, undefined],
-  //       properties: {
-  //         color: 'black',
-  //         backgroundColor: 'hsl(100, 100%, 50%)',
-  //         textAlign: 'center',
-  //         pointerEvents: 'none'
-  //       }
-  //     }));
-  //   }
-
-  //   return surfaces;
-  // }
-  // remove grid layout
   
-  // function _createGrid(dimensions) {
-  //   var grid = new GridLayout({
-  //     dimensions: dimensions
-  //   });
 
-  //   var surfaces = _createSurfaces();
-  //   grid.sequenceFrom(surfaces);
-  //   console.log();
-  //   this.add(grid);
-  // }
-
-  function addPiece(index){
-    var piece = new PieceView();
-    this.add(piece)
-  }
   function BoardView() {
     View.apply(this, arguments);
-    _createBackground.call(this);
-    addPiece.call(this);
-    
-    var gridController = new GridController();
-    for(var i = 0; i < 35; i++){
 
-      gridController.getCoords(i);
-    }
+    _createBackground.call(this);
+    var viewSize = this.getSize();
+    var gridController = new GridController(boardDimensions);
+
+    var pieceSize = gridController.getPieceSize(viewSize);
+    var piecePosition = gridController.getXYCoords(17, pieceSize[0]);
+    console.log('piecePosition: ', piecePosition);
+
+    var pieceModifier = new StateModifier({
+      origin: [0,0],
+      align: [0,0],
+      size: pieceSize,
+      transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
+    });
+
+
+    var piece = new Surface({
+      size: [pieceSize[0], pieceSize[1]],
+      properties: {
+        backgroundColor: 'blue'
+      }
+    });
+
+    var node = this.add(pieceModifier);
+    node.add(piece);
+
+
+    // var piece = gridController.newPiece({
+    //   width: pieceSize[0],
+    //   height: pieceSize[1]
+    // });
+    // node.add(piece);
+
+
+
 
     Engine.pipe(sync);
 
-    sync.on('start', function(data){
+    sync.on('start', function(data){ // add same color piece here
       xStart = data.clientX;
       yStart = data.clientY;
       console.log(xStart + ' ' + yStart);
     });
 
-    sync.on('end', function(data){
+    sync.on('end', function(data){ // animate 
       xEnd = data.clientX;
       yEnd = data.clientY;
+      var direction;
 
       // swipe right
       if(xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)){
         console.log('right');
-        return 'right';
+        direction = 'right';
       }
       // swipe left
       if(xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd) ){
         console.log('left');
-        return 'left';
+        direction = 'left';
       }
       // swipe down
       if(yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)){
         console.log('down');
-        return 'down';
+        direction = 'down';
       }
       // swipe up
       if(yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ){
         console.log('up');
-        return 'up';
+        direction = 'up';
       }
+      // get piece to swipe based on direction
+      var piece = gridController.newPiece({
+        width: pieceSize[0],
+        height: pieceSize[1],
+        frontBgColor: 'green',
+        backBgColor: 'red',
+        direction: direction
+      });
+      console.log(piece);
+      node.add(piece);
+      piece.reflect();
+
     });
 
   }
