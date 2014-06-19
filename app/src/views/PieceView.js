@@ -57,7 +57,7 @@ define(function(require, exports, module) {
   // ## Surfaces
   function _createBack() {
     var back = new Surface({
-      content: 'back',
+      content: '',
       size: [this.options.width, this.options.height],
       origin: [0.5, 0.5],
       align: [0.5, 0.5],
@@ -73,7 +73,7 @@ define(function(require, exports, module) {
   function _createFront() {
     // console.log(size)
     var front = new Surface({
-      content: 'front',
+      content: '',
       size: [this.options.width, this.options.height],
       origin: [0.5, 0.5],
       align: [0.5, 0.5],

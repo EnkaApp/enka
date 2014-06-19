@@ -2,7 +2,6 @@
 define(function(require, exports, module) {
   var columns;
   var rows;
-  var state = [];
 
 
   var StateModifier = require('famous/modifiers/StateModifier');
@@ -26,6 +25,7 @@ define(function(require, exports, module) {
 
   function GridController(dimensions) {
     if(!dimensions) dimensions = [];
+    this._state = [];
     createGrid.call(this, dimensions);
 
   }
@@ -36,9 +36,9 @@ define(function(require, exports, module) {
     rows = dimensions[1] || GridController.DEFAULT_OPTIONS.rows;
     var length = rows * columns;
     for(var i = 0; i < length; i++){
-      state.push(null); 
+      this._state.push(null); 
     }
-    
+
   }
 
   GridController.prototype.newPiece = function(size){
@@ -46,34 +46,10 @@ define(function(require, exports, module) {
     return piece;
   }
 
-  // GridController.prototype.placeStartPiece = function(dimensions, pieceSize){
-  //   var length = dimensions[0] * dimensions[1];
-  //   var middle = (length - 1) / 2;
-  //   var midOrigin = GridController.prototype.getXYCoords(middle, pieceSize);
-  //   // placeRenderNodeHere
-  //   var piece = GridController.prototype.newPiece(pieceSize);
-
-  //   console.log('midOrigin: ' + midOrigin[0] + ' ' + midOrigin[1]);
-  //   var centerModifier = new StateModifier({
-  //     // why does y need to be zero instead of midOrigin[1]?? // *******************************
-  //     transform: Transform.translate(midOrigin[0], 0, 0) 
-  //   });
-  //   state[middle] = piece;
-  //   this.add(centerModifier).add(piece);
-  //   console.log('this: ', this);
-
-  //   console.log('piece: ', piece);
-  //   console.log('boardLength: ', length);
-  //   console.log('middleIndex: ', middle);
-  //   console.log('midOrigin: ', midOrigin);
-  //   console.log(state);
-  // }
-
   GridController.prototype.getPieceSize = function(viewSize){
     var pSize =  viewSize[0] / columns;
     return [pSize, pSize];
   };
-
 
   GridController.prototype.getXYCoords = function(index, pieceSize){
     // return xy coords

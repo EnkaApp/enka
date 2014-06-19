@@ -43,11 +43,10 @@ define(function(require, exports, module) {
 // ----------------------------------------------------------------------
 
     View.apply(this, arguments);
-    var self = this;
-    //store columns and rows
-    var columns = this.options.dimensions[0];
+    //store this.columns and rows
+    this.columns = this.options.dimensions[0];
     var rows = this.options.dimensions[1];
-    console.log('columns: ', columns);
+    console.log('this.columns: ', this.columns);
     console.log('rows: ', rows);
 
     // index variables;
@@ -65,10 +64,9 @@ define(function(require, exports, module) {
     console.log('viewPortSize: ', viewSize);
 
     //creates array of state, set to null
-    //gives us access to gridControllerMethods
-    var gridController = new GridController(this.dimensions);
-
-
+    //gives us access to this.gridControllerMethods
+    this.gridController = new GridController(this.dimensions);
+    console.log('gridState: ', this.gridController._state)
 
 
 
@@ -81,12 +79,12 @@ define(function(require, exports, module) {
 // ----------------------------------------------------------------------
 
     // sets piece size based off of view size
-    var pieceSize = gridController.getPieceSize(viewSize);
+    var pieceSize = this.gridController.getPieceSize(viewSize);
     console.log('pieceSize: ', pieceSize);
 
     // determines coordinates of piece on grid relative to (0, 0)
     // based on index and pieceSize
-    var piecePosition = gridController.getXYCoords(currentIndex, pieceSize[0]);
+    var piecePosition = this.gridController.getXYCoords(currentIndex, pieceSize[0]);
     console.log('piecePosition: ', piecePosition);
     console.log('translatePosition x:' + piecePosition[0] +' y:'+ piecePosition[1] + ' z:' + '0' );
 
@@ -101,7 +99,7 @@ define(function(require, exports, module) {
     // attach modifier to board
     var centerNode = this.add(centerModifier);
 
-    var centerPiece = gridController.newPiece({
+    var centerPiece = this.gridController.newPiece({
       width: pieceSize[0],
       height: pieceSize[1],
       frontBgColor: 'blue',
@@ -111,6 +109,7 @@ define(function(require, exports, module) {
 
     // attach piece to centerModifier to drop piece in middle
     centerNode.add(centerPiece);
+    this.gridController._state[currentIndex] = centerPiece.options.frontBgColor;
 
     Engine.pipe(sync);
 
@@ -188,47 +187,51 @@ define(function(require, exports, module) {
         console.log('up');
         direction = 'up';
       }
+      console.log(currentIndex, direction, this.columns)
+      var newIndex = this.getNewIndex(currentIndex, direction, this.columns);
+      console.log('brokenINdex', newIndex);
 
-      var piece = gridController.newPiece({
-        width: pieceSize[0],
-        height: pieceSize[1],
-        frontBgColor: 'blue',
-        backBgColor: 'red',
-        direction: direction
-      });
+      if(!this.gridController._state[newIndex]){
 
-      var pieceModifier = new StateModifier({
-        origin: [0,0],
-        align: [0,0],
-        size: pieceSize,
-        transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
-      });
+        var piece = this.gridController.newPiece({
+          width: pieceSize[0],
+          height: pieceSize[1],
+          frontBgColor: 'blue',
+          backBgColor: 'red',
+          direction: direction
+        });
 
-      self.add(pieceModifier).add(piece);
-      console.log(piece);
-      console.log('broken: ', piece.reflect());
+        console.log('oldIndex: ', currentIndex);
+        console.log('newIndex: ', newIndex);
+        currentIndex = newIndex;
+
+        var pieceModifier = new StateModifier({
+          origin: [0,0],
+          align: [0,0],
+          size: pieceSize,
+          transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
+        });
+
+        this.add(pieceModifier).add(piece);
+        console.log(piece);
+        piece.reflect();
+
+        piecePosition = this.gridController.getXYCoords(currentIndex, pieceSize[0]);
+        console.log('cI', currentIndex)
+        this.gridController._state[currentIndex] = piece.options.backBgColor;
+        console.log('state: ', this.gridController._state);
+
+        this.checkIfHasMatch.call(this, newIndex, piece);
+        // checkIfTrapped(newIndex);
 
 
 
-  // GETS NEW INDEX AND COORDINATES BASED OFF OF SWIPE DIRECTION
-//-------------------------------------------------------------------------
-      var newIndex = BoardView.prototype.getNewIndex(currentIndex, direction, columns);
-      console.log('oldIndex: ', currentIndex);
-      console.log('newIndex: ', newIndex);
-      currentIndex = newIndex;
-      // console.log('currentIndex: ', currentIndex);
-      // console.log('pieceSize: ', pieceSize);
-
-      piecePosition = gridController.getXYCoords(currentIndex, pieceSize[0]);
-      // console.log('newPiecePosition: ', piecePosition);
-//-------------------------------------------------------------------------
-
-
+      }
       
 
 
 
-    }); // <---- END SYNC.ON('END')********************************************
+    }.bind(this)); // <---- END SYNC.ON('END')********************************************
 
   }// <---- END BOARDVIEW FUNCTION
 // *********************************************************************************
@@ -254,7 +257,22 @@ define(function(require, exports, module) {
     return (length - 1) / 2;
   }
 
-  BoardView.prototype.getNewIndex = function(currentIndex, direction, columns){
+  BoardView.prototype.checkIfHasMatch = function(index, piece){
+
+    var matches = 0;
+    if(this.gridController._state[this.getNewIndex(index, 'left', this.columns)] === piece.options.backBgColor){
+      matches++;
+      console.log(matches);
+    }
+
+  }
+  BoardView.prototype.checkIfTrapped = function(index){
+
+
+
+  }
+
+  BoardView.prototype.getNewIndex = function(currentIndex, direction){
     if(direction === 'left'){
       return currentIndex - 1;
     }
@@ -262,10 +280,10 @@ define(function(require, exports, module) {
       return currentIndex + 1;
     }
     if(direction === 'up'){
-      return currentIndex - columns ;
+      return currentIndex - this.columns ;
     }
     if(direction === 'down'){
-      return currentIndex + columns;
+      return currentIndex + this.columns;
     }
   }
 
