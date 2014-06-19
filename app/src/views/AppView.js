@@ -10,6 +10,7 @@ define(function(require, exports, module) {
   var Transitionable  = require('famous/transitions/Transitionable');
 
   // ## Views
+  var GameView    = require('views/GameView');
   var HomeView      = require('views/HomeView');
   var StagesView    = require('views/StagesView');
 
@@ -25,28 +26,26 @@ define(function(require, exports, module) {
 
   // ## Shared Variables
   var H = window.innerHeight;
-
-  function _createGameView() {
-    this.gameView = new GameView();
-    this.gameModifier = new StateModifier({
-      transform: Transform.translate(0,H,0)
-    });
-
-    this.add(this.gameModifier).add(this.gameView);
-  }
+  var W = window.innerWidth;
 
   // ## View Constructors
   function _createStagesView() {
     this.stagesView = new StagesView();
 
-    this.stagesModifier = new Modifier({
+    this.stagesYModifier = new Modifier({
       transform: function() {
-        var h = H - this.homeViewPos.get();
+        var h = H - this.homeViewYPos.get();
         return Transform.translate(0, h, 0);
       }.bind(this)
     });
 
-    this.add(this.stagesModifier).add(this.stagesView);
+    this.gameXModifier = new Modifier({
+      transform: function() {
+        return Transform.translate(-this.gameViewXPos.get(), 0, 0);
+      }.bind(this)
+    });
+
+    this.add(this.stagesYModifier).add(this.gameXModifier).add(this.stagesView);
   }
 
   function _createHomeView() {
@@ -54,12 +53,35 @@ define(function(require, exports, module) {
 
     this.homeModifier = new Modifier({
       transform: function() {
-        return Transform.translate(0, -this.homeViewPos.get(), 0);
+        return Transform.translate(0, -this.homeViewYPos.get(), 0);
       }.bind(this)
     });
 
-    this.add(this.homeModifier).add(this.homeView);
+    this.gameXModifier = new Modifier({
+      transform: function() {
+        return Transform.translate(-this.gameViewXPos.get(), 0, 0);
+      }.bind(this)
+    });
+
+    this.add(this.homeModifier).add(this.gameXModifier).add(this.homeView);
   }
+
+  function _createGameView() {
+    this.gameView = new GameView();
+
+    this.gameModifier = new Modifier({
+      opacity: function() {
+        return this.gameViewOpacity.get();
+      }.bind(this),
+      transform: function() {
+        var w = W - this.gameViewXPos.get();
+        return Transform.translate(w, 0, 0);
+      }.bind(this)
+    });
+
+    this.add(this.gameModifier).add(this.gameView);
+  }
+
 
   // ## Event Handlers/Listeners
 
@@ -85,8 +107,8 @@ define(function(require, exports, module) {
     sync.on('update', function(data) {
       // Only respond to input events if we are not within the scrollView
       if (!this.delegateToScrollView) {
-        var pos = this.homeViewPos.get();
-        this.homeViewPos.set(Math.max(0, pos + -data.delta));
+        var pos = this.homeViewYPos.get();
+        this.homeViewYPos.set(Math.max(0, pos + -data.delta));
       }
     }.bind(this));
 
@@ -94,7 +116,7 @@ define(function(require, exports, module) {
       // Only respond to input events if we are not within the scrollView
       if (!this.delegateToScrollView) {
         var velocity = data.velocity;
-        var position = this.homeViewPos.get();
+        var position = this.homeViewYPos.get();
       
         // Show Stages
         if (this.showingHome) {
@@ -130,6 +152,10 @@ define(function(require, exports, module) {
     this.homeView.on('nav:loadStages', function(){
       this.slideUp();
     }.bind(this));
+
+    this.homeView.on('nav:loadGame', function() {
+      this.slideLeft();
+    }.bind(this));
   }
 
   function AppView() {
@@ -138,13 +164,20 @@ define(function(require, exports, module) {
     this.showingHome = true;
     this.delegateToScrollView = false;
     
-    // @NOTE homeViewPos indicates the number of pixels ABOVE the top of the
+    // @NOTE homeViewYPos indicates the number of pixels ABOVE the top of the
     // document that homeView is currently positioned. 
-    // Also keep in mind that stagesView moves inversely to homeViewPos.
-    this.homeViewPos = new Transitionable(0);
+    // Also keep in mind that stagesView moves inversely to homeViewYPos.
+    this.homeViewYPos = new Transitionable(0);
+
+    // @NOTE gameViewXPos indicates the number of pixels RIGHT of the right edge
+    // of the document that gameView is currently positioned. 
+    // Also keep in mind that stagesView and homeView moves inversely to gameViewXPos.
+    this.gameViewXPos = new Transitionable(0);
+    this.gameViewOpacity = new Transitionable(0);
 
     _createStagesView.call(this);
     _createHomeView.call(this);
+    _createGameView.call(this);
 
     // Initialize Event Handlers
     _setListeners.call(this);
@@ -164,14 +197,27 @@ define(function(require, exports, module) {
   };
 
   AppView.prototype.slideUp = function() {
-    this.homeViewPos.set(H, this.options.transition, function() {
+    this.homeViewYPos.set(H, this.options.transition, function() {
       this.showingHome = false;
     });
   };
 
   AppView.prototype.slideDown = function() {
-    this.homeViewPos.set(0, this.options.transition, function() {
+    this.homeViewYPos.set(0, this.options.transition, function() {
       this.showingHome = true;
+    });
+  };
+
+  AppView.prototype.slideLeft = function() {
+    this.gameViewOpacity.set(1);
+    this.gameViewXPos.set(W, this.options.transition, function() {
+      this.showingStages = false;
+    });
+  };
+
+  AppView.prototype.slideRight = function() {
+    this.gameViewXPos.set(0, this.options.transition, function() {
+      this.showingStages = true;
     });
   };
 

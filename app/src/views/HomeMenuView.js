@@ -9,13 +9,30 @@ define(function(require, exports, module) {
   // ## Views
   var HomeButtonView = require('./HomeButtonView');
 
+  function _createResumeGameButton() {
+    this.btnResumeGame = new HomeButtonView({
+      content: 'Resume',
+      classes: ['btn-resume']
+    });
+
+    var mod = new StateModifier({
+      transform: Transform.translate(0, 0, 0)
+    });
+
+    this.add(mod).add(this.btnResumeGame);
+  }
+
   function _createPlayButton() {
     this.btnPlay = new HomeButtonView({
-      content: 'Play',
+      content: 'Stages',
       classes: ['btn-play']
     });
 
-    this.add(this.btnPlay);
+    var mod = new StateModifier({
+      transform: Transform.translate(0, 50, 0)
+    });
+
+    this.add(mod).add(this.btnPlay);
   }
 
   function _createAboutButton() {
@@ -25,15 +42,23 @@ define(function(require, exports, module) {
     });
 
     var mod = new StateModifier({
-      transform: Transform.translate(0, 50, 0)
+      transform: Transform.translate(0, 100, 0)
     });
 
     this.add(mod).add(this.btnAbout);
   }
 
   function _setListeners() {
-    this.btnPlay.on('nav:loadStages', function() {
+    this.btnPlay.on('click', function() {
       this._eventOutput.emit('nav:loadStages');
+    }.bind(this));
+
+    this.btnResumeGame.on('click', function() {
+      this._eventOutput.emit('nav:loadGame');
+    }.bind(this));
+
+    this.btnAbout.on('click', function() {
+      this._eventOutput.emit('nav:showAbout');
     }.bind(this));
   }
 
@@ -42,6 +67,7 @@ define(function(require, exports, module) {
 
     _createPlayButton.call(this);
     _createAboutButton.call(this);
+    _createResumeGameButton.call(this);
 
     // Pipe the event up
     _setListeners.call(this);

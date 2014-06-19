@@ -8,9 +8,19 @@ define(function(require, exports, module) {
   var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
+  var ContainerSurface = require('famous/surfaces/ContainerSurface');
 
   // ## Views
   var BoardView = require('./BoardView');
+
+  // function _createContainer() {
+  //   this.container = new ContainerSurface({
+  //     size: [undefined, undefined],
+  //     properties: {
+  //       visibility: 'hidden'
+  //     }
+  //   });
+  // }
 
   function _createBoardView() {
     this.boardView = new BoardView();
@@ -22,6 +32,7 @@ define(function(require, exports, module) {
   function GameView() {
     View.apply(this, arguments);
 
+    // _createContainer.call(this);
     _createBoardView.call(this);
   }
 

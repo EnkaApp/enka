@@ -12,6 +12,7 @@ define(function(require, exports, module) {
   var StateModifier = require('famous/modifiers/StateModifier');
   var Easing        = require('famous/transitions/Easing');
   var ContainerSurface = require('famous/surfaces/ContainerSurface');
+  var RenderNode    = require('famous/core/RenderNode');
 
   // ## Layout
   var Layout        = require('famous/views/HeaderFooterLayout');

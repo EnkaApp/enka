@@ -18,7 +18,9 @@ define(function(require, exports, module) {
   var LogoView = require('./LogoView');
 
   function _createLayout() {
-    this.layout = new HomeLayout();
+    this.layout = new HomeLayout({
+      menuTopMargin: 80
+    });
 
     var modifier = new StateModifier({
       tranform: Transform.translate(0, 0, 0.1)
@@ -54,6 +56,10 @@ define(function(require, exports, module) {
   function _setListeners() {
     this.menuView.on('nav:loadStages', function() {
       this._eventOutput.emit('nav:loadStages');
+    }.bind(this));
+
+    this.menuView.on('nav:loadGame', function() {
+      this._eventOutput.emit('nav:loadGame');
     }.bind(this));
 
     // Listen for event from AppView

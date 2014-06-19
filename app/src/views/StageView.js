@@ -31,6 +31,30 @@ define(function(require, exports, module) {
     });
 
     this.add(this.bgMod).add(this.bg);
+    // this.node.add(this.bgMod).add(this.bg);
+  }
+
+  function _createLevelButtonView() {
+    var buttonBg = new Surface({
+      size: [150, 35],
+      content: 'Start Playing',
+      properties: {
+        backgroundColor: 'black',
+        boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+        color: 'white',
+        textAlign: 'center'
+      }
+    });
+
+    var buttonMod = new StateModifier({
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5],
+      transform: Transform.inFront
+    });
+
+    // this.add(buttonMod).add(buttonBg);
+    // this.node.add(buttonMod).add(buttonBg);
+    // this.add(buttonBg);
   }
 
   // ## Event Handlers/Listeners    
@@ -52,7 +76,15 @@ define(function(require, exports, module) {
   function StageView() {
     View.apply(this, arguments);
 
+    // var viewMod = new Modifier({
+    //   size: [undefined, this.options.height]
+    // });
+
+    // this.node = this.add(viewMod);
+
     _createBackground.call(this);
+    // _createLevelButtonView.call(this);
+
     _setListeners.call(this);
   }
 

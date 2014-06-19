@@ -41,8 +41,8 @@ define(function(require, exports, module) {
 
   }
 
-  GridController.prototype.newPiece = function(size){
-    var piece = new PieceView(size);
+  GridController.prototype.newPiece = function(options){
+    var piece = new PieceView(options);
     return piece;
   }
 

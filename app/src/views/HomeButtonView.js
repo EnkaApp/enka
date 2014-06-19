@@ -38,7 +38,7 @@ define(function(require, exports, module) {
 
   function _setListeners() {
     this.buttonBackground.on('click', function() {
-      this._eventOutput.emit('nav:loadStages');
+      this._eventOutput.emit('click');
     }.bind(this));
   }
 

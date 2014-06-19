@@ -63,7 +63,8 @@ define(function(require, exports, module) {
       align: [0.5, 0.5],
       properties: {
         backgroundColor: this.options.backBgColor,
-        webkitBackfaceVisibility: 'visible'
+        webkitBackfaceVisibility: 'visible',
+        pointerEvents: 'none'
       }
     });
 
@@ -79,7 +80,8 @@ define(function(require, exports, module) {
       align: [0.5, 0.5],
       properties: {
         backgroundColor: this.options.frontBgColor,
-        webkitBackfaceVisibility: 'visible'
+        webkitBackfaceVisibility: 'visible',
+        pointerEvents: 'none'
       }
     });
 

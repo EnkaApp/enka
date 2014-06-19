@@ -1,8 +1,6 @@
 /* globals define */
-var xStart, yStart, xEnd, yEnd;  
-
 define(function(require, exports, module) {
-  var Engine        = require('famous/core/Engine')
+  var Engine        = require('famous/core/Engine');
   var View          = require('famous/core/View');
   var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
@@ -13,6 +11,8 @@ define(function(require, exports, module) {
   var GenericSync   = require('famous/inputs/GenericSync');
   var Transitionable = require('famous/transitions/Transitionable');
   var GridController = require('../GridController');
+  
+  var xStart, yStart, xEnd, yEnd;
 
   GenericSync.register({
     'touch': TouchSync
@@ -21,18 +21,18 @@ define(function(require, exports, module) {
   var sync = new GenericSync({
     "mouse"  : {},
     "touch"  : {},
-    "scroll" : {scale : .5}
+    // "scroll" : {scale : .5}
   });
    
   function _createBackground() {
-    var bgSurface = new Surface({
+    this.bgSurface = new Surface({
       size: [window.innerWidth, window.innerHeight],
       properties: {
         backgroundColor: 'black'
       }
     });
 
-    this.add(bgSurface);
+    this.add(this.bgSurface);
   }
 
   
@@ -111,7 +111,8 @@ define(function(require, exports, module) {
     centerNode.add(centerPiece);
     this.gridController._state[currentIndex] = centerPiece.options.frontBgColor;
 
-    Engine.pipe(sync);
+    // Engine.pipe(sync);
+    this.bgSurface.pipe(sync);
 
 
 
@@ -142,11 +143,8 @@ define(function(require, exports, module) {
 
 
 
-
-
-
-
-
+// TEMP - toggle changes the color so the animation looks right
+var toggle = false;
 
     // BEGIN SYNC.ON(END)
 // ----------------------------------------------------------------------
@@ -191,13 +189,25 @@ define(function(require, exports, module) {
       var newIndex = this.getNewIndex(currentIndex, direction, this.columns);
       console.log('brokenINdex', newIndex);
 
-      if(!this.gridController._state[newIndex]){
 
+      var frontBgColor = 'blue';
+      var backBgColor = 'red';
+
+      if (toggle) {
+        frontBgColor = 'red';
+        backBgColor = 'blue';
+      }
+
+      toggle = !toggle;
+
+
+      if(!this.gridController._state[newIndex]){
+        
         var piece = this.gridController.newPiece({
           width: pieceSize[0],
           height: pieceSize[1],
-          frontBgColor: 'blue',
-          backBgColor: 'red',
+          frontBgColor: frontBgColor,
+          backBgColor: backBgColor,
           direction: direction
         });
 
