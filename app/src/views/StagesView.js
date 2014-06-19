@@ -177,7 +177,7 @@ define(function(require, exports, module) {
     // set initial active stage
     this.prevIndex = this.options.activeStage - 1;
     this.activeIndex = this.options.activeStage - 1;
-    // this.loadStage();
+    this.loadStage();
   }
 
   StagesView.prototype = Object.create(View.prototype);
@@ -284,7 +284,7 @@ define(function(require, exports, module) {
     Engine.on('prerender', prerender);
     
     transitionable.set(yOffset, transition, complete);
-    // this.loadStage();
+    this.loadStage();
   };
 
   StagesView.prototype.loadStage = function() {
