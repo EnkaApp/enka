@@ -20,6 +20,7 @@ define(function(require, exports, module) {
       content: this.options.content,
       properties: {
         backgroundColor: this.options.backgroundColor,
+        boxShadow: '0 0 10px rgba(0,0,0,0.5)',
         color: 'white'
       }
     });
@@ -37,7 +38,8 @@ define(function(require, exports, module) {
     function handleClick(e) {
       this._eventOutput.emit('selectStage', {
         index: this.options.index,
-        backgroundColor: this.options.backgroundColor,
+        // backgroundColor: this.options.backgroundColor,
+        node: this,
         event: e
       });
     }

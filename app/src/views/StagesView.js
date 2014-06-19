@@ -24,7 +24,7 @@ define(function(require, exports, module) {
 
   function _createLayout() {
     this.layout = new Layout({
-      headerSize: this.options.headerSize
+      headerSize: this.options.headerHeight
     });
 
     var mod = new StateModifier({
@@ -72,6 +72,10 @@ define(function(require, exports, module) {
     bg.setClasses(['navbar']);
 
     // Modifiers
+    var headerMod = new StateModifier({
+      transform: Transform.translate(0,0,0.1)
+    });
+
     var bgMod = new StateModifier({
       transform: Transform.behind
     });
@@ -82,8 +86,9 @@ define(function(require, exports, module) {
       transform: Transform.translate(-12,0,0)
     });
 
-    this.layout.header.add(iconMod).add(this.homeIcon);
-    this.layout.header.add(bgMod).add(bg);
+    var node = this.layout.header.add(headerMod);
+    node.add(bgMod).add(bg);
+    node.add(iconMod).add(this.homeIcon);
   }
 
   // ## Setup layout.content
@@ -92,36 +97,28 @@ define(function(require, exports, module) {
     var view = new StageView({
       index: options.index,
       height: options.height,
-      backgroundColor: options.backgroundColor
+      backgroundColor: options.backgroundColor,
     });
 
     view.pipe(this.scrollView);
-    view.on('selectStage', this.loadStage.bind(this));
-
-    // var surface = new Surface({
-    //   size: [undefined, options.height],
-    //   properties: {
-    //     backgroundColor: options.backgroundColor
-    //     boxShadow: '0 0 10px rgba(0,0,0,0.5)'
-    //   }
-    // });
-
-    // surface.pipe(this.scrollView);
-    // surface.on('click', this.loadStage);
-    // return surface;
+    view.on('selectStage', this.scrollToStage.bind(this));
 
     return view;
   }
 
   function _createScrollView() {
     this.scrollViewNodes = [];
-    this.scrollView = new Scrollview({});
+    this.scrollView = new Scrollview({
+      // if paginated === true, a click event on a scrollview item 
+      // triggers ScrollView.goToNextPage so we can't use it
+      // paginated: true
+    });
 
-    for (var i = 0; i < 40; i++) {
+    for (var i = 0; i < 30; i++) {
       var node = _createScrollViewNode.call(this, {
         index: i,
         height: this.options.stripHeight,
-        backgroundColor: 'hsl(' + i * 360/40 + ', 100%, 50%)'
+        backgroundColor: 'hsl(' + i * 360/30 + ', 100%, 50%)'
       });
 
       this.scrollViewNodes.push(node);
@@ -131,10 +128,10 @@ define(function(require, exports, module) {
 
     this.scrollView._eventInput.on('end', function() {
 
-      // if the current scroll position is greater than 0 then we need to 
-      // tell AppView to stop responding to Touch/Scroll Events
+      // if we are not at the top edge tell AppView to stop responding 
+      // to Touch/Scroll Events
       // if (this.scrollView.getPosition() > 0) {
-      if (this.scrollView._scroller.onEdge() === -1) {
+      if (this.scrollView._scroller.onEdge() !== -1) {
         this._eventOutput.emit('stagesView:scrollViewInContent');
       } else {
         this._eventOutput.emit('stagesView:scrollViewEdgeHit');
@@ -144,12 +141,12 @@ define(function(require, exports, module) {
     this.scrollView.pipe(this._eventOutput);
   }
 
-  function _createBody() {
+  function _createContent() {
 
     _createScrollView.call(this);
 
     var mod = new StateModifier({
-      size: [undefined, H - this.options.headerSize],
+      size: [undefined, H - this.options.headerHeight],
       transform: Transform.translate(0, 0, 0)
     });
 
@@ -162,24 +159,34 @@ define(function(require, exports, module) {
     }.bind(this));
   }
 
+  function _getNodeAtIndex(index) {
+    return this.scrollViewNodes[index];
+  }
+
   function StagesView() {
     View.apply(this, arguments);
 
     // _createBackground.call(this);
     _createLayout.call(this);
     _createHeader.call(this);
-    _createBody.call(this);
+    _createContent.call(this);
     
     // Init Event Listeners
     _setListeners.call(this);
+
+    // set initial active stage
+    this.prevIndex = this.options.activeStage - 1;
+    this.activeIndex = this.options.activeStage - 1;
+    // this.loadStage();
   }
 
   StagesView.prototype = Object.create(View.prototype);
   StagesView.prototype.constructor = StagesView;
 
   StagesView.DEFAULT_OPTIONS = {
-    headerSize: 44,
-    stripHeight: 100
+    headerHeight: 44,
+    stripHeight: 100,
+    activeStage: 2
   };
 
   /**
@@ -206,25 +213,44 @@ define(function(require, exports, module) {
     }
   }
 
-  function _getYOffset(index, clickY, svPos) {
-    console.log(svPos, clickY);
+  function _getYOffset(index, clickY) {
+    
+    var svPos = this.scrollView.getPosition();
+
+    clickY -= this.options.headerHeight;
     var offset = clickY - clickY % this.options.stripHeight;
 
-    if (this.scrollView._scroller.onEdge() === -1) {
-      offset += this.options.headerSize;
+    // scrollView position is the number of pixels above the scrollview container
+    // that the first visible scrollview node is... so for instance if the bottom 5 pixels
+    // of the first visible node is showing and the node height is 100 then the scrollview 
+    // position is 95
+    //
+    // So in order to align the node with the top of the scrollview we need to adjust the
+    // offset if the scrollView position is greater than 0 but less than the node height
+    if (svPos > 0 && svPos < this.options.stripHeight) {
+      if (svPos <= this.options.stripHeight * 0.5) {
+        offset -= svPos;
+      } else {
+        offset += this.options.stripHeight - svPos;
+      }
     }
-    
+
     return offset;
   }
 
-  StagesView.prototype.loadStage = function(data) {
-    console.log('load stage', data, data.event);
-
+  StagesView.prototype.scrollToStage = function(data) {
     var e = data.event;
     var index = data.index;
+    var node = data.node;
+
+    // stop from executing if their is a second click on an already active node
+    if (this.activeIndex === index) return;
+    this.prevIndex = this.activeIndex;
+    this.activeIndex = index;
+
     var bgColor = data.backgroundColor;
     var transition = {
-      duration: 300,
+      duration: 250,
       curve: 'linear'
     };
 
@@ -251,78 +277,28 @@ define(function(require, exports, module) {
     var complete = function(){
       Engine.removeListener('prerender', prerender);
     };
-
-    var svPos = this.scrollView.getPosition();
-    var yOffset = _getYOffset.call(this, index, e.y, svPos);
+    
+    var yOffset = _getYOffset.call(this, index, e.y);
+    console.log(yOffset);
 
     Engine.on('prerender', prerender);
     
     transitionable.set(yOffset, transition, complete);
+    // this.loadStage();
   };
 
-  // StagesView.prototype.animateStrips = function(e){
+  StagesView.prototype.loadStage = function() {
+    var prevNode = _getNodeAtIndex.call(this, this.prevIndex);
+    var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
+    
+    // close the currently expanded node
+    if (this.prevIndex !== this.activeIndex) {
+      prevNode.contract();
+    }
 
-  //   if (this.options.active === true) {
-
-  //     this.options.active = false;
-
-  //     var stripIndex = e.index;
-  //     var durationBase = 450;
-
-  //     this.backgroundView.colorize(e.bgColor);
-  //     this.stripViews[stripIndex].animateIcon();
-  //     this.stripViews[stripIndex].animateText(stripIndex);
-
-  //     for(var i = 0; i < this.stripModifiers.length; i++){
-
-  //       if (i < stripIndex){
-  //           var yOffset = -this.options.stripHeight;
-  //           var duration = durationBase;
-  //           var z = i; 
-
-  //       } else if (i > stripIndex) {
-  //           var yOffset = 548; 
-  //           var duration = durationBase;
-  //           var z = i;
-
-  //       } else {
-  //           this.stripViews[i].expandBacking();
-  //           var yOffset = 0;
-  //           var duration = durationBase - 50;
-  //           var z = i;
-  //       }
-
-  //       //immediately set the z index based on direction...
-  //       this.stripModifiers[i].setTransform(
-  //       Transform.translate(0, this.options.topOffset + this.options.stripOffset * i, z));
-
-
-  //       this.animationComplete = false;
-
-  //       this.stripModifiers[i].setTransform(
-  //           Transform.translate(0, yOffset, z),{
-  //           duration: 500,
-  //           curve: Easing.outCubic
-  //       }, function() {
-
-  //           //hide all un-selected strips, once...
-  //           if (!this.animationComplete) {
-  //               this.animationComplete = true;
-
-  //               for(var i = 0; i < this.stripModifiers.length; i++) {
-
-  //                   if (i != stripIndex) {
-  //                       this.stripViews[i].hide();
-  //                   }
-
-  //               }
-  //           }
-
-  //       }.bind(this));
-  //     }
-
-  //   };
-  // };
+    // open the new node
+    activeNode.expand();
+  };
 
   module.exports = StagesView;
 });
