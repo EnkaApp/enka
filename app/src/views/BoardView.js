@@ -2,15 +2,15 @@
 var xStart, yStart, xEnd, yEnd;  
 
 define(function(require, exports, module) {
-  var Engine        = require('famous/core/Engine')
-  var View          = require('famous/core/View');
-  var Surface       = require('famous/core/Surface');
-  var Transform     = require('famous/core/Transform');
-  var StateModifier = require('famous/modifiers/StateModifier');
-  var EventHandler  = require('famous/core/EventHandler');
-  var MouseSync     = require('famous/inputs/MouseSync');
-  var TouchSync     = require('famous/inputs/TouchSync');
-  var GenericSync   = require('famous/inputs/GenericSync');
+  var Engine         = require('famous/core/Engine')
+  var View           = require('famous/core/View');
+  var Surface        = require('famous/core/Surface');
+  var Transform      = require('famous/core/Transform');
+  var StateModifier  = require('famous/modifiers/StateModifier');
+  var EventHandler   = require('famous/core/EventHandler');
+  var MouseSync      = require('famous/inputs/MouseSync');
+  var TouchSync      = require('famous/inputs/TouchSync');
+  var GenericSync    = require('famous/inputs/GenericSync');
   var Transitionable = require('famous/transitions/Transitionable');
   var GridController = require('../GridController');
 
