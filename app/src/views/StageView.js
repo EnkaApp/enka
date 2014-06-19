@@ -12,6 +12,7 @@ define(function(require, exports, module) {
   var Modifier      = require('famous/core/Modifier');
   var Transitionable = require('famous/transitions/Transitionable');
   var Easing        = require('famous/transitions/Easing');
+  var Timer         = require('famous/utilities/Timer');
 
   // ## View Elements
   function _createBackground() {
@@ -66,7 +67,10 @@ define(function(require, exports, module) {
   };
 
   function _animateSize(node, options) {
-    var transition = {duration: 300, curve: Easing.inOutQuad };
+    var transition = {
+      duration: 300,
+      curve: Easing.inOutQuad
+    };
 
     var start = options.start || 0;
     var end = options.end || 0;

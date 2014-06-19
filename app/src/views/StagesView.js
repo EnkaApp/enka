@@ -11,6 +11,7 @@ define(function(require, exports, module) {
   var Transitionable = require('famous/transitions/Transitionable');
   var StateModifier = require('famous/modifiers/StateModifier');
   var Easing        = require('famous/transitions/Easing');
+  var ContainerSurface = require('famous/surfaces/ContainerSurface');
 
   // ## Layout
   var Layout        = require('famous/views/HeaderFooterLayout');
@@ -145,22 +146,30 @@ define(function(require, exports, module) {
 
     _createScrollView.call(this);
 
-    var mod = new StateModifier({
+    var container = new ContainerSurface({
       size: [undefined, H - this.options.headerHeight],
-      transform: Transform.translate(0, 0, 0)
+      properties: {
+        overflow: 'hidden'
+      }
     });
 
-    this.layout.content.add(mod).add(this.scrollView);
+    // var mod = new StateModifier({
+    //   size: [undefined, H - this.options.headerHeight],
+    //   transform: Transform.translate(0, 0, 0)
+    // });
+
+    container.add(this.scrollView);
+    this.layout.content.add(container);
+  }
+
+  function _getNodeAtIndex(index) {
+    return this.scrollViewNodes[index];
   }
 
   function _setListeners() {
     this.homeIcon.on('click', function() {
       this._eventOutput.emit('nav:loadHome');
     }.bind(this));
-  }
-
-  function _getNodeAtIndex(index) {
-    return this.scrollViewNodes[index];
   }
 
   function StagesView() {
