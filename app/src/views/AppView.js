@@ -74,10 +74,12 @@ define(function(require, exports, module) {
 
     this.stagesView.on('stagesView:scrollViewEdgeHit', function() {
       this.delegateToScrollView = false;
+      console.log('delegateToScrollView', this.delegateToScrollView);
     }.bind(this));
 
     this.stagesView.on('stagesView:scrollViewInContent', function() {
       this.delegateToScrollView = true;
+      console.log('delegateToScrollView', this.delegateToScrollView);
     }.bind(this));
 
     sync.on('update', function(data) {
