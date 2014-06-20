@@ -231,41 +231,34 @@ define(function(require, exports, module) {
     }
   }
 
-  // @NOTE this works only when the scrollview items are all the same height
-  // function _getYOffset(clickY) {
-    
-  //   var svPos = this.scrollView.getPosition();
+  /**
+   * Calculates the height of the first visible scrollview item
+   */
+  function _getFirstVisibleHeight() {
+    var svPos = this.scrollView.getPosition();
+    var firstIndex = this.scrollView._scroller._node.index;
 
-  //   clickY -= this.options.headerHeight;
-  //   var offset = clickY - clickY % this.options.stripHeight;
+    if (firstIndex === 0) return 0;
 
-  //   console.log('click offset', offset);
-  //   console.log('scrollView position', svPos);
-  //   console.log('expanded height', this.options.stripExpandedHeight);
+    var firstVisibile = _getNodeAtIndex.call(this, firstIndex);
+    var firstHeight = firstVisibile.getSize()[1];
+    var height = firstHeight - svPos;
 
-  //   // scrollView position is the number of pixels above the scrollview container
-  //   // that the first visible scrollview node is... so for instance if the bottom 5 pixels
-  //   // of the first visible node is showing and the node height is 100 then the scrollview 
-  //   // position is 95
-  //   //
-  //   // So in order to align the node with the top of the scrollview we need to adjust the
-  //   // offset if the scrollView position is greater than 0 but less than the node height
-  //   if (svPos > 0) {
-  //     if (svPos < this.options.stripHeight) {
-  //       if (svPos <= this.options.stripHeight * 0.5) {
-  //         offset -= svPos;
-  //       } else {
-  //         offset += this.options.stripHeight - svPos;
-  //       }
-  //     }
-  //   }
+    return height;
+  }
 
-  //   return offset;
-  // }
-
+  /**
+   * Calculates how far up we need to scroll in order to have the
+   * top of the item that was click line up with the top of the 
+   * scrollview
+   */
   function _getYOffset(clickY) {
-    var offset = clickY - this.options.headerHeight;
-    return offset;
+    var firstVisibileHeight = _getFirstVisibleHeight.call(this);
+    var offset = clickY - firstVisibileHeight;
+    offset = offset - this.options.headerHeight;
+    offset = offset - offset % this.options.stripHeight;
+    
+    return firstVisibileHeight + offset;
   }
 
   /**
@@ -281,17 +274,16 @@ define(function(require, exports, module) {
     // set up a transitionable that will be used to animate scroll position change
     var transitionable = new Transitionable(0);
 
-    if (typeof transition === 'function') callback = transition;
+    if (typeof transition === 'function') {
+      callback = transition;
+      transition = null;
+    }
 
     // default transition
     if (!transition) {
-      // transition = {
-      //   duration: 200,
-      //   curve: 'linear'
-      // };
       transition = {
-        method: 'snap',
-        period: 200
+        duration: 200,
+        curve: 'linear'
       };
     }
 
@@ -322,33 +314,6 @@ define(function(require, exports, module) {
     transitionable.set(delta, transition, complete);
   }
 
-  function _alignWithTop(count) {
-
-    // Because this is being called recursively we add a failsafe in here
-    // to make sure it doesn't continue forever
-    count = count || 1;
-    if (count > 2) return;
-
-    var transition;
-    var svPos = this.scrollView.getPosition();
-    var delta = -(svPos+2);
-
-    transition = {
-      method: 'spring',
-      period: 600,
-      dampingRatio: 0.3
-    };
-    
-    // The plus two here is hacky but svPos seems to be consistently off by a 
-    // pixel or two so we need to adjust for it to get a nice alignment
-    _scrollOrigin.call(this, delta, transition, function() {
-      var svPos = this.scrollView.getPosition();
-      if (svPos < 10) {
-        _alignWithTop.call(this, count++);
-      }
-    }.bind(this));
-  }
-
   StagesView.prototype.scrollToStage = function(data) {
     var e = data.event;
     var index = data.index;
@@ -362,13 +327,9 @@ define(function(require, exports, module) {
 
     var bgColor = data.backgroundColor;
     var yOffset = _getYOffset.call(this, e.y);
-    
-    // We are doing loadStage and _scrollOrigin simultaneously so that the fact
-    // that we need to to first scroll past the top of the scollview in order to 
-    // calculate how to align the top with the top of the scrollview feels more  
-    this.loadStage();
+
+    this.expandStage();
     _scrollOrigin.call(this, yOffset, function() {
-      _alignWithTop.call(this);
       this.closeExpanded();
     }.bind(this));
   };
@@ -383,11 +344,15 @@ define(function(require, exports, module) {
     }
   };
 
-  StagesView.prototype.loadStage = function() {
+  StagesView.prototype.expandStage = function() {
     var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
     
     // open the new node
     activeNode.expand();
+  };
+
+  StagesView.prototype.loadStage = function() {
+    this.expandStage();
   };
 
   module.exports = StagesView;
