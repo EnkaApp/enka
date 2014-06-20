@@ -3,23 +3,21 @@ define(function(require, exports, module) {
   var columns;
   var rows;
 
-
   var StateModifier = require('famous/modifiers/StateModifier');
   var Transform = require('famous/core/Transform');
   var RenderNode = require('famous/core/RenderNode');
-  var PieceView     = require('./views/PieceView');
 
-  function getY(index){
-    for(var row = 0; row < rows; row++){
-      if(index < columns){
+  function _getY(index){
+    for (var row = 0; row < rows; row++) {
+      if (index < columns) {
         return row;
-      }else if( (index >= (columns * row)) && index < ( columns * (row + 1) )){
+      } else if ((index >= (columns * row)) && index < (columns * (row + 1))) {
         return row;
-      } 
+      }
     }
   }
 
-  function getX(index){
+  function _getX(index){
     return index % columns;
   }
 
@@ -36,17 +34,18 @@ define(function(require, exports, module) {
     rows = dimensions[1] || GridController.DEFAULT_OPTIONS.rows;
     var length = rows * columns;
     for(var i = 0; i < length; i++){
-      this._state.push(null); 
+      this._state.push(null);
     }
 
   }
 
-  GridController.prototype.newPiece = function(options){
-    var piece = new PieceView(options);
-    return piece;
-  }
+  // Deprectated
+  // Use getCellSize instead
+  GridController.prototype.getPieceSize = function(viewSize) {
+    return this.getCellSize(viewSize);
+  };
 
-  GridController.prototype.getPieceSize = function(viewSize){
+  GridController.prototype.getCellSize = function(viewSize) {
     var pSize =  viewSize[0] / columns;
     return [pSize, pSize];
   };
@@ -55,32 +54,25 @@ define(function(require, exports, module) {
     // return xy coords
     var xyCoords = [];
     var coords = {
-      x: getX(index),
-      y: getY(index)
-    }
+      x: _getX(index),
+      y: _getY(index)
+    };
+
     var size = pieceSize;
-    xPix = getX(index) * size;
-    yPix = getY(index) * size;
+    xPix = _getX(index) * size;
+    yPix = _getY(index) * size;
     xyCoords.push(xPix, yPix);
 
     console.log('coordinates@index ' + index + ': ' + '(' + coords.x + ', ' + coords.y + ')');
-    console.log('pixelPosition@index ' + index + ': (' + xPix + ', ' + yPix + ')')
+    console.log('pixelPosition@index ' + index + ': (' + xPix + ', ' + yPix + ')');
     console.log('xyCoords: ', xyCoords);
 
     return xyCoords;
-  }
+  };
 
   GridController.prototype.isEmpty = function(index){
     return this._state === null;
-  }
-
-  GridController.prototype.findSameColorWithPath = function(index, piece){
-    // return array of connected pieces of same color, not including piece
-  }
-
-  GridController.prototype.canMove = function(index){
-    // returns bool
-  }
+  };
 
   GridController.DEFAULT_OPTIONS = {
     rows: 7,
