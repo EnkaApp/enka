@@ -53,7 +53,8 @@ define(function(require, exports, module) {
   GridController.DEFAULT_OPTIONS = {
     rows: 7,
     columns: 5,
-    viewSize: window.innerWidth
+    viewWidth: window.innerWidth,
+    viewHeight: window.innerHeight
   };
 
   /**
@@ -87,22 +88,27 @@ define(function(require, exports, module) {
   // Deprectated
   // Use getCellSize instead
   GridController.prototype.getPieceSize = function(viewSize) {
-    this.options.viewSize = viewSize;
+    this.options.viewWidth = viewSize[0];
+    this.options.viewHeight = viewSize[1];
     return this.getCellSize();
   };
 
   // 
   GridController.prototype.getCellSize = function() {
     var columns = this.options.columns;
-    var viewSize = this.options.viewSize;
-    var size =  viewSize[0] / columns;
+    var viewWidth = this.options.viewWidth;
+    var size =  viewWidth / columns;
 
     return [size, size];
   };
 
-  // GridController.prototype.getXYCoordsFromGridCoords = function(coords) {
-  //   this.pieceSize
-  // }
+  GridController.prototype.getXYCoordsFromGridCoords = function(coords) {
+    var size = this._cellSize;
+    var x = coords[0] * size[0];
+    var y = coords[1] * size[1];
+
+    return [x, y];
+  };
 
   /**
    * @param {number} index
