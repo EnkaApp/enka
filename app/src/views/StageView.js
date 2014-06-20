@@ -98,7 +98,7 @@ define(function(require, exports, module) {
     backgroundColor: 'blue'
   };
 
-  function _animateSize(node, options) {
+  function _animateSize(node, options, callback) {
     var transition = {
       duration: 300,
       curve: Easing.inOutQuad
@@ -129,6 +129,8 @@ define(function(require, exports, module) {
 
     var complete = function(){
       Engine.removeListener('prerender', prerender);
+      console.log('StageView _animateSize complete');
+      if (callback) callback();
     };
 
     Engine.on('prerender', prerender);
@@ -144,12 +146,13 @@ define(function(require, exports, module) {
     });
   };
 
-  StageView.prototype.contract = function() {
+  StageView.prototype.contract = function(callback) {
+    console.log('contract');
     _animateSize(this.bg, {
       start: this.options.expandedHeight,
       end: this.options.height,
       axis: 'y'
-    });
+    }, callback);
   };
 
   module.exports = StageView;

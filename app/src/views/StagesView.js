@@ -13,6 +13,8 @@ define(function(require, exports, module) {
   var Easing        = require('famous/transitions/Easing');
   var ContainerSurface = require('famous/surfaces/ContainerSurface');
   var RenderNode    = require('famous/core/RenderNode');
+  var SpringTransition = require('famous/transitions/SpringTransition');
+  var SnapTransition = require('famous/transitions/SnapTransition');
 
   // ## Layout
   var Layout        = require('famous/views/HeaderFooterLayout');
@@ -23,6 +25,9 @@ define(function(require, exports, module) {
 
   // ## Shared
   var H = window.innerHeight;
+
+  Transitionable.registerMethod('spring', SpringTransition);
+  Transitionable.registerMethod('snap', SnapTransition);
 
   function _createLayout() {
     this.layout = new Layout({
@@ -99,6 +104,7 @@ define(function(require, exports, module) {
     var view = new StageView({
       index: options.index,
       height: options.height,
+      expandedHeight: options.expandedHeight,
       backgroundColor: options.backgroundColor,
     });
 
@@ -120,6 +126,7 @@ define(function(require, exports, module) {
       var node = _createScrollViewNode.call(this, {
         index: i,
         height: this.options.stripHeight,
+        expandedHeight: this.options.stripExpandedHeight,
         backgroundColor: 'hsl(' + i * 360/30 + ', 100%, 50%)'
       });
 
@@ -196,6 +203,7 @@ define(function(require, exports, module) {
   StagesView.DEFAULT_OPTIONS = {
     headerHeight: 44,
     stripHeight: 100,
+    stripExpandedHeight: H - 44, // window height minus the header height
     activeStage: 2
   };
 
@@ -223,49 +231,69 @@ define(function(require, exports, module) {
     }
   }
 
-  function _getYOffset(index, clickY) {
+  // @NOTE this works only when the scrollview items are all the same height
+  // function _getYOffset(clickY) {
     
-    var svPos = this.scrollView.getPosition();
+  //   var svPos = this.scrollView.getPosition();
 
-    clickY -= this.options.headerHeight;
-    var offset = clickY - clickY % this.options.stripHeight;
+  //   clickY -= this.options.headerHeight;
+  //   var offset = clickY - clickY % this.options.stripHeight;
 
-    // scrollView position is the number of pixels above the scrollview container
-    // that the first visible scrollview node is... so for instance if the bottom 5 pixels
-    // of the first visible node is showing and the node height is 100 then the scrollview 
-    // position is 95
-    //
-    // So in order to align the node with the top of the scrollview we need to adjust the
-    // offset if the scrollView position is greater than 0 but less than the node height
-    if (svPos > 0 && svPos < this.options.stripHeight) {
-      if (svPos <= this.options.stripHeight * 0.5) {
-        offset -= svPos;
-      } else {
-        offset += this.options.stripHeight - svPos;
-      }
-    }
+  //   console.log('click offset', offset);
+  //   console.log('scrollView position', svPos);
+  //   console.log('expanded height', this.options.stripExpandedHeight);
 
+  //   // scrollView position is the number of pixels above the scrollview container
+  //   // that the first visible scrollview node is... so for instance if the bottom 5 pixels
+  //   // of the first visible node is showing and the node height is 100 then the scrollview 
+  //   // position is 95
+  //   //
+  //   // So in order to align the node with the top of the scrollview we need to adjust the
+  //   // offset if the scrollView position is greater than 0 but less than the node height
+  //   if (svPos > 0) {
+  //     if (svPos < this.options.stripHeight) {
+  //       if (svPos <= this.options.stripHeight * 0.5) {
+  //         offset -= svPos;
+  //       } else {
+  //         offset += this.options.stripHeight - svPos;
+  //       }
+  //     }
+  //   }
+
+  //   return offset;
+  // }
+
+  function _getYOffset(clickY) {
+    var offset = clickY - this.options.headerHeight;
     return offset;
   }
 
-  StagesView.prototype.scrollToStage = function(data) {
-    var e = data.event;
-    var index = data.index;
-    var node = data.node;
-
-    // stop from executing if their is a second click on an already active node
-    if (this.activeIndex === index) return;
-    this.prevIndex = this.activeIndex;
-    this.activeIndex = index;
-
-    var bgColor = data.backgroundColor;
-    var transition = {
-      duration: 250,
-      curve: 'linear'
-    };
+  /**
+   * This calls _shiftOrigin
+   *
+   * @param {number} delta The number of pixels to shift the scrollview origin by. If this
+   * number is positive then it will be shift up by that many pixels. Vice versa if down.
+   *
+   * @param {function} callback The callback function to execute when scrolling is done
+   */
+  function _scrollOrigin(delta, transition, callback) {
 
     // set up a transitionable that will be used to animate scroll position change
     var transitionable = new Transitionable(0);
+
+    if (typeof transition === 'function') callback = transition;
+
+    // default transition
+    if (!transition) {
+      // transition = {
+      //   duration: 200,
+      //   curve: 'linear'
+      // };
+      transition = {
+        method: 'snap',
+        period: 200
+      };
+    }
 
     // @NOTE
     // This is hacky... but it works. Unlike with a standard transform where the
@@ -284,28 +312,80 @@ define(function(require, exports, module) {
       _shiftOrigin.call(this, move);
     }.bind(this);
 
-    var complete = function(){
+    var complete = function() {
       Engine.removeListener('prerender', prerender);
-    };
-    
-    var yOffset = _getYOffset.call(this, index, e.y);
-    console.log(yOffset);
+      if(callback) callback();
+    }.bind(this);
 
     Engine.on('prerender', prerender);
     
-    transitionable.set(yOffset, transition, complete);
+    transitionable.set(delta, transition, complete);
+  }
+
+  function _alignWithTop(count) {
+
+    // Because this is being called recursively we add a failsafe in here
+    // to make sure it doesn't continue forever
+    count = count || 1;
+    if (count > 2) return;
+
+    var transition;
+    var svPos = this.scrollView.getPosition();
+    var delta = -(svPos+2);
+
+    transition = {
+      method: 'spring',
+      period: 600,
+      dampingRatio: 0.3
+    };
+    
+    // The plus two here is hacky but svPos seems to be consistently off by a 
+    // pixel or two so we need to adjust for it to get a nice alignment
+    _scrollOrigin.call(this, delta, transition, function() {
+      var svPos = this.scrollView.getPosition();
+      if (svPos < 10) {
+        _alignWithTop.call(this, count++);
+      }
+    }.bind(this));
+  }
+
+  StagesView.prototype.scrollToStage = function(data) {
+    var e = data.event;
+    var index = data.index;
+    var node = data.node;
+
+    // stop from executing if their is a second click on an already active node
+    if (this.activeIndex === index) return;
+
+    this.prevIndex = this.activeIndex;
+    this.activeIndex = index;
+
+    var bgColor = data.backgroundColor;
+    var yOffset = _getYOffset.call(this, e.y);
+    
+    // We are doing loadStage and _scrollOrigin simultaneously so that the fact
+    // that we need to to first scroll past the top of the scollview in order to 
+    // calculate how to align the top with the top of the scrollview feels more  
     this.loadStage();
+    _scrollOrigin.call(this, yOffset, function() {
+      _alignWithTop.call(this);
+      this.closeExpanded();
+    }.bind(this));
+  };
+
+  StagesView.prototype.closeExpanded = function(callback) {
+    var prevNode = _getNodeAtIndex.call(this, this.prevIndex);
+    var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
+
+    // close the currently expanded node
+    if (this.prevIndex !== this.activeIndex) {
+      prevNode.contract(callback);
+    }
   };
 
   StagesView.prototype.loadStage = function() {
-    var prevNode = _getNodeAtIndex.call(this, this.prevIndex);
     var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
     
-    // close the currently expanded node
-    if (this.prevIndex !== this.activeIndex) {
-      prevNode.contract();
-    }
-
     // open the new node
     activeNode.expand();
   };
