@@ -14,6 +14,9 @@ define(function(require, exports, module) {
   var Easing        = require('famous/transitions/Easing');
   var Timer         = require('famous/utilities/Timer');
 
+  // ## Views
+  var StageLevelsView = require('views/StageLevelsView');
+
   // ## View Elements
   function _createBackground() {
     this.bg = new Surface({
