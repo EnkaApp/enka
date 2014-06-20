@@ -10,14 +10,16 @@ define(function(require, exports, module) {
   var Transitionable  = require('famous/transitions/Transitionable');
 
   // ## Views
-  var GameView    = require('views/GameView');
+  var GameView      = require('views/GameView');
   var HomeView      = require('views/HomeView');
   var StagesView    = require('views/StagesView');
+  var FpsMeterView  = require('views/FpsMeterView');
 
   // ## EventSyncs
   var GenericSync   = require('famous/inputs/GenericSync');
   var MouseSync     = require('famous/inputs/MouseSync');
   var TouchSync     = require('famous/inputs/TouchSync');
+
 
   GenericSync.register({
     'mouse': MouseSync,
@@ -80,6 +82,12 @@ define(function(require, exports, module) {
     });
 
     this.add(this.gameModifier).add(this.gameView);
+  }
+
+  function _createFPSView() {
+    this.fpsView = new FpsMeterView();
+
+    this.add(this.fpsView);
   }
 
 
@@ -178,6 +186,7 @@ define(function(require, exports, module) {
     _createStagesView.call(this);
     _createHomeView.call(this);
     _createGameView.call(this);
+    _createFPSView.call(this);
 
     // Initialize Event Handlers
     _setListeners.call(this);
