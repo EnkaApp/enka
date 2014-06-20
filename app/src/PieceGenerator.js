@@ -52,9 +52,6 @@ define(function(require, exports, module) {
 		return colorArray[num];
 	}
 
-	
-	
-
  // create an unending array of random colors.
  // 
 

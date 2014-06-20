@@ -66,8 +66,8 @@ define(function(require, exports, module) {
     _createBackground.call(this);
 
     // size of viewport
-    var viewSize = this.getSize();
-    console.log('viewPortSize: ', viewSize);
+    this.viewSize = this.getSize();
+    console.log('viewPortSize: ', this.viewSize);
 
     //creates array of state, set to null
     //gives us access to this.gridControllerMethods
@@ -85,12 +85,12 @@ define(function(require, exports, module) {
 // ----------------------------------------------------------------------
 
     // sets piece size based off of view size
-    var pieceSize = this.gridController.getPieceSize(viewSize);
+    var pieceSize = this.gridController.getPieceSize(this.viewSize);
     console.log('pieceSize: ', pieceSize);
 
     // determines coordinates of piece on grid relative to (0, 0)
     // based on index and pieceSize
-    var piecePosition = this.gridController.getXYCoords(currentIndex, pieceSize[0]);
+    var piecePosition = this.gridController.getXYCoords(currentIndex);
     console.log('piecePosition: ', piecePosition);
     console.log('translatePosition x:' + piecePosition[0] +' y:'+ piecePosition[1] + ' z:' + '0' );
 
@@ -201,19 +201,7 @@ define(function(require, exports, module) {
       // gets new index (2, 4, 15, etc) based off current index, swipe direction, and #of columns
       var newIndex = this.getNewIndex(currentIndex, direction, this.columns);
 
-      // var frontBgColor = 'blue';
-      // var backBgColor = 'red';
-
-      // if (toggle) {
-      //   frontBgColor = 'red';
-      //   backBgColor = 'blue';
-      // }
-      // var isInBounds = function(newIndex, viewSize){
-        
-      // }()
-
-      // toggle = !toggle;
-
+      this.isInBounds(direction, newIndex);
       // if the newIndex does not have a piece already on it
       // then we can add a new piece
       if(!this.gridController._state[newIndex]){
@@ -228,8 +216,11 @@ define(function(require, exports, module) {
           console.log('HERE: ',this.gridController._state);
           lastColor = this.gridController._state[currentIndex]._object.back.properties.backgroundColor;
         }
-          flag++;
-          if(flag === 3) this.deletePiece(17);
+        flag++;
+        if(flag === 3){
+          this.deletePiece(17);
+          this.gridController._state[17] = null;
+        } 
         
         var piece = pieceGenerator.createNewPiece(pieceSize[0], lastColor, direction);
         console.log('flag: ', flag);
@@ -245,6 +236,7 @@ define(function(require, exports, module) {
           size: pieceSize,
           transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
         });
+
         console.log('pieceModifier: ', pieceModifier);
         var node = this.add(pieceModifier).add(piece);
         console.log('node: ', node);
@@ -302,6 +294,19 @@ define(function(require, exports, module) {
   }
   BoardView.prototype.checkIfTrapped = function(index){
 
+  }
+
+  BoardView.prototype.isInBounds = function(direction, currentIndex){
+    var viewPortSize = this.viewSize;
+    var cellSize = this.gridController.getPieceSize(viewPortSize);
+    console.log('idx: ', currentIndex)
+    console.log('this.gridController: ', this.gridController)
+
+    piecePosition = this.gridController.getXYCoords(currentIndex)
+    console.log('viewPortSize: ', viewPortSize);
+    console.log('cellSize: ', cellSize);
+    console.log('piecePosition: ', piecePosition);
+    
   }
 
   BoardView.prototype.deletePiece = function(index){
