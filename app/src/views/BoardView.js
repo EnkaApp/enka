@@ -11,6 +11,8 @@ define(function(require, exports, module) {
   var GenericSync   = require('famous/inputs/GenericSync');
   var Transitionable = require('famous/transitions/Transitionable');
   var GridController = require('../GridController');
+  var PieceGenerator = require('../PieceGenerator');
+
   
   var xStart, yStart, xEnd, yEnd;
 
@@ -41,19 +43,22 @@ define(function(require, exports, module) {
 
         // INITIAL SETUP
 // ----------------------------------------------------------------------
-
     View.apply(this, arguments);
-    //store this.columns and rows
+    // initializes colorQueue
+    var pieceGenerator = new PieceGenerator();
+    var flag = 0;
+
+    //store columns and rows
     this.columns = this.options.dimensions[0];
-    var rows = this.options.dimensions[1];
-    console.log('this.columns: ', this.columns);
-    console.log('rows: ', rows);
+    this.rows = this.options.dimensions[1];
+    console.log('columns: ', this.columns);
+    console.log('rows: ', this.rows);
 
     // index variables;
     // currentIndex starts at center
     var currentIndex = this.getCenterIndex();
     console.log('startIndex (center): ', this.getCenterIndex())
-    var previousIndex;
+    // var previousIndex;  (not in use)
     var nextIndex;
 
     // creates blackBackground
@@ -99,17 +104,13 @@ define(function(require, exports, module) {
     // attach modifier to board
     var centerNode = this.add(centerModifier);
 
-    var centerPiece = this.gridController.newPiece({
-      width: pieceSize[0],
-      height: pieceSize[1],
-      frontBgColor: 'blue',
-      backBgColor: 'red',
-      direction: 'left'
-    });
-
+    // creates first Piece to put on board
+    var centerPiece = pieceGenerator.createNewPiece(pieceSize[0]);
+    
     // attach piece to centerModifier to drop piece in middle
     centerNode.add(centerPiece);
-    this.gridController._state[currentIndex] = centerPiece.options.frontBgColor;
+    this.gridController._state[currentIndex] = centerNode;
+    console.log('centerNode: ', centerNode)  
 
     // Engine.pipe(sync);
     this.bgSurface.pipe(sync);
@@ -144,7 +145,7 @@ define(function(require, exports, module) {
 
 
 // TEMP - toggle changes the color so the animation looks right
-var toggle = false;
+// var toggle = false;
 
     // BEGIN SYNC.ON(END)
 // ----------------------------------------------------------------------
@@ -152,6 +153,9 @@ var toggle = false;
       xEnd = data.clientX;
       yEnd = data.clientY;
       var direction;
+
+      
+
 
 
 
@@ -185,31 +189,48 @@ var toggle = false;
         console.log('up');
         direction = 'up';
       }
+// ----------------------------------------------------------------------
+//      END GET SWIPE DIRECTION
+
+
+
       console.log(currentIndex, direction, this.columns)
+      // gets new index (2, 4, 15, etc) based off current index, swipe direction, and #of columns
       var newIndex = this.getNewIndex(currentIndex, direction, this.columns);
-      console.log('brokenINdex', newIndex);
 
+      // var frontBgColor = 'blue';
+      // var backBgColor = 'red';
 
-      var frontBgColor = 'blue';
-      var backBgColor = 'red';
-
-      if (toggle) {
-        frontBgColor = 'red';
-        backBgColor = 'blue';
-      }
-
-      toggle = !toggle;
-
-
-      if(!this.gridController._state[newIndex]){
+      // if (toggle) {
+      //   frontBgColor = 'red';
+      //   backBgColor = 'blue';
+      // }
+      // var isInBounds = function(newIndex, viewSize){
         
-        var piece = this.gridController.newPiece({
-          width: pieceSize[0],
-          height: pieceSize[1],
-          frontBgColor: frontBgColor,
-          backBgColor: backBgColor,
-          direction: direction
-        });
+      // }()
+
+      // toggle = !toggle;
+
+      // if the newIndex does not have a piece already on it
+      // then we can add a new piece
+      if(!this.gridController._state[newIndex]){
+        console.log('lastIndex: ', currentIndex);
+        console.log('currState: ', this.gridController._state);
+        // console.log('old ', this.gridController._state[currentIndex]._child._object.back.properties.backgroundColor)
+        console.log('flag: ', flag);
+        if(flag === 0){
+          var lastColor = this.gridController._state[currentIndex]._child._object.front.properties.backgroundColor;
+        }
+        else{
+          console.log('HERE: ',this.gridController._state);
+          lastColor = this.gridController._state[currentIndex]._object.back.properties.backgroundColor;
+        }
+          flag++;
+          if(flag === 3) this.deletePiece(17);
+        
+        var piece = pieceGenerator.createNewPiece(pieceSize[0], lastColor, direction);
+        console.log('flag: ', flag);
+
 
         console.log('oldIndex: ', currentIndex);
         console.log('newIndex: ', newIndex);
@@ -221,14 +242,14 @@ var toggle = false;
           size: pieceSize,
           transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
         });
-
-        this.add(pieceModifier).add(piece);
-        console.log(piece);
+        console.log('pieceModifier: ', pieceModifier);
+        var node = this.add(pieceModifier).add(piece);
+        console.log('node: ', node);
         piece.reflect();
 
         piecePosition = this.gridController.getXYCoords(currentIndex, pieceSize[0]);
         console.log('cI', currentIndex)
-        this.gridController._state[currentIndex] = piece.options.backBgColor;
+        this.gridController._state[currentIndex] = node;
         console.log('state: ', this.gridController._state);
 
         this.checkIfHasMatch.call(this, newIndex, piece);
@@ -278,8 +299,10 @@ var toggle = false;
   }
   BoardView.prototype.checkIfTrapped = function(index){
 
+  }
 
-
+  BoardView.prototype.deletePiece = function(index){
+    this.gridController._state[index]._object._opacityState.state = .01
   }
 
   BoardView.prototype.getNewIndex = function(currentIndex, direction){

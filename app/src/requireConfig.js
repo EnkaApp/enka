@@ -1,7 +1,7 @@
 /*globals require*/
 require.config({
     shim: {
-      
+
     },
     paths: {
         famous: '../lib/famous',
