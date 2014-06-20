@@ -4,6 +4,7 @@ define(function(require, exports, module) {
   	var colorArray = ['red', 'orange', 'blue', 'green'];
   	var colorQueue = [];
 
+
   	// initializes colorQueue with 3 colors
 	function PieceGenerator(){
 		for(var i = 0; i < 3; i++){
@@ -51,5 +52,12 @@ define(function(require, exports, module) {
 		return colorArray[num];
 	}
 
+	
+	
+
+ // create an unending array of random colors.
+ // 
+
 	module.exports = PieceGenerator;
-})
+});
+ // TODO: START WORK ON PIECE CREATION USING COLOR array
