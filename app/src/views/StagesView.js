@@ -20,8 +20,8 @@ define(function(require, exports, module) {
   var Layout        = require('famous/views/HeaderFooterLayout');
 
   // ## Views
-  var Scrollview    = require('famous/views/Scrollview');
-  var StageView     = require('views/StageView');
+  var Scrollview      = require('famous/views/Scrollview');
+  var StageView       = require('views/StageView');
 
   // ## Shared
   var H = window.innerHeight;
@@ -40,24 +40,6 @@ define(function(require, exports, module) {
 
     this.add(mod).add(this.layout);
   }
-  
-  // function _createBackground() {
-  //   this.bg = new Surface({
-  //     size: [undefined, undefined],
-  //     content: 'Temp',
-  //     properties: {
-  //       backgroundColor: 'red'
-  //     }
-  //   });
-
-  //   this.bg.setClasses(['bg-stages']);
-
-  //   var mod = new StateModifier({
-  //     transform: Transform.behind
-  //   });
-
-  //   this.add(mod).add(this.bg);
-  // }
 
   // ## Setup layout.header
 
@@ -105,6 +87,7 @@ define(function(require, exports, module) {
       index: options.index,
       height: options.height,
       expandedHeight: options.expandedHeight,
+      currentHeight: options.currentHeight,
       backgroundColor: options.backgroundColor,
     });
 
@@ -116,17 +99,17 @@ define(function(require, exports, module) {
 
   function _createScrollView() {
     this.scrollViewNodes = [];
-    this.scrollView = new Scrollview({
-      // if paginated === true, a click event on a scrollview item 
-      // triggers ScrollView.goToNextPage so we can't use it
-      // paginated: true
-    });
 
-    for (var i = 0; i < 30; i++) {
+    // if paginated === true, a click event on a scrollview item 
+      // triggers ScrollView.goToNextPage so we can't use it
+    this.scrollView = new Scrollview();
+
+    for (var i = 0; i < 7; i++) {
       var node = _createScrollViewNode.call(this, {
         index: i,
         height: this.options.stripHeight,
         expandedHeight: this.options.stripExpandedHeight,
+        currentHeight: this.options.stripHeight,
         backgroundColor: 'hsl(' + i * 360/30 + ', 100%, 50%)'
       });
 
@@ -204,7 +187,7 @@ define(function(require, exports, module) {
     headerHeight: 44,
     stripHeight: 100,
     stripExpandedHeight: H - 44, // window height minus the header height
-    activeStage: 2
+    activeStage: 1
   };
 
   /**

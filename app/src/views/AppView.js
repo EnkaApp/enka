@@ -86,7 +86,6 @@ define(function(require, exports, module) {
 
   function _createFPSView() {
     this.fpsView = new FpsMeterView();
-
     this.add(this.fpsView);
   }
 
