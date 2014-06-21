@@ -132,7 +132,6 @@ define(function(require, exports, module) {
 
     var complete = function(){
       Engine.removeListener('prerender', prerender);
-      console.log('StageView _animateSize complete');
       if (callback) callback();
     };
 

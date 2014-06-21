@@ -11,7 +11,6 @@ define(function(require, exports, module) {
 			var color = getRandomColor(0, colorArray.length - 1); 
 			colorQueue.push(color);	
 		}
-		console.log(colorQueue);
 	}
 
 	PieceGenerator.prototype.createNewPiece = function(size, lastColor, direction){
@@ -33,8 +32,6 @@ define(function(require, exports, module) {
 		}
 
 		var piece = new PieceView(options);
-		console.log(piece);
-		console.log(colorQueue);
 		return piece;
 	}
 

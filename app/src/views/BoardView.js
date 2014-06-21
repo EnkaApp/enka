@@ -52,13 +52,11 @@ define(function(require, exports, module) {
     //store columns and rows
     this.columns = this.options.dimensions[0];
     this.rows = this.options.dimensions[1];
-    console.log('columns: ', this.columns);
-    console.log('rows: ', this.rows);
 
     // index variables;
     // currentIndex starts at center
     var currentIndex = this.getCenterIndex();
-    console.log('startIndex (center): ', this.getCenterIndex())
+    // console.log('startIndex (center): ', this.getCenterIndex())
     // var previousIndex;  (not in use)
     var nextIndex;
 
@@ -67,12 +65,16 @@ define(function(require, exports, module) {
 
     // size of viewport
     this.viewSize = this.getSize();
-    console.log('viewPortSize: ', this.viewSize);
+    // console.log('viewPortSize: ', this.viewSize);
 
     //creates array of state, set to null
     //gives us access to this.gridControllerMethods
-    this.gridController = new GridController(this.dimensions);
-    console.log('gridState: ', this.gridController._state)
+    this.gridController = new GridController({
+      columns: this.columns,
+      rows: this.rows,
+      viewWidth: this.viewSize[0],
+      viewHeight: this.viewSize[1]
+    });
 
 
 
@@ -86,13 +88,11 @@ define(function(require, exports, module) {
 
     // sets piece size based off of view size
     var pieceSize = this.gridController.getPieceSize(this.viewSize);
-    console.log('pieceSize: ', pieceSize);
+    // console.log('pieceSize: ', pieceSize);
 
     // determines coordinates of piece on grid relative to (0, 0)
     // based on index and pieceSize
     var piecePosition = this.gridController.getXYCoords(currentIndex);
-    console.log('piecePosition: ', piecePosition);
-    console.log('translatePosition x:' + piecePosition[0] +' y:'+ piecePosition[1] + ' z:' + '0' );
 
     // responsible for placing piece at center (after attaching piece)
     var centerModifier = new StateModifier({
@@ -107,13 +107,10 @@ define(function(require, exports, module) {
 
     // creates first Piece to put on board
     var centerPiece = pieceGenerator.createNewPiece(pieceSize[0]);
-
-    console.log(centerPiece);
     
     // attach piece to centerModifier to drop piece in middle
     centerNode.add(centerPiece);
     this.gridController._state[currentIndex] = centerNode;
-    console.log('centerNode: ', centerNode)  
 
     // Engine.pipe(sync);
     this.bgSurface.pipe(sync);
@@ -174,46 +171,35 @@ define(function(require, exports, module) {
 
       // swipe right
       if(xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)){
-        console.log('right');
         direction = 'right';
       }
       // swipe left
       if(xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd) ){
-        console.log('left');
         direction = 'left';
       }
       // swipe down
       if(yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)){
-        console.log('down');
         direction = 'down';
       }
       // swipe up
       if(yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ){
-        console.log('up');
         direction = 'up';
       }
 // ----------------------------------------------------------------------
 //      END GET SWIPE DIRECTION
 
-
-
-      console.log(currentIndex, direction, this.columns)
       // gets new index (2, 4, 15, etc) based off current index, swipe direction, and #of columns
       var newIndex = this.getNewIndex(currentIndex, direction, this.columns);
 
-      this.isInBounds(direction, newIndex);
       // if the newIndex does not have a piece already on it
       // then we can add a new piece
-      if(!this.gridController._state[newIndex]){
-        console.log('lastIndex: ', currentIndex);
-        console.log('currState: ', this.gridController._state);
+      if(this.isInBounds(direction, currentIndex) && !this.gridController._state[newIndex]){
+        // console.log('lastIndex: ', currentIndex);
         // console.log('old ', this.gridController._state[currentIndex]._child._object.back.properties.backgroundColor)
-        console.log('flag: ', flag);
         if(flag === 0){
           var lastColor = this.gridController._state[currentIndex]._child._object.front.properties.backgroundColor;
         }
         else{
-          console.log('HERE: ',this.gridController._state);
           lastColor = this.gridController._state[currentIndex]._object.back.properties.backgroundColor;
         }
         flag++;
@@ -223,11 +209,8 @@ define(function(require, exports, module) {
         } 
         
         var piece = pieceGenerator.createNewPiece(pieceSize[0], lastColor, direction);
-        console.log('flag: ', flag);
 
-
-        console.log('oldIndex: ', currentIndex);
-        console.log('newIndex: ', newIndex);
+        // console.log('newIndex: ', newIndex);
         currentIndex = newIndex;
 
         var pieceModifier = new StateModifier({
@@ -237,15 +220,11 @@ define(function(require, exports, module) {
           transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
         });
 
-        console.log('pieceModifier: ', pieceModifier);
         var node = this.add(pieceModifier).add(piece);
-        console.log('node: ', node);
         piece.reflect();
 
         piecePosition = this.gridController.getXYCoords(currentIndex, pieceSize[0]);
-        console.log('cI', currentIndex)
         this.gridController._state[currentIndex] = node;
-        console.log('state: ', this.gridController._state);
 
         this.checkIfHasMatch.call(this, newIndex, piece);
         // checkIfTrapped(newIndex);
@@ -299,14 +278,30 @@ define(function(require, exports, module) {
   BoardView.prototype.isInBounds = function(direction, currentIndex){
     var viewPortSize = this.viewSize;
     var cellSize = this.gridController.getPieceSize(viewPortSize);
-    console.log('idx: ', currentIndex)
-    console.log('this.gridController: ', this.gridController)
 
     piecePosition = this.gridController.getXYCoords(currentIndex)
-    console.log('viewPortSize: ', viewPortSize);
-    console.log('cellSize: ', cellSize);
-    console.log('piecePosition: ', piecePosition);
-    
+    var boardHeight = this.rows * cellSize[1];
+    var yLowerBounds = boardHeight - cellSize[0];
+
+    if(direction === 'left' && piecePosition[0] === 0){
+      console.log('false');
+      return false
+    }
+      
+    if(direction === 'right' && piecePosition[0] === (viewPortSize[0] - cellSize[0])){
+      console.log('false');
+      return false
+    }
+      
+    if(direction === 'up' && piecePosition[1] === 0){
+      console.log('false');
+      return false
+    }
+    if(direction === 'down' && piecePosition[1] === yLowerBounds){
+      console.log('false');
+      return false
+    }
+    return true;
   }
 
   BoardView.prototype.deletePiece = function(index){

@@ -125,18 +125,14 @@ define(function(require, exports, module) {
     };
 
     if (pieceSize) {
-      size = pieceSize;
+      size = [pieceSize, pieceSize];
     } else {
       size = this._cellSize;
     }
 
-    xPix = _getX.call(this, index) * size;
-    yPix = _getY.call(this, index) * size;
+    xPix = _getX.call(this, index) * size[0];
+    yPix = _getY.call(this, index) * size[1];
     xyCoords.push(xPix, yPix);
-
-    console.log('coordinates@index ' + index + ': ' + '(' + coords.x + ', ' + coords.y + ')');
-    console.log('pixelPosition@index ' + index + ': (' + xPix + ', ' + yPix + ')');
-    console.log('xyCoords: ', xyCoords);
 
     return xyCoords;
   };
