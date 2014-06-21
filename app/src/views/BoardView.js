@@ -53,6 +53,7 @@ define(function(require, exports, module) {
     this.columns = this.options.dimensions[0];
     this.rows = this.options.dimensions[1];
 
+
     // index variables;
     // currentIndex starts at center
     var currentIndex = this.getCenterIndex();
@@ -76,7 +77,7 @@ define(function(require, exports, module) {
       viewHeight: this.viewSize[1]
     });
 
-
+    this.state = this.gridController._state;
 
 
 
@@ -110,7 +111,7 @@ define(function(require, exports, module) {
     
     // attach piece to centerModifier to drop piece in middle
     centerNode.add(centerPiece);
-    this.gridController._state[currentIndex] = centerNode;
+    this.state[currentIndex] = centerNode;
 
     // Engine.pipe(sync);
     this.bgSurface.pipe(sync);
@@ -188,30 +189,37 @@ define(function(require, exports, module) {
 // ----------------------------------------------------------------------
 //      END GET SWIPE DIRECTION
 
+
+
+
+
+
+
+
+
+
+
       // gets new index (2, 4, 15, etc) based off current index, swipe direction, and #of columns
       var newIndex = this.getNewIndex(currentIndex, direction, this.columns);
+      console.log('currentIndex: ', currentIndex);
+      console.log('newIndex: ', newIndex);
 
-      // if the newIndex does not have a piece already on it
+      // if the newIndex does not have a piece already on it and it is in bounds
       // then we can add a new piece
-      if(this.isInBounds(direction, currentIndex) && !this.gridController._state[newIndex]){
-        // console.log('lastIndex: ', currentIndex);
-        // console.log('old ', this.gridController._state[currentIndex]._child._object.back.properties.backgroundColor)
-        if(flag === 0){
-          var lastColor = this.gridController._state[currentIndex]._child._object.front.properties.backgroundColor;
-        }
-        else{
-          lastColor = this.gridController._state[currentIndex]._object.back.properties.backgroundColor;
-        }
+      if(this.isInBounds(direction, currentIndex) && !this.state[newIndex]){
         flag++;
         if(flag === 3){
           this.deletePiece(17);
-          this.gridController._state[17] = null;
-        } 
+        }
+        var lastColor = this.state[currentIndex]._child._object.back.properties.backgroundColor;
+        
         
         var piece = pieceGenerator.createNewPiece(pieceSize[0], lastColor, direction);
 
         // console.log('newIndex: ', newIndex);
+        // this.getColorFromIndex(currentIndex);
         currentIndex = newIndex;
+        
 
         var pieceModifier = new StateModifier({
           origin: [0,0],
@@ -220,17 +228,16 @@ define(function(require, exports, module) {
           transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
         });
 
-        var node = this.add(pieceModifier).add(piece);
+        var node = this.add(pieceModifier)
+        
+        this.state[currentIndex] = node;
+        node.add(piece);
         piece.reflect();
 
         piecePosition = this.gridController.getXYCoords(currentIndex, pieceSize[0]);
-        this.gridController._state[currentIndex] = node;
 
         this.checkIfHasMatch.call(this, newIndex, piece);
-        // checkIfTrapped(newIndex);
-
-
-
+        console.log(this.state);
       }
       
 
@@ -262,16 +269,33 @@ define(function(require, exports, module) {
     return (length - 1) / 2;
   }
 
-  BoardView.prototype.checkIfHasMatch = function(index, piece){
+  BoardView.prototype.checkIfHasMatch = function(index){
+    // get the current index we would like to check neighbors for
 
-    var matches = 0;
-    if(this.gridController._state[this.getNewIndex(index, 'left', this.columns)] === piece.options.backBgColor){
-      matches++;
-      console.log(matches);
+    // perform check to see if this is the first node we placed (edge case)
+    // console.log('child: ', this.state[index]._child);
+    if(this.state[index].child === null){
+      // is not edge case if inside this block
+      // get color
     }
 
+
+    // get color of piece located at this index
+    // console.log(this.state[index]);
   }
+
+  // BoardView.prototype.getColorFromIndex = function(index){
+  //   console.log('index: ', index);
+  //   // if not edge case
+  //   console.log(this.state[index]);
+  //   var color = this.state[index]._object.back.properties.backgroundColor;
+  //   console.log('color: ', color);
+
+  // }
+
   BoardView.prototype.checkIfTrapped = function(index){
+    // check surrounding indices for either !null or false
+
 
   }
 
@@ -305,7 +329,16 @@ define(function(require, exports, module) {
   }
 
   BoardView.prototype.deletePiece = function(index){
-    this.gridController._state[index]._object._opacityState.state = .01
+    // this.state[index]._object._opacityState.state = .01
+
+    this.state[index]._object._transformState.translate.state = [100, 100, 0];
+    var centerMod = new StateModifier({
+      origin: [0,0],
+      align: [0,0],
+      size: [64, 64],
+      transform: Transform.translate(100, 100, 0)
+    });
+    this.state[index].set(centerMod)
   }
 
   BoardView.prototype.getNewIndex = function(currentIndex, direction){
@@ -316,21 +349,12 @@ define(function(require, exports, module) {
       return currentIndex + 1;
     }
     if(direction === 'up'){
-      return currentIndex - this.columns ;
+      return currentIndex - this.columns;
     }
     if(direction === 'down'){
       return currentIndex + this.columns;
     }
   }
-
-
-
-
-
-
-
-
-
 
 // ADD DEFAULT OPTIONS TO BOARVIEW AND AND BOARDVIEW TO EXPORTS
 //-------------------------------------------------------------------------
