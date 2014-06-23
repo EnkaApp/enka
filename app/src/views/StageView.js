@@ -14,6 +14,8 @@ define(function(require, exports, module) {
   var Easing        = require('famous/transitions/Easing');
   var Timer         = require('famous/utilities/Timer');
 
+  // ## Stage Configuration
+  var StageConfig = require('StageConfig');
 
   // ## Views
   var StageLevelsView = require('views/StageLevelsView');
@@ -23,24 +25,26 @@ define(function(require, exports, module) {
     this.bg = new Surface({
       // size: [undefined, this.options.height],
       size: [undefined, undefined],
-      content: this.options.content,
-      properties: {
-        backgroundColor: this.options.backgroundColor,
-        boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-        color: 'white'
-      }
+      content: this.options.content
     });
 
     this.bgMod = new Modifier({
       transform: Transform.translate(0, 0, 0)
     });
 
+    this.bg.setClasses(['stage-bg', 'stage-'+this._stageNum]);
+
     this.node.add(this.bgMod).add(this.bg);
   }
 
   function _createStageLevelsView() {
     this._levels = new StageLevelsView({
-      stage: this.options.index + 1
+      stage: this._stageNum,
+      rows: this._stage.getRows(),
+      cols: this._stage.getCols(),
+      cellSize: this._stage.getCellSize(),
+      coords: this._stage.getCoords(),
+      warp: this._stage.getWarp()
     });
 
     var stageMod = new Modifier({
@@ -67,10 +71,21 @@ define(function(require, exports, module) {
     this.bg.on('click', handleClick.bind(this));
   }
 
+  function _getExpandedHeight() {
+    var rows = this._stage.getRows();
+    var cellSize = this._stage.getCellSize();
+    var margin = 40;
+
+    return rows * cellSize[1] + margin * 2;
+  }
+
   function StageView() {
     View.apply(this, arguments);
 
     this._levels = null;
+    this._stage = new StageConfig(this.options.index);
+    this._stageNum = this.options.index + 1;
+    this._expandedHeight = _getExpandedHeight.call(this);
 
     this.rootModifier = new StateModifier({
       size: [undefined, this.options.currentHeight]
@@ -90,7 +105,6 @@ define(function(require, exports, module) {
   StageView.DEFAULT_OPTIONS = {
     index: 0,
     height: 100,
-    expandedHeight: window.innerHeight,
     currentHeight: 100,
     content: '',
     backgroundColor: 'blue'
@@ -140,7 +154,7 @@ define(function(require, exports, module) {
   StageView.prototype.expand = function() {
     _animateSize.call(this, {
       start: this.options.height,
-      end: this.options.expandedHeight,
+      end: this._expandedHeight,
       axis: 'y'
     }, function () {
       this._levels.showLevels();
@@ -149,7 +163,7 @@ define(function(require, exports, module) {
 
   StageView.prototype.contract = function(callback) {
     _animateSize.call(this, {
-      start: this.options.expandedHeight,
+      start: this._expandedHeight,
       end: this.options.height,
       axis: 'y'
     }, function () {

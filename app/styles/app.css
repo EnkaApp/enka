@@ -1697,6 +1697,14 @@ html {
   -webkit-backface-visibility: visible;
   backface-visibility: visible;
 }
+.header.lives-count {
+  color: white;
+  padding-left: 5px;
+}
+.header.lives-timer {
+  color: white;
+  padding-left: 5px;
+}
 .bg-home {
   background-color: #ffffff;
 }
@@ -1716,4 +1724,121 @@ html {
   text-transform: uppercase;
   font-size: 0.9em;
   font-style: italic;
+}
+.top-triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 0 75.5px 75.5px 75.5px;
+  border-color: transparent transparent #2cb8c4 transparent;
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+}
+.left-triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 75.5px 75.5px 75.5px 0;
+  border-color: transparent #2cb8c4 transparent transparent;
+}
+.right-triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 75.5px 0 75.5px 75.5px;
+  border-color: transparent transparent transparent #2cb8c4;
+}
+.bottom-triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 75.5px 75.5px 0 75.5px;
+  border-color: #2cb8c4 transparent transparent transparent;
+}
+.top-triangle.light {
+  border-color: transparent transparent #f5fafa transparent;
+}
+.left-triangle.light {
+  border-color: transparent #f5fafa transparent transparent;
+}
+.right-triangle.light {
+  border-color: transparent transparent transparent #f5fafa;
+}
+.stage-1.stage-bg {
+  background-color: #f4f0e4;
+}
+.stage-1.stage-level-bg {
+  background-color: #e5dcc0;
+}
+.stage-1.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-1.stage-level-incomplete {
+  background-color: #e5dcc0;
+}
+.stage-2.stage-bg {
+  background-color: #fcb040;
+}
+.stage-2.stage-level-bg {
+  background-color: #fb9b0e;
+}
+.stage-2.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-2.stage-level-incomplete {
+  background-color: #fb9b0e;
+}
+.stage-3.stage-bg {
+  background-color: #f9b6b3;
+}
+.stage-3.stage-level-bg {
+  background-color: #f58984;
+}
+.stage-3.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-3.stage-level-incomplete {
+  background-color: #f58984;
+}
+.stage-4.stage-bg {
+  background-color: #e1a391;
+}
+.stage-4.stage-level-bg {
+  background-color: #81020e;
+}
+.stage-4.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-4.stage-level-incomplete {
+  background-color: #81020e;
+}
+.stage-5.stage-bg {
+  background-color: #bbf5e9;
+}
+.stage-5.stage-level-bg {
+  background-color: #8feedb;
+}
+.stage-5.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-5.stage-level-incomplete {
+  background-color: #8feedb;
+}
+.stage-6.stage-bg {
+  background-color: #5ab4b2;
+}
+.stage-6.stage-level-bg {
+  background-color: #449795;
+}
+.stage-6.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-6.stage-level-incomplete {
+  background-color: #449795;
 }

@@ -15,36 +15,50 @@ define(function(require, exports, module) {
     this.backing = new Surface({
       size: [undefined, undefined],
       properties: {
-        backgroundColor: 'black'
+        pointerEvents: 'none'
       }
     });
 
-    this.backing.setClasses(['level-select-bg']);
+    this.backing.setClasses([
+      'stage-level-bg',
+      'stage-'+this.options.stage,
+      'color-'+this.options.color
+    ]);
+
+    if (this.options.current) {
+      this.backing.addClass('current');
+    }
 
     this.node.add(this.backing);
   }
 
-  function _createLightbox() {
-    var lightboxOpts = {
-      inOpacity: 1,
-      outOpacity: 0,
-      inOrigin: [0, 0],
-      outOrigin: [0, 0],
-      showOrigin: [0, 0],
-      inTransform: Transform.thenMove(Transform.rotateX(0.9), [0, -300, -300]),
-      outTransform: Transform.thenMove(Transform.rotateZ(0.7), [0, window.innerHeight, -1000]),
-      inTransition: { duration: 650, curve: 'easeOut' },
-      outTransition: { duration: 500, curve: Easing.inCubic }
-    };
+  function _createNumber() {
+    this.number = new Surface({
+      content: this.options.level,
+      size: [true, true],
+      properties: {
+        zIndex: 1
+      }
+    });
 
-    this.lightbox = new Lightbox(lightboxOpts);
-    this.node.add(this.lightbox);
+    var mod = new StateModifier({
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5]
+    });
+
+    this.number.setClasses([
+      'stage-level-number',
+      'stage-'+this.options.stage,
+      'color-'+this.options.color
+    ]);
+
+    this.node.add(mod).add(this.number);
   }
 
   function StageLevelView() {
     View.apply(this, arguments);
 
-    console.log('StageLevelView', this.options.x, this.options.y);
+    // console.log('StageLevelView', this.options.x, this.options.y);
 
     this.rootModifier = new StateModifier({
       size: [this.options.width, this.options.height],
@@ -56,13 +70,17 @@ define(function(require, exports, module) {
     this.node = this.add(this.rootModifier);
 
     _createBacking.call(this);
-    _createLightbox.call(this);
+    _createNumber.call(this);
   }
 
   StageLevelView.prototype = Object.create(View.prototype);
   StageLevelView.prototype.constructor = StageLevelView;
 
   StageLevelView.DEFAULT_OPTIONS = {
+    current: false,
+    level: 1,
+    stage: 1,
+    color: 1,
     width: 50,
     height: 50,
     x: 0,

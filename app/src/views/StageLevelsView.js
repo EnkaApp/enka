@@ -16,161 +16,17 @@ define(function(require, exports, module) {
   // ## Views
   var StageLevelView = require('views/StageLevelView');
 
-  // Stage Level layout definition...
-  // Each top level array item (stage array) contains the definition
-  // for the layout of the levels for that stage.
-  //
-  // Each stage array contains the grid positions of a level view
-  // Additionally each level view will be displayed with animation
-  // in the order that they are declared
-  // 
-  var stageLevelsLayoutDef = [
-    // Stage 1... shape of an F
-    [{
-      grid: [3, 5],
-      coords: [
-        [0,0],
-        [0,1],
-        [0,2],
-        [0,3],
-        [0,4],
-        
-        [1,0],
-        [1,2],
-
-        [2,0],
-      ]
-    }],
-
-    // Stage 2... shape of an A
-    [{
-      grid: [3, 5],
-      coords: [
-        [0,0],
-        [0,1],
-        [0,2],
-        [0,3],
-        [0,4],
-
-        [1,0],
-        [1,2],
-
-        [2,0],
-        [2,1],
-        [2,2],
-        [2,3],
-        [2,4]
-      ]
-    }],
-
-    // Stage 3... shape of an M
-    [{
-      grid: [5, 5],
-      coords: [
-        [0,0],
-        [0,1],
-        [0,2],
-        [0,3],
-        [0,4],
-
-        [1,0],
-        [2,0],
-        [3,0],
-
-        [2,1],
-        [2,2],
-
-        [4,0],
-        [4,1],
-        [4,2],
-        [4,3],
-        [4,4]
-      ]
-    }],
-
-    // Stage 4... shape of an O
-    [{
-      grid: [3, 5],
-      coords: [
-        [0,0],
-        [0,1],
-        [0,2],
-        [0,3],
-        [0,4],
-
-        [1,0],
-        [1,4],
-
-        [2,0],
-        [2,1],
-        [2,2],
-        [2,3],
-        [2,4]
-      ]
-    }],
-
-    // Stage 5... shape of an . (period)
-    [{
-      grid: [2, 2],
-      coords: [
-        [0,0],
-        [0,1],
-        [1,0],
-        [1,1],
-      ]
-    }],
-
-    // Stage 6... shape of an U
-    [{
-      grid: [3, 5],
-      coords: [
-        [0,0],
-        [0,1],
-        [0,2],
-        [0,3],
-        [0,4],
-
-        [1,4],
-
-        [2,0],
-        [2,1],
-        [2,2],
-        [2,3],
-        [2,4]
-      ]
-    }],
-
-    // Stage 7... shape of an S
-    [{
-      grid: [3, 5],
-      coords: [
-        [0,0],
-        [0,1],
-        [0,2],
-        [0,4],
-
-        [1,0],
-        [1,2],
-        [1,4],
-
-        [2,0],
-        [2,2],
-        [2,3],
-        [2,4]
-      ]
-    }]
-  ];
-
-  var _createLightbox = function () {
-    this.lightbox = new Lightbox();
-    this.add(this.lightbox);
-  };
-
-  function _createLevel(gridCoords) {
-    var size = this.gridController.getCellSize();
+  function _createLevel(index, gridCoords) {
+    // var size = this.gridController.getCellSize();
+    var size = this.options.cellSize;
     var xy = this.gridController.getXYCoordsFromGridCoords(gridCoords);
+    var color = (index % 3) + 1;
 
     var level = new StageLevelView({
+      current: false,
+      level: index+1,
+      stage: this.options.stage,
+      color: color,
       width: size[0],
       height: size[1],
       x: xy[0],
@@ -182,24 +38,21 @@ define(function(require, exports, module) {
   }
 
   function _createLevels() {
-    var layoutDef = stageLevelsLayoutDef[this.options.stage - 1][0];
-    var grid = layoutDef.grid;
-    var coords = layoutDef.coords;
 
-    console.log(layoutDef);
-    
+    var count = this.options.coords.length;
+
     // Create the layout grid
     this.gridController = new GridController({
-      rows: grid[1],
-      columns: grid[0],
-      viewWidth: this.options.width,
-      viewHeight: this.options.height,
+      rows: this.options.rows,
+      columns: this.options.cols,
+      viewWidth: this._width,
+      viewHeight: this._height,
     });
 
-    for (var i = 0; i < coords.length; i++) {
-      var coord = coords[i];
+    for (var i = 0; i < count; i++) {
+      var coord = this.options.coords[i];
       
-      _createLevel.call(this, coord);
+      _createLevel.call(this, i, coord);
     }
   }
 
@@ -207,10 +60,15 @@ define(function(require, exports, module) {
     View.apply(this, arguments);
 
     this._levels = [];
+    this._width = this.options.cols * this.options.cellSize[1];
+    this._height = this.options.rows * this.options.cellSize[0];
+
+    // console.log(this.options.rows);
+    // console.log(this.options.cols);
 
     // _createLightbox.call(this);
     this.rootModifier = new StateModifier({
-      size: [this.options.width, this.options.height],
+      size: [this._width, this._height],
       origin: [0.5, 0.5],
       align: [0.5, 0.5]
     });
@@ -222,26 +80,26 @@ define(function(require, exports, module) {
   StageLevelsView.prototype.constructor = StageLevelsView;
 
   StageLevelsView.DEFAULT_OPTIONS = {
-    stage: 3,
-    width: window.innerWidth - 40,
-    height: window.innerHeight - 100,
+    stage: 1,
+    rows: 5,
+    cols: 5,
+    cellSize: [50, 50],
+    coords: [],
+    warp: null
   };
 
   StageLevelsView.prototype.showLevels = function() {
-    console.log('showLevels', this._levels);
     if (this._levels.length === 0) {
       _createLevels.call(this);
     }
 
     for (var i = 0; i < this._levels.length; i++) {
-      // this.lightbox.show(this._levels[i]);
       this._levels[i].show();
     }
   };
 
   StageLevelsView.prototype.hideLevels = function() {
     for (var i = 0; i < this._levels.length; i++) {
-      // this.lightbox.hide(this._levels[i]);
       this._levels[i].hide();
     }
   };
