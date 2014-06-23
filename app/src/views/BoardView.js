@@ -57,8 +57,6 @@ define(function(require, exports, module) {
     // index variables;
     // currentIndex starts at center
     var currentIndex = this.getCenterIndex();
-    // console.log('startIndex (center): ', this.getCenterIndex())
-    // var previousIndex;  (not in use)
     var nextIndex;
 
     // creates blackBackground
@@ -66,7 +64,6 @@ define(function(require, exports, module) {
 
     // size of viewport
     this.viewSize = this.getSize();
-    // console.log('viewPortSize: ', this.viewSize);
 
     //creates array of state, set to null
     //gives us access to this.gridControllerMethods
@@ -89,7 +86,6 @@ define(function(require, exports, module) {
 
     // sets piece size based off of view size
     var pieceSize = this.gridController.getPieceSize(this.viewSize);
-    // console.log('pieceSize: ', pieceSize);
 
     // determines coordinates of piece on grid relative to (0, 0)
     // based on index and pieceSize
@@ -116,60 +112,17 @@ define(function(require, exports, module) {
     // Engine.pipe(sync);
     this.bgSurface.pipe(sync);
 
-
-
-
-
-
-
-        // EVENT LISTENERS
-// ----------------------------------------------------------------------
-
-
-
-    // BEGIN SYNC.ON(START)
-// ----------------------------------------------------------------------
-
     sync.on('start', function(data){ // add same color piece here
       xStart = data.clientX;
       yStart = data.clientY;
     });
-    // END SYNC.ON(START)
-// ----------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-// TEMP - toggle changes the color so the animation looks right
-// var toggle = false;
-
-    // BEGIN SYNC.ON(END)
-// ----------------------------------------------------------------------
     sync.on('end', function(data){ // animate 
       xEnd = data.clientX;
       yEnd = data.clientY;
       var direction;
 
-      
-
-
-
-
-
-
-
-
-
-
-
       // GET SWIPE DIRECTION
-// ----------------------------------------------------------------------
-
       // swipe right
       if(xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)){
         direction = 'right';
@@ -186,41 +139,22 @@ define(function(require, exports, module) {
       if(yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ){
         direction = 'up';
       }
-// ----------------------------------------------------------------------
-//      END GET SWIPE DIRECTION
-
-
-
-
-
-
-
-
-
-
+      // END GET SWIPE DIRECTION
 
       // gets new index (2, 4, 15, etc) based off current index, swipe direction, and #of columns
       var newIndex = this.getNewIndex(currentIndex, direction, this.columns);
-      console.log('currentIndex: ', currentIndex);
-      console.log('newIndex: ', newIndex);
 
       // if the newIndex does not have a piece already on it and it is in bounds
       // then we can add a new piece
-      if(this.isInBounds(direction, currentIndex) && !this.state[newIndex]){
-        flag++;
-        if(flag === 3){
-          this.deletePiece(17);
-        }
-        var lastColor = this.state[currentIndex]._child._object.back.properties.backgroundColor;
+      if(this.isInBounds(direction, currentIndex) && !this.state[newIndex]){    
         
-        
-        var piece = pieceGenerator.createNewPiece(pieceSize[0], lastColor, direction);
 
-        // console.log('newIndex: ', newIndex);
-        // this.getColorFromIndex(currentIndex);
+        // create piece
+        var lastColor = this.state[currentIndex]._child._object.back.properties.backgroundColor;
+        var piece = pieceGenerator.createNewPiece(pieceSize[0], lastColor, direction, true);
         currentIndex = newIndex;
         
-
+        // create modifier
         var pieceModifier = new StateModifier({
           origin: [0,0],
           align: [0,0],
@@ -229,32 +163,21 @@ define(function(require, exports, module) {
         });
 
         var node = this.add(pieceModifier)
-        
+        // add piece to modifier and modifier to BoardView, then reflect()
         this.state[currentIndex] = node;
         node.add(piece);
         piece.reflect();
 
+        // delete all legal matches. if no matches, check if we are trapped
+        this.deleteMatches.call(this, currentIndex);
+        this.checkIfTrapped.call(this, currentIndex);
+
         piecePosition = this.gridController.getXYCoords(currentIndex, pieceSize[0]);
 
-        this.checkIfHasMatch.call(this, newIndex, piece);
-        console.log(this.state);
       }
-      
+    }.bind(this)); // <---- END SYNC.ON('END')
 
-
-
-    }.bind(this)); // <---- END SYNC.ON('END')********************************************
-
-  }// <---- END BOARDVIEW FUNCTION
-// *********************************************************************************
-
-
-
-
-
-
-
-
+  }// <---- END BOARDVIEW FUNCTION ----------------------------------------
 
 
 
@@ -269,34 +192,104 @@ define(function(require, exports, module) {
     return (length - 1) / 2;
   }
 
-  BoardView.prototype.checkIfHasMatch = function(index){
-    // get the current index we would like to check neighbors for
+  BoardView.prototype.deleteMatches = function(index){
+    var alreadyChecked = [];
+    var connections = 0;
+    var initialIndex = index;
+    alreadyChecked[index] = true; 
 
-    // perform check to see if this is the first node we placed (edge case)
-    // console.log('child: ', this.state[index]._child);
-    if(this.state[index].child === null){
-      // is not edge case if inside this block
-      // get color
+    seekAndDestroy.call(this, index);
+
+    function seekAndDestroy(index){
+      var matches = this.checkIfAnyNeighborHasMatch(index);
+      for(var i = 0; i < matches.length; i++){
+        if(matches[i]){
+          var newIndexToCheck = matches[i][0];
+          // console.log(matches[i]);
+          if(matches[i][1] === true && !alreadyChecked[newIndexToCheck]){
+            alreadyChecked[newIndexToCheck] = true;
+            connections++;
+            // positionsToCheck.push(newIndexToCheck);
+            seekAndDestroy.call(this, newIndexToCheck);
+          }  
+        }
+      }
+    } 
+
+    if(connections > 1){
+      for(var i = 0; i < alreadyChecked.length; i++){
+        if(alreadyChecked[i] && i !== initialIndex){
+          this.deletePiece(i);
+        }
+      }
     }
+  } // end deleteMatches
 
-
-    // get color of piece located at this index
-    // console.log(this.state[index]);
+  BoardView.prototype.checkIfAnyNeighborHasMatch = function(index) {
+    var matches = [];
+    var directions = {
+      left : this.checkIfDirectionHasMatch(index, 'left'),
+      right : this.checkIfDirectionHasMatch(index, 'right'),
+      up : this.checkIfDirectionHasMatch(index, 'up'),
+      down : this.checkIfDirectionHasMatch(index, 'down')
+    };
+    for(var direction in directions){
+      if(this.isInBounds(index, direction)){
+        matches.push(directions[direction]); 
+      }
+    }
+    return matches;
   }
 
-  // BoardView.prototype.getColorFromIndex = function(index){
-  //   console.log('index: ', index);
-  //   // if not edge case
-  //   console.log(this.state[index]);
-  //   var color = this.state[index]._object.back.properties.backgroundColor;
-  //   console.log('color: ', color);
+  BoardView.prototype.checkIfDirectionHasMatch = function(index, direction){
+    var isMatchAtIndex = [];
+    var matchColor = this.getColorFromIndex(index);
 
-  // }
+    // check neighbor in specified direction for match
+    var neighborIndex = this.getNewIndex(index, direction);
+    // check if neighbor is null
+    if(this.state[neighborIndex] && this.isInBounds(direction, index)){
+      isMatch = this.getColorFromIndex(neighborIndex) === matchColor
+      isMatchAtIndex.push(neighborIndex, isMatch)
+      return isMatchAtIndex;
+    }else {
+      isMatch = false;
+      isMatchAtIndex.push(neighborIndex, isMatch)
+      return isMatchAtIndex;
+    }
+  }
+
+  BoardView.prototype.getColorFromIndex = function(index){
+    if(this.state[index]){
+      var color = this.state[index]._child._object.options.backBgColor;
+      return color;
+    }
+  }
 
   BoardView.prototype.checkIfTrapped = function(index){
-    // check surrounding indices for either !null or false
+    var canMove = [];
+    var directions = {
+      left : this.isInBounds('left', index),
+      right : this.isInBounds('right', index),
+      up : this.isInBounds('up', index),
+      down : this.isInBounds('down', index)
+    };
+    for(var direction in directions){
+      var indexToCheck = this.getNewIndex(index, direction);
+      if(directions[direction]){
+        canMove.push(this.state[indexToCheck] === null);
+      }
+    }
 
-
+    var trueFlag = 0;
+    for(var i = 0; i < canMove.length; i++){
+      if(canMove[i]){
+        trueFlag++;
+      }
+    }
+    if(!trueFlag){
+      console.log('Game Over');
+    }
   }
 
   BoardView.prototype.isInBounds = function(direction, currentIndex){
@@ -308,37 +301,31 @@ define(function(require, exports, module) {
     var yLowerBounds = boardHeight - cellSize[0];
 
     if(direction === 'left' && piecePosition[0] === 0){
-      console.log('false');
       return false
     }
-      
     if(direction === 'right' && piecePosition[0] === (viewPortSize[0] - cellSize[0])){
-      console.log('false');
       return false
-    }
-      
+    } 
     if(direction === 'up' && piecePosition[1] === 0){
-      console.log('false');
       return false
     }
     if(direction === 'down' && piecePosition[1] === yLowerBounds){
-      console.log('false');
       return false
     }
     return true;
   }
 
   BoardView.prototype.deletePiece = function(index){
-    // this.state[index]._object._opacityState.state = .01
 
-    this.state[index]._object._transformState.translate.state = [100, 100, 0];
     var centerMod = new StateModifier({
       origin: [0,0],
       align: [0,0],
       size: [64, 64],
-      transform: Transform.translate(100, 100, 0)
+      transform: Transform.translate(2000, 2000, 0)
     });
-    this.state[index].set(centerMod)
+    
+    this.state[index].set(centerMod);
+    this.state[index] = null;
   }
 
   BoardView.prototype.getNewIndex = function(currentIndex, direction){

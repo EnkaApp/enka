@@ -1,7 +1,7 @@
 define(function(require, exports, module) {
 
   	var PieceView     = require('./views/PieceView');
-  	var colorArray = ['red', 'orange', 'blue', 'green'];
+  	var colorArray = ['blue', 'green'];
   	var colorQueue = [];
 
 
@@ -13,7 +13,7 @@ define(function(require, exports, module) {
 		}
 	}
 
-	PieceGenerator.prototype.createNewPiece = function(size, lastColor, direction){
+	PieceGenerator.prototype.createNewPiece = function(size, lastColor, direction, isNotFirst){
 		if(!lastColor){
 			lastColor = getNextColorFromQueue();
 			addColorToQueue();
@@ -30,9 +30,21 @@ define(function(require, exports, module) {
 			backBgColor: backColor,
 			direction: direction
 		}
+		if(!isNotFirst){
+			var options = {
+				width: size,
+				height: size,
+				frontBgColor: lastColor,
+				backBgColor: lastColor,
+				direction: direction
+			}
+			var piece = new PieceView(options);
+			return piece;
+		}else{
+			var piece = new PieceView(options);
+			return piece;
+		}
 
-		var piece = new PieceView(options);
-		return piece;
 	}
 
 	function getNextColorFromQueue (){
@@ -42,6 +54,7 @@ define(function(require, exports, module) {
 	function addColorToQueue (){
 		var color = getRandomColor(0, colorArray.length - 1);
 		colorQueue.push(color);
+		console.log(colorQueue)
 	}
 
 	function getRandomColor (min, max){
