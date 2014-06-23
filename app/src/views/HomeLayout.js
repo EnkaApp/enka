@@ -21,9 +21,9 @@ define(function(require, exports, module) {
 
   HomeLayout.DEFAULT_OPTIONS = {
     brandingSize: [195, 195],
-    brandingTopMargin: 80,
+    brandingTopMargin: 60,
     menuSize: [190, true],
-    menuTopMargin: 120
+    menuBottomMargin: 60,
   };
 
   /**
@@ -66,6 +66,7 @@ define(function(require, exports, module) {
     var brandingTopMargin = this.options.brandingTopMargin;
     var menuSize = this.options.menuSize;
     var menuTopMargin = this.options.menuTopMargin;
+    var menuBottomMargin = this.options.menuBottomMargin;
 
     var result = [
       {
@@ -76,9 +77,9 @@ define(function(require, exports, module) {
         target: this.branding.render()
       },
       {
-        origin: [0.5, 0],
-        align: [0.5, 0],
-        transform: Transform.translate(0, brandingTopMargin+brandingSize[1]+menuTopMargin, 0),
+        origin: [0.5, 1],
+        align: [0.5, 1],
+        transform: Transform.translate(0, -menuBottomMargin, 0),
         size: menuSize,
         target: this.menu.render()
       }

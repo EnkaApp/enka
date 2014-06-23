@@ -8,7 +8,8 @@ define(function(require, exports, module) {
   var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
-  var Modifier = require('famous/core/Modifier');
+  var Modifier      = require('famous/core/Modifier');
+  var Timer         = require('famous/utilities/Timer');
 
   // ## Layouts
   var HomeLayout = require('./HomeLayout');
@@ -19,7 +20,9 @@ define(function(require, exports, module) {
 
   function _createLayout() {
     this.layout = new HomeLayout({
-      menuTopMargin: 80
+      brandingTopMargin: window.innerHeight / 10,
+      menuSize: [190, 110],
+      menuBottomMargin: window.innerHeight / 10,
     });
 
     var modifier = new StateModifier({
@@ -51,6 +54,11 @@ define(function(require, exports, module) {
     this.menuView = new HomeMenuView();
 
     this.layout.menu.add(this.menuView);
+
+    // show the buttons
+    Timer.setTimeout(function() {
+      this.menuView.showButtons();
+    }.bind(this), 1000);
   }
 
   function _setListeners() {
