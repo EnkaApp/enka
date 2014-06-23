@@ -16,12 +16,18 @@ define(function(require, exports, module) {
   var SpringTransition = require('famous/transitions/SpringTransition');
   var SnapTransition = require('famous/transitions/SnapTransition');
 
+  // ## Stage Configuration
+  var StageConfig = require('StageConfig');
+
   // ## Layout
-  var Layout        = require('famous/views/HeaderFooterLayout');
+  var Layout = require('famous/views/HeaderFooterLayout');
 
   // ## Views
-  var Scrollview      = require('famous/views/Scrollview');
-  var StageView       = require('views/StageView');
+  var Scrollview = require('famous/views/Scrollview');
+  var StageView = require('views/StageView');
+
+  // ## Controllers
+  var LivesController = require('LivesController');
 
   // ## Shared
   var H = window.innerHeight;
@@ -44,12 +50,32 @@ define(function(require, exports, module) {
   // ## Setup layout.header
 
   function _createHeader() {
+
+    var livesController = new LivesController();
+
+    // temp
+    livesController.remove();
+
+    var headerMod = new StateModifier({
+      transform: Transform.translate(0,0,0.1)
+    });
+
+    var node = this.layout.header.add(headerMod);
+
+    // Setup the background
     var bg = new Surface({
       properties: {
         backgroundColor: 'black'
       }
     });
 
+    bg.setClasses(['navbar']);
+
+    var bgMod = new StateModifier({
+      transform: Transform.behind
+    });
+
+    // Setup the home icone
     this.homeIcon = new Surface({
       size: [true, true],
       content: '<i class="fa fa-2x fa-angle-double-up"></i>',
@@ -58,26 +84,79 @@ define(function(require, exports, module) {
       }
     });
 
-    bg.setClasses(['navbar']);
-
-    // Modifiers
-    var headerMod = new StateModifier({
-      transform: Transform.translate(0,0,0.1)
-    });
-
-    var bgMod = new StateModifier({
-      transform: Transform.behind
-    });
-
-    var iconMod = new StateModifier({
+    var homeIconMod = new StateModifier({
       align: [1, 0.5],
       origin: [1, 0.5],
       transform: Transform.translate(-12,0,0)
     });
 
-    var node = this.layout.header.add(headerMod);
+    // Setup lives display
+    var livesIcon = new Surface({
+      size: [true, true],
+      content: '<i class="fa fa-heart"></i>',
+      properties: {
+        color: 'white'
+      }
+    });
+
+    var livesIconMod = new StateModifier({
+      align: [0, 0.5],
+      origin: [0, 0.5],
+      transform: Transform.translate(12,0,0)
+    });
+
+    var livesCounter = new Surface({
+      size: [true, true],
+      content: livesController.get() || '0',
+      properties: {
+        color: 'white'
+      }
+    });
+
+    livesCounter.setClasses(['header', 'lives-count']);
+
+    var livesCounterMod = new StateModifier({
+      align: [0, 0.5],
+      origin: [0, 0.5],
+      transform: Transform.translate(30,0,0)
+    });
+
+    // Setup the lives timer
+    var timer = new Surface({
+      content: '',
+      properties: {
+        color: 'white'
+      }
+    });
+
+    timer.setClasses(['header', 'lives-timer']);
+
+    var timerMod = new StateModifier({
+      size: [50, 24],
+      align: [0, 0.5],
+      origin: [0, 0.5],
+      transform: Transform.translate(43,0,0)
+    });
+
+    // Setup event listeners
+    livesController.on('lives:timeRemaining', function(time) {
+      timer.setContent('- ' + time);
+    });
+
+    livesController.on('lives:isMaxxed', function() {
+      timer.setContent('');
+    });
+
+    livesController.on('lives:updateCount', function(lives) {
+      livesCounter.setContent(lives);
+    });
+
+    // Add everything to the scene graph
     node.add(bgMod).add(bg);
-    node.add(iconMod).add(this.homeIcon);
+    node.add(homeIconMod).add(this.homeIcon);
+    node.add(livesIconMod).add(livesIcon);
+    node.add(livesCounterMod).add(livesCounter);
+    node.add(timerMod).add(timer);
   }
 
   // ## Setup layout.content
@@ -86,7 +165,6 @@ define(function(require, exports, module) {
     var view = new StageView({
       index: options.index,
       height: options.height,
-      expandedHeight: options.expandedHeight,
       currentHeight: options.currentHeight,
       backgroundColor: options.backgroundColor,
     });
@@ -101,14 +179,13 @@ define(function(require, exports, module) {
     this.scrollViewNodes = [];
 
     // if paginated === true, a click event on a scrollview item 
-      // triggers ScrollView.goToNextPage so we can't use it
+    // triggers ScrollView.goToNextPage so we can't use it
     this.scrollView = new Scrollview();
 
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < StageConfig.getStagesCount(); i++) {
       var node = _createScrollViewNode.call(this, {
         index: i,
         height: this.options.stripHeight,
-        expandedHeight: this.options.stripExpandedHeight,
         currentHeight: this.options.stripHeight,
         backgroundColor: 'hsl(' + i * 360/30 + ', 100%, 50%)'
       });
@@ -122,7 +199,6 @@ define(function(require, exports, module) {
 
       // if we are not at the top edge tell AppView to stop responding 
       // to Touch/Scroll Events
-      // if (this.scrollView.getPosition() > 0) {
       if (this.scrollView._scroller.onEdge() !== -1) {
         this._eventOutput.emit('stagesView:scrollViewInContent');
       } else {
@@ -144,11 +220,6 @@ define(function(require, exports, module) {
       }
     });
 
-    // var mod = new StateModifier({
-    //   size: [undefined, H - this.options.headerHeight],
-    //   transform: Transform.translate(0, 0, 0)
-    // });
-
     container.add(this.scrollView);
     this.layout.content.add(container);
   }
@@ -166,7 +237,6 @@ define(function(require, exports, module) {
   function StagesView() {
     View.apply(this, arguments);
 
-    // _createBackground.call(this);
     _createLayout.call(this);
     _createHeader.call(this);
     _createContent.call(this);

@@ -7,7 +7,8 @@ require.config({
         famous: '../lib/famous',
         requirejs: '../lib/requirejs/require',
         almond: '../lib/almond/almond',
-        lodash: '../lib/lodash/dist/lodash.compat'
+        lodash: '../lib/lodash/dist/lodash.compat',
+        localforage: '../lib/localforage/dist/localforage.min'
     },
     packages: [
 
