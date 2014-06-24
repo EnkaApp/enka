@@ -63,6 +63,20 @@ define(function(require, exports, module) {
         direction: Reflector.DIRECTION_RIGHT
     };
 
+    Reflector.prototype.updateOptions = function(options) {
+        this.setOptions(options);
+
+        if (this.options.direction === Reflector.DIRECTION_UP ||
+            this.options.direction === Reflector.DIRECTION_DOWN) {
+            this.axis = Reflector.AXIS_X;
+        }
+
+        if (this.options.direction === Reflector.DIRECTION_LEFT ||
+            this.options.direction === Reflector.DIRECTION_RIGHT) {
+            this.axis = Reflector.AXIS_Y;
+        }
+    }
+
     /**
      * Toggles the rotation between the front and back renderables
      *
@@ -74,6 +88,12 @@ define(function(require, exports, module) {
         var angle = this.reflected ? 0 : Math.PI;
         this.setAngle(angle, transition, callback);
         this.reflected = !this.reflected;
+    };
+
+    Reflector.prototype.reset = function reset() {
+        this.angle = new Transitionable(0);
+        this.reflected = false;
+        this.setAngle(0);
     };
 
     /**
