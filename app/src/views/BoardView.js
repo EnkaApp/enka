@@ -13,6 +13,7 @@ define(function(require, exports, module) {
   var Transitionable = require('famous/transitions/Transitionable');
   var GridController = require('../GridController');
   var PieceGenerator = require('../PieceGenerator');
+  var Timer          = require('famous/utilities/Timer');
 
   
   var xStart, yStart, xEnd, yEnd;
@@ -49,9 +50,11 @@ define(function(require, exports, module) {
     var pieceGenerator = new PieceGenerator();
     var flag = 0;
 
+
     //store columns and rows
     this.columns = this.options.dimensions[0];
     this.rows = this.options.dimensions[1];
+    this.deletedPieces = [];
 
 
     // index variables;
@@ -107,7 +110,11 @@ define(function(require, exports, module) {
     
     // attach piece to centerModifier to drop piece in middle
     centerNode.add(centerPiece);
-    this.state[currentIndex] = centerNode;
+    this.state[currentIndex] = {
+          mod: centerModifier,
+          piece: centerPiece
+        };
+    // this.state[currentIndex] = centerNode;
 
     // Engine.pipe(sync);
     this.bgSurface.pipe(sync);
@@ -146,31 +153,70 @@ define(function(require, exports, module) {
 
       // if the newIndex does not have a piece already on it and it is in bounds
       // then we can add a new piece
-      if(this.isInBounds(direction, currentIndex) && !this.state[newIndex]){    
-        
+      console.log(pieceGenerator.colorQueue);
 
-        // create piece
-        var lastColor = this.state[currentIndex]._child._object.back.properties.backgroundColor;
-        var piece = pieceGenerator.createNewPiece(pieceSize[0], lastColor, direction, true);
+      if(this.isInBounds(direction, currentIndex) && !this.state[newIndex]){    
+     
+        var lastColor = this.state[currentIndex].piece.getOption('backBgColor');
+        
+        var piece = null;
         currentIndex = newIndex;
         
         // create modifier
-        var pieceModifier = new StateModifier({
-          origin: [0,0],
-          align: [0,0],
-          size: pieceSize,
-          transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
-        });
+        if(this.deletedPieces.length === 0){
+          piece = pieceGenerator.createNewPiece(pieceSize[0], lastColor, direction, true);
+          console.log('piece: ', piece);
 
-        var node = this.add(pieceModifier)
-        // add piece to modifier and modifier to BoardView, then reflect()
-        this.state[currentIndex] = node;
-        node.add(piece);
+          var pieceModifier = new StateModifier({
+            origin: [0,0],
+            align: [0,0],
+            size: pieceSize,
+            transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
+          });
+
+          // add piece to modifier and modifier to BoardView, then reflect()
+         this.add(pieceModifier).add(piece);
+          // this.state[currentIndex] = node;
+        }else{
+          console.log('sorry, you must reuse a piece');
+          console.log('pieces to use', this.deletedPieces.length);
+        
+          var pieceObject = this.deletedPieces.pop();
+
+          console.log('pieces remaining to use', this.deletedPieces.length);
+
+          console.log('piece: ', pieceObject.piece);
+          var pieceModifier = pieceObject.mod;
+          console.log('pieceModifier: ', pieceModifier)
+          var color = pieceGenerator.colorQueue.shift();
+          
+          piece = pieceObject.piece;
+          piece.updateOptions({
+            direction: direction,
+            frontBgColor: lastColor,
+            backBgColor: color
+          });
+
+          pieceGenerator.addColorToQueue();
+
+          pieceModifier.setTransform(Transform.translate(piecePosition[0], piecePosition[1], 0));
+
+          console.log('pieceAfter: ', piece);
+        }
+
+        this.state[currentIndex] = {
+          mod: pieceModifier,
+          piece: piece
+        };
+
         piece.reflect();
 
         // delete all legal matches. if no matches, check if we are trapped
-        this.deleteMatches.call(this, currentIndex);
-        this.checkIfTrapped.call(this, currentIndex);
+        piece.on('reflected', function(){
+          this.deleteMatches.call(this, currentIndex);
+          this.checkIfTrapped.call(this, currentIndex);
+        }.bind(this));
+          
 
         piecePosition = this.gridController.getXYCoords(currentIndex, pieceSize[0]);
 
@@ -261,7 +307,8 @@ define(function(require, exports, module) {
 
   BoardView.prototype.getColorFromIndex = function(index){
     if(this.state[index]){
-      var color = this.state[index]._child._object.options.backBgColor;
+      // console.log('this.state[index]: ', this.state[index]);
+      var color = this.state[index].piece.getOption('backBgColor');
       return color;
     }
   }
@@ -316,16 +363,10 @@ define(function(require, exports, module) {
   }
 
   BoardView.prototype.deletePiece = function(index){
-
-    var centerMod = new StateModifier({
-      origin: [0,0],
-      align: [0,0],
-      size: [64, 64],
-      transform: Transform.translate(2000, 2000, 0)
-    });
-    
-    this.state[index].set(centerMod);
+    this.deletedPieces.push(this.state[index]);
+    this.state[index].mod.setTransform(Transform.translate(2000, 2000, 0));
     this.state[index] = null;
+    console.log('add deletedPieces: ', this.deletedPieces.length);
   }
 
   BoardView.prototype.getNewIndex = function(currentIndex, direction){
