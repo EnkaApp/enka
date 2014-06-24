@@ -5,17 +5,17 @@ define(function(require, exports, module) {
   var RenderNode    = require('famous/core/RenderNode');
   var OptionsManager = require('famous/core/OptionsManager');
 
+  var boardView = null;
+
   // coords: [gridSize: [2, 4],
   // startCoords: [2, 4]
   // obstacles: [3, 5]
 
 
   function BoardGenerator(options) {
- 
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
     if (options) this.setOptions(options);
-
   }
 
   BoardGenerator.DEFAULT_OPTIONS = {
@@ -33,8 +33,17 @@ define(function(require, exports, module) {
    * @return {Object} associated object
    */
   BoardGenerator.prototype.getOptions = function getOptions() {
-      return this._optionsManager.value();
+    return this._optionsManager.value();
   };
+
+  BoardGenerator.prototype.getNewBoard = function(){
+    // TODO UPDATE OPTIONS
+    if(!boardView){
+      boardView = new BoardView(this.options);
+    } else{
+      boardView.setOptions(this.options);
+    }  
+  }
 
   /*
    *  Set internal options.
@@ -43,11 +52,8 @@ define(function(require, exports, module) {
    *  @param {Object} options
    */
   BoardGenerator.prototype.setOptions = function setOptions(options) {
-      this._optionsManager.patch(options);
+    this._optionsManager.patch(options);
   };
-
-  // Deprectated
-  // Moved to PieceGenerator
  
 
   module.exports = BoardGenerator;

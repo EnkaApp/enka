@@ -42,9 +42,6 @@ define(function(require, exports, module) {
   
 
   function BoardView() {
-
-        // INITIAL SETUP
-// ----------------------------------------------------------------------
     View.apply(this, arguments);
     // initializes colorQueue
     var pieceGenerator = new PieceGenerator();
@@ -116,7 +113,6 @@ define(function(require, exports, module) {
         };
     // this.state[currentIndex] = centerNode;
 
-    // Engine.pipe(sync);
     this.bgSurface.pipe(sync);
 
     sync.on('start', function(data){ // add same color piece here
