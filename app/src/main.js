@@ -1,4 +1,5 @@
 /* globals define */
+
 define(function(require, exports, module) {
   'use strict';
   // import dependencies
@@ -6,7 +7,9 @@ define(function(require, exports, module) {
   var Modifier = require('famous/core/Modifier');
   var Transform = require('famous/core/Transform');
   var ImageSurface = require('famous/surfaces/ImageSurface');
+  
   var db = require('localforage');
+  var UserModel = require('UserModel');
 
   // Configure database (using localforage)
   db.config({
@@ -16,6 +19,10 @@ define(function(require, exports, module) {
     storeName: 'enka',
     description: 'Stores persistent game information, i.e. current stage, current level, lives'
   });
+
+  // Initialize User Model
+  var user = new UserModel();
+  console.log(user);
 
 
   // Views
@@ -29,5 +36,4 @@ define(function(require, exports, module) {
   var appView = new AppView();
 
   mainContext.add(appView);
-  // mainContext.add(centerSpinModifier).add(logo);
 });
