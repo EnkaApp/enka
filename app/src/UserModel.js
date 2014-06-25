@@ -72,12 +72,11 @@ define(function(require, exports, module) {
 
   User.DEFAULT_OPTIONS = {
     created: '',
-    latestStage: 1,
-    latestLevel: 1,
+    latestStage: 1, // latest stage progressed to
+    latestLevel: 1, // furthest level of latest stage
     lives: 5,
     lastDeath: '',
-    lastRecharge: '',
-    completed: [],
+    lastRecharge: ''
   };
 
   User.prototype.save = function(data) {
@@ -111,12 +110,18 @@ define(function(require, exports, module) {
       this._optionsManager.patch(options);
   };
 
-  User.prototype.hasCompletedLevel = function(stage, level) {
+  User.prototype.hasUnlockedLevel = function(stage, level) {
+    var res = false;
 
-  };
+    if (stage < this.options.latestStage) {
+      res = true;
+    } else if (stage === this.options.latestStage) {
+      if (level <= this.options.latestLevel) {
+        res = true;
+      }
+    }
 
-  User.prototype.hasUnlockedStage = function(stage) {
-
+    return res;
   };
 
   /**
@@ -139,7 +144,7 @@ define(function(require, exports, module) {
     // update options
     this.setOptions(options);
 
-    // save to databse
+    // save to database
     this.save(options);
   };
 
