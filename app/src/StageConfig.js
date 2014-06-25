@@ -4,6 +4,9 @@ define(function(require, exports, module) {
   // Each 'coords' array contains the grid positions of a level view.
   // Each level view will be animated in using the order that they are declared
 
+  GAMETYPE_SURVIVAL = 1;
+  GAMETYPE_DESTROY = 2;
+
   var stages = [
 
     // ## Stage 1
@@ -24,6 +27,8 @@ define(function(require, exports, module) {
       grid: [4, 5],
       levels: [
         {
+          gametype: GAMETYPE_SURVIVAL,
+          goal: 10,
           grid: [2,8],
           startCoord: [1,1]
         }
@@ -67,8 +72,17 @@ define(function(require, exports, module) {
     }
   ];
 
-  function StageConfig(index) {
-    this.index = index || 0;
+  function _getGameTypeDesc(type, goal) {
+    if (type === GAMETYPE_SURVIVAL) {
+      return 'Survive for ' + goal + ' turns to win';
+    }
+    else if (type === GAMETYPE_DESTROY) {
+      return 'Destroy ' + goal + ' blocks to win';
+    }
+  }
+
+  function StageConfig(stage) {
+    this.index = stage - 1 || 0;
   }
 
   // ## Static Methods
@@ -99,6 +113,13 @@ define(function(require, exports, module) {
 
   StageConfig.prototype.getIcon = function() {
     return stages[this.index].icon;
+  };
+
+  StageConfig.prototype.getGameDesc = function(level) {
+    var type = stages[this.index].levels[level-1].gametype;
+    var goal = stages[this.index].levels[level-1].goal;
+    
+    return _getGameTypeDesc(type, goal);
   };
 
   module.exports = StageConfig;

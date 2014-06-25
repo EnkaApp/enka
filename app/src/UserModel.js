@@ -46,16 +46,14 @@ define(function(require, exports, module) {
           this.save(this.options);
         }
 
-        this._instance = this;
-
       }.bind(this));
     }.bind(this));
   }
 
   function User(options) {
     
-    if (this._instance) {
-      return this._instance;
+    if (User._instance) {
+      return User._instance;
     }
 
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
@@ -66,6 +64,8 @@ define(function(require, exports, module) {
 
     // initialize user
     _init.call(this);
+
+    User._instance = this;
   }
 
   User._instance = null;

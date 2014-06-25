@@ -83,8 +83,8 @@ define(function(require, exports, module) {
     View.apply(this, arguments);
 
     this._levels = null;
-    this._stage = new StageConfig(this.options.index);
     this._stageNum = this.options.index + 1;
+    this._stage = new StageConfig(this._stageNum);
     this._expandedHeight = _getExpandedHeight.call(this);
 
     this.rootModifier = new StateModifier({

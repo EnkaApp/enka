@@ -56,8 +56,8 @@ define(function(require, exports, module) {
   }
   
   function Lives(options) {
-    if (this._instance) {
-      return this._instance;
+    if (Lives._instance) {
+      return Lives._instance;
     }
 
     this._eventInput = new EventHandler();
@@ -70,7 +70,7 @@ define(function(require, exports, module) {
 
     if (options) this.setOptions(options);
 
-    this._instance = this;
+    Lives._instance = this;
   }
 
   Lives._instance = null;

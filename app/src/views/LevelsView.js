@@ -48,7 +48,7 @@ define(function(require, exports, module) {
   function LevelsView() {
     View.apply(this, arguments);
 
-    this.config = new StageConfig(this.options.stage - 1);
+    this.config = new StageConfig(this.options.stage);
 
     this.rootMod = new StateModifier({
       size: [undefined, this.options.currentHeight],
@@ -144,7 +144,10 @@ define(function(require, exports, module) {
     var icon = this.config.getIcon();
 
     this.icon = new ImageSurface({
-      content: icon.url
+      content: icon.url,
+      properties: {
+        pointerEvents: 'none'
+      }
     });
 
     this.iconMod = new StateModifier({
