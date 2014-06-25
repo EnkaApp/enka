@@ -76,7 +76,8 @@ define(function(require, exports, module) {
     latestLevel: 1,
     lives: 5,
     lastDeath: '',
-    lastRecharge: ''
+    lastRecharge: '',
+    completed: [],
   };
 
   User.prototype.save = function(data) {
@@ -108,6 +109,10 @@ define(function(require, exports, module) {
    */
   User.prototype.setOptions = function setOptions(options) {
       this._optionsManager.patch(options);
+  };
+
+  User.prototype.hasCompletedLevel = function(stage, level) {
+
   };
 
   User.prototype.hasUnlockedStage = function(stage) {

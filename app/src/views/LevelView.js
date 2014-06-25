@@ -15,6 +15,10 @@ define(function(require, exports, module) {
   // ## Views
   var Flipper = require('famous/views/Flipper');
 
+  // ## Templates
+  var tplLevelFront = require('hbs!templates/levelFront');
+  var tplLevelDetail = require('hbs!templates/levelDetail');
+
   function _createListeners() {
     
     function select(e) {
@@ -87,6 +91,7 @@ define(function(require, exports, module) {
     level: 1,
     stage: 1,
     colors: 1,
+    locked: true,
     start: [-10000, -10000, 0]
   };
 
@@ -137,14 +142,18 @@ define(function(require, exports, module) {
   function _createFront() {
     this.front = new LevelFrontView({
       stage: this.options.stage,
-      color: this._color
+      level: this.options.level,
+      color: this._color,
+      locked: this.options.locked
     });
   }
 
   function _createBack() {
     this.back = new LevelBackView({
       stage: this.options.stage,
-      color: this._color
+      level: this.options.level,
+      color: this._color,
+      locked: this.options.locked
     });
   }
 
@@ -168,57 +177,50 @@ define(function(require, exports, module) {
     this.node = this.add(this.rootModifier);
 
     _createLFVBacking.call(this);
-    _createLFVNumber.call(this);
+    // _createLFVNumber.call(this);
     _setLFVListeners.call(this);
   }
 
   LevelFrontView.DEFAULT_OPTIONS = {
-    color: 1
+    stage: 1,
+    level: 1,
+    color: 1,
+    locked: true
   };
 
   LevelFrontView.prototype = Object.create(View.prototype);
   LevelFrontView.prototype.constructor = LevelFrontView;
 
+  function _getLFVContent() {
+    var data = {
+      level: this.options.level
+    };
+
+    return tplLevelFront(data);
+  }
+
   function _createLFVBacking() {
     this.backing = new Surface({
       size: [undefined, undefined],
+      content: _getLFVContent.call(this),
       properties: {}
     });
 
     this.backing.setClasses([
       'stage-level-front',
-      'stage-level-bg',
       'stage-'+this.options.stage,
-      'color-'+this.options.color
+      'stage-level--color'+this.options.color
     ]);
 
     if (this.options.current) {
       this.backing.addClass('current');
     }
 
+    if (this.options.locked) {
+      this.backing.addClass('locked');
+    }
+
     this.node.add(this.backing);
-  }
-
-  function _createLFVNumber() {
-    this.number = new Surface({
-      content: this.options.level,
-      size: [true, true],
-      properties: {
-        zIndex: 1,
-        pointerEvents: 'none'
-      }
-    });
-
-    var mod = new StateModifier({
-      origin: [0.5, 0.5],
-      align: [0.5, 0.5]
-    });
-
-    this.number.setClasses([
-      'stage-level-number',
-      'stage-'+this.options.stage,
-      'color-'+this.options.color
-    ]);
   }
 
   // ------------------------------------------------------------
@@ -246,15 +248,27 @@ define(function(require, exports, module) {
 
   LevelBackView.DEFAULT_OPTIONS = {
     stage: 1,
-    color: 1
+    level: 1,
+    color: 1,
+    locked: true
   };
 
   LevelBackView.prototype = Object.create(View.prototype);
   LevelBackView.prototype.constructor = LevelBackView;
 
+  function _getLFBContent() {
+    var data = {
+      description: 'Test description'
+    };
+
+    return tplLevelDetail(data);
+  }
+
   function _createLFBBacking() {
+
     this.backing = new Surface({
       size: [undefined, undefined],
+      content: _getLFBContent.call(this),
       properties: {
         backgroundColor: 'white' // TEMP
       }
@@ -262,13 +276,16 @@ define(function(require, exports, module) {
 
     this.backing.setClasses([
       'stage-level-back',
-      'stage-level-bg',
       'stage-'+this.options.stage,
-      'color-'+this.options.color
+      'stage-level--color'+this.options.color
     ]);
 
     if (this.options.current) {
       this.backing.addClass('current');
+    }
+
+    if (this.options.locked) {
+      this.backing.addClass('locked');
     }
 
     this.node.add(this.backing);

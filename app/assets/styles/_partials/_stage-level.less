@@ -1,0 +1,71 @@
+.stage-level-front {
+  .level-number, .fa-lock {
+    position: absolute;
+    display: block;
+    width: 100%;
+    line-height: 1;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .level-number {
+    height: 60px;
+    font-size: 60px;
+    top: 50%;
+    margin-top: -30px;
+  }
+
+  .fa-lock {
+    display: none;
+  }
+
+  &.locked {
+    .level-number {
+      display: none;
+    }
+
+    .fa-lock {
+      display: block;
+      height: 100px;
+      font-size: 100px;
+      top: 50%;
+      margin-top: -50px;
+    }
+  }
+}
+
+.stage-level-front.stage-1 {
+  .level-number, .fa-lock {
+    color: darken(@cc1-baige, 20%);
+  }
+}
+
+.stage-level-front.stage-2 {
+  .level-number, .fa-lock {
+    color: darken(@cc3-marigold, 20%);
+  }
+}
+
+.stage-level-front.stage-3 {
+  .level-number, .fa-lock {
+    color: darken(@cc3-salmon, 20%);
+  }
+}
+
+.stage-level-front.stage-4 {
+  .level-number, .fa-lock {
+    color: darken(@cc4-clay, 20%);
+  }
+}
+
+.stage-level-front.stage-5 {
+  .level-number, .fa-lock {
+    color: darken(@cc2-light-mint, 20%);
+  }
+}
+
+.stage-level-front.stage-6 {
+  .level-number, .fa-lock {
+    color: darken(@cc1-seagreen, 20%);
+  }
+}
