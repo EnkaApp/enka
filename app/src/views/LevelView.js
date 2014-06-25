@@ -12,12 +12,18 @@ define(function(require, exports, module) {
   var Lightbox      = require('famous/views/Lightbox');
   var Easing        = require('famous/transitions/Easing');
 
+  // ## Models
+  var User = require('UserModel');
+
   // ## Views
   var Flipper = require('famous/views/Flipper');
 
   // ## Templates
   var tplLevelFront = require('hbs!templates/levelFront');
   var tplLevelDetail = require('hbs!templates/levelDetail');
+
+  // ## Shared
+  var user = new User();
 
   function _createListeners() {
     
@@ -49,14 +55,19 @@ define(function(require, exports, module) {
       });
     }
 
-    this.front.on('click', select.bind(this));
-    this.back.on('click', close.bind(this));
+    if (!this._locked) {
+      this.front.on('click', select.bind(this));
+      this.back.on('click', close.bind(this));
+    }
     
     this.front.pipe(this._eventOutput);
   }
 
   function LevelView() {
     View.apply(this, arguments);
+
+    // set locked/unlocked status
+    this._locked = !user.hasUnlockedLevel(this.options.stage, this.options.level);
 
     this._transform = Transform.translate(
       this.options.start[0],
@@ -91,7 +102,6 @@ define(function(require, exports, module) {
     level: 1,
     stage: 1,
     colors: 1,
-    locked: true,
     start: [-10000, -10000, 0]
   };
 
@@ -122,6 +132,20 @@ define(function(require, exports, module) {
     this.rootMod.setTransform(Transform.translate(0,0,1), transition);
   };
 
+  LevelView.prototype.unlock = function() {
+
+    // update the user model
+    user.setLatestLevel(this.stage, this.level);
+
+    // update the view
+    this._locked = false;
+    this.front.unlock();
+    this.back.unlock();
+
+    // make sure listeners are set
+    _createListeners.call(this);
+  };
+
   function _createFlipper() {
     this.flipper = new Flipper();
 
@@ -144,7 +168,7 @@ define(function(require, exports, module) {
       stage: this.options.stage,
       level: this.options.level,
       color: this._color,
-      locked: this.options.locked
+      locked: this._locked
     });
   }
 
@@ -153,7 +177,7 @@ define(function(require, exports, module) {
       stage: this.options.stage,
       level: this.options.level,
       color: this._color,
-      locked: this.options.locked
+      locked: this._locked
     });
   }
 
@@ -177,7 +201,6 @@ define(function(require, exports, module) {
     this.node = this.add(this.rootModifier);
 
     _createLFVBacking.call(this);
-    // _createLFVNumber.call(this);
     _setLFVListeners.call(this);
   }
 
@@ -190,6 +213,14 @@ define(function(require, exports, module) {
 
   LevelFrontView.prototype = Object.create(View.prototype);
   LevelFrontView.prototype.constructor = LevelFrontView;
+
+  LevelFrontView.prototype.unlock = function() {
+    this.setOptions({
+      locked: false
+    });
+
+    this.backing.removeClass('locked');
+  };
 
   function _getLFVContent() {
     var data = {
@@ -255,6 +286,14 @@ define(function(require, exports, module) {
 
   LevelBackView.prototype = Object.create(View.prototype);
   LevelBackView.prototype.constructor = LevelBackView;
+
+  LevelBackView.prototype.unlock = function() {
+    this.setOptions({
+      locked: false
+    });
+
+    this.backing.removeClass('locked');
+  };
 
   function _getLFBContent() {
     var data = {
