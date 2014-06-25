@@ -8,7 +8,8 @@ require.config({
         requirejs: '../lib/requirejs/require',
         almond: '../lib/almond/almond',
         lodash: '../lib/lodash/dist/lodash.compat',
-        localforage: '../lib/localforage/dist/localforage.min'
+        localforage: '../lib/localforage/dist/localforage.min',
+        hbs: '../lib/require-handlebars-plugin/hbs'
     },
     packages: [
 
