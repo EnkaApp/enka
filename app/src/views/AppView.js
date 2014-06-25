@@ -30,6 +30,86 @@ define(function(require, exports, module) {
   var H = window.innerHeight;
   var W = window.innerWidth;
 
+
+  function _setListeners() {
+    this.stagesView.on('nav:loadHome', function() {
+      this.slideDown();
+    }.bind(this));
+
+    this.homeView.on('nav:loadStages', function(){
+      this.slideUp();
+    }.bind(this));
+
+    this.homeView.on('nav:loadGame', function() {
+      this.slideLeft();
+    }.bind(this));
+  }
+
+  function AppView() {
+    View.apply(this, arguments);
+
+    this.showingHome = true;
+    this.delegateToScrollView = false;
+    
+    // @NOTE homeViewYPos indicates the number of pixels ABOVE the top of the
+    // document that homeView is currently positioned. 
+    // Also keep in mind that stagesView moves inversely to homeViewYPos.
+    this.homeViewYPos = new Transitionable(0);
+
+    // @NOTE gameViewXPos indicates the number of pixels RIGHT of the right edge
+    // of the document that gameView is currently positioned. 
+    // Also keep in mind that stagesView and homeView moves inversely to gameViewXPos.
+    this.gameViewXPos = new Transitionable(0);
+    this.gameViewOpacity = new Transitionable(0);
+
+    _createStagesView.call(this);
+    _createHomeView.call(this);
+    _createGameView.call(this);
+    _createFPSView.call(this);
+
+    // Initialize Event Handlers
+    _setListeners.call(this);
+    _handleSwipe.call(this);
+  }
+
+  AppView.prototype = Object.create(View.prototype);
+  AppView.prototype.constructor = AppView;
+
+  AppView.DEFAULT_OPTIONS = {
+    transition: {
+      duration: 500,
+      curve: 'easeOut',
+    },
+    posThreshold: H/4,
+    velThreshold: 0.75
+  };
+
+  AppView.prototype.slideUp = function() {
+    this.homeViewYPos.set(H, this.options.transition, function() {
+      this.showingHome = false;
+    });
+  };
+
+  AppView.prototype.slideDown = function() {
+    this.homeViewYPos.set(0, this.options.transition, function() {
+      this.showingHome = true;
+    });
+  };
+
+  AppView.prototype.slideLeft = function() {
+    this.gameViewOpacity.set(1);
+    this.gameViewXPos.set(W, this.options.transition, function() {
+      this.showingStages = false;
+    });
+  };
+
+  AppView.prototype.slideRight = function() {
+    this.gameViewXPos.set(0, this.options.transition, function() {
+      this.showingStages = true;
+    });
+  };
+
+
   // ## View Constructors
   function _createStagesView() {
     this.stagesView = new StagesView();
@@ -150,84 +230,6 @@ define(function(require, exports, module) {
 
     }.bind(this));
   }
-
-  function _setListeners() {
-    this.stagesView.on('nav:loadHome', function() {
-      this.slideDown();
-    }.bind(this));
-
-    this.homeView.on('nav:loadStages', function(){
-      this.slideUp();
-    }.bind(this));
-
-    this.homeView.on('nav:loadGame', function() {
-      this.slideLeft();
-    }.bind(this));
-  }
-
-  function AppView() {
-    View.apply(this, arguments);
-
-    this.showingHome = true;
-    this.delegateToScrollView = false;
-    
-    // @NOTE homeViewYPos indicates the number of pixels ABOVE the top of the
-    // document that homeView is currently positioned. 
-    // Also keep in mind that stagesView moves inversely to homeViewYPos.
-    this.homeViewYPos = new Transitionable(0);
-
-    // @NOTE gameViewXPos indicates the number of pixels RIGHT of the right edge
-    // of the document that gameView is currently positioned. 
-    // Also keep in mind that stagesView and homeView moves inversely to gameViewXPos.
-    this.gameViewXPos = new Transitionable(0);
-    this.gameViewOpacity = new Transitionable(0);
-
-    _createStagesView.call(this);
-    _createHomeView.call(this);
-    _createGameView.call(this);
-    _createFPSView.call(this);
-
-    // Initialize Event Handlers
-    _setListeners.call(this);
-    _handleSwipe.call(this);
-  }
-
-  AppView.prototype = Object.create(View.prototype);
-  AppView.prototype.constructor = AppView;
-
-  AppView.DEFAULT_OPTIONS = {
-    transition: {
-      duration: 500,
-      curve: 'easeOut',
-    },
-    posThreshold: H/4,
-    velThreshold: 0.75
-  };
-
-  AppView.prototype.slideUp = function() {
-    this.homeViewYPos.set(H, this.options.transition, function() {
-      this.showingHome = false;
-    });
-  };
-
-  AppView.prototype.slideDown = function() {
-    this.homeViewYPos.set(0, this.options.transition, function() {
-      this.showingHome = true;
-    });
-  };
-
-  AppView.prototype.slideLeft = function() {
-    this.gameViewOpacity.set(1);
-    this.gameViewXPos.set(W, this.options.transition, function() {
-      this.showingStages = false;
-    });
-  };
-
-  AppView.prototype.slideRight = function() {
-    this.gameViewXPos.set(0, this.options.transition, function() {
-      this.showingStages = true;
-    });
-  };
 
   module.exports = AppView;
 });

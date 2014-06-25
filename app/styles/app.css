@@ -1764,8 +1764,14 @@ html {
 .right-triangle.light {
   border-color: transparent transparent transparent #f5fafa;
 }
+.stage-bg.active {
+  border-bottom: 10px solid white;
+}
 .stage-1.stage-bg {
   background-color: #f4f0e4;
+}
+.stage-1.stage-bg.active {
+  border-color: #ede6d2;
 }
 .stage-1.stage-level-bg {
   background-color: #e5dcc0;
@@ -1780,6 +1786,9 @@ html {
 .stage-2.stage-bg {
   background-color: #fcb040;
 }
+.stage-2.stage-bg.active {
+  border-color: #fca627;
+}
 .stage-2.stage-level-bg {
   background-color: #fb9b0e;
 }
@@ -1792,6 +1801,9 @@ html {
 }
 .stage-3.stage-bg {
   background-color: #f9b6b3;
+}
+.stage-3.stage-bg.active {
+  border-color: #f79f9b;
 }
 .stage-3.stage-level-bg {
   background-color: #f58984;
@@ -1806,18 +1818,24 @@ html {
 .stage-4.stage-bg {
   background-color: #e1a391;
 }
+.stage-4.stage-bg.active {
+  border-color: #dc927d;
+}
 .stage-4.stage-level-bg {
-  background-color: #81020e;
+  background-color: #d68169;
 }
 .stage-4.stage-level-current {
   font-weight: bold;
   text-decoration: underline;
 }
 .stage-4.stage-level-incomplete {
-  background-color: #81020e;
+  background-color: #d68169;
 }
 .stage-5.stage-bg {
   background-color: #bbf5e9;
+}
+.stage-5.stage-bg.active {
+  border-color: #a5f2e2;
 }
 .stage-5.stage-level-bg {
   background-color: #8feedb;
@@ -1831,6 +1849,9 @@ html {
 }
 .stage-6.stage-bg {
   background-color: #5ab4b2;
+}
+.stage-6.stage-bg.active {
+  border-color: #4ca8a6;
 }
 .stage-6.stage-level-bg {
   background-color: #449795;

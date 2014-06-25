@@ -24,7 +24,7 @@ define(function(require, exports, module) {
 
   // ## Views
   var Scrollview = require('famous/views/Scrollview');
-  var StageView = require('views/StageView');
+  var LevelsView = require('views/LevelsView');
 
   // ## Controllers
   var LivesController = require('LivesController');
@@ -34,6 +34,39 @@ define(function(require, exports, module) {
 
   Transitionable.registerMethod('spring', SpringTransition);
   Transitionable.registerMethod('snap', SnapTransition);
+
+
+  function _setListeners() {
+    this.homeIcon.on('click', function() {
+      this._eventOutput.emit('nav:loadHome');
+    }.bind(this));
+  }
+
+  function StagesView() {
+    View.apply(this, arguments);
+
+    _createLayout.call(this);
+    _createHeader.call(this);
+    _createContent.call(this);
+    
+    // Init Event Listeners
+    _setListeners.call(this);
+
+    // set initial active stage
+    this.prevIndex = this.options.activeStage - 1;
+    this.activeIndex = this.options.activeStage - 1;
+    this.loadStage();
+  }
+
+  StagesView.prototype = Object.create(View.prototype);
+  StagesView.prototype.constructor = StagesView;
+
+  StagesView.DEFAULT_OPTIONS = {
+    headerHeight: 44,
+    stageHeight: 100,
+    stageExpandedHeight: 500,
+    activeStage: 1
+  };
 
   function _createLayout() {
     this.layout = new Layout({
@@ -161,33 +194,45 @@ define(function(require, exports, module) {
 
   // ## Setup layout.content
 
+  function _createContent() {
+
+    _createScrollView.call(this);
+
+    var container = new ContainerSurface({
+      size: [undefined, H - this.options.headerHeight],
+      properties: {
+        overflow: 'hidden'
+      }
+    });
+
+    container.add(this.scrollView);
+    this.layout.content.add(container);
+  }
+
   function _createScrollViewNode(options) {
-    var view = new StageView({
-      index: options.index,
+    var view = new LevelsView({
+      stage: options.index + 1,
       height: options.height,
       currentHeight: options.currentHeight,
-      backgroundColor: options.backgroundColor,
+      expandedHeight: options.expandedHeight
     });
 
     view.pipe(this.scrollView);
-    view.on('selectStage', this.scrollToStage.bind(this));
+    view.on('stage:select', this.scrollToStage.bind(this));
 
     return view;
   }
 
   function _createScrollView() {
     this.scrollViewNodes = [];
-
-    // if paginated === true, a click event on a scrollview item 
-    // triggers ScrollView.goToNextPage so we can't use it
     this.scrollView = new Scrollview();
 
     for (var i = 0; i < StageConfig.getStagesCount(); i++) {
       var node = _createScrollViewNode.call(this, {
         index: i,
-        height: this.options.stripHeight,
-        currentHeight: this.options.stripHeight,
-        backgroundColor: 'hsl(' + i * 360/30 + ', 100%, 50%)'
+        height: this.options.stageHeight,
+        currentHeight: this.options.stageHeight,
+        expandedHeight: this.options.stageExpandedHeight,
       });
 
       this.scrollViewNodes.push(node);
@@ -208,57 +253,6 @@ define(function(require, exports, module) {
 
     this.scrollView.pipe(this._eventOutput);
   }
-
-  function _createContent() {
-
-    _createScrollView.call(this);
-
-    var container = new ContainerSurface({
-      size: [undefined, H - this.options.headerHeight],
-      properties: {
-        overflow: 'hidden'
-      }
-    });
-
-    container.add(this.scrollView);
-    this.layout.content.add(container);
-  }
-
-  function _getNodeAtIndex(index) {
-    return this.scrollViewNodes[index];
-  }
-
-  function _setListeners() {
-    this.homeIcon.on('click', function() {
-      this._eventOutput.emit('nav:loadHome');
-    }.bind(this));
-  }
-
-  function StagesView() {
-    View.apply(this, arguments);
-
-    _createLayout.call(this);
-    _createHeader.call(this);
-    _createContent.call(this);
-    
-    // Init Event Listeners
-    _setListeners.call(this);
-
-    // set initial active stage
-    this.prevIndex = this.options.activeStage - 1;
-    this.activeIndex = this.options.activeStage - 1;
-    this.loadStage();
-  }
-
-  StagesView.prototype = Object.create(View.prototype);
-  StagesView.prototype.constructor = StagesView;
-
-  StagesView.DEFAULT_OPTIONS = {
-    headerHeight: 44,
-    stripHeight: 100,
-    stripExpandedHeight: H - 44, // window height minus the header height
-    activeStage: 1
-  };
 
   /**
    * Taken from famous/views/Scrollview because _shiftOrigin is not exposed
@@ -309,7 +303,7 @@ define(function(require, exports, module) {
     var firstVisibileHeight = _getFirstVisibleHeight.call(this);
     var offset = clickY - firstVisibileHeight;
     offset = offset - this.options.headerHeight;
-    offset = offset - offset % this.options.stripHeight;
+    offset = offset - offset % this.options.stageHeight;
     
     return firstVisibileHeight + offset;
   }
@@ -369,7 +363,7 @@ define(function(require, exports, module) {
 
   StagesView.prototype.scrollToStage = function(data) {
     var e = data.event;
-    var index = data.index;
+    var index = data.stage - 1;
     var node = data.node;
 
     // stop from executing if their is a second click on an already active node
@@ -407,6 +401,10 @@ define(function(require, exports, module) {
   StagesView.prototype.loadStage = function() {
     this.expandStage();
   };
+
+  function _getNodeAtIndex(index) {
+    return this.scrollViewNodes[index];
+  }
 
   module.exports = StagesView;
 });
