@@ -48,6 +48,10 @@ define(function(require, exports, module) {
 
   function _setListeners() {
 
+    // Pipe PieceGenerator events out
+    this.pieceGenerator._eventOutput.pipe(this._eventOutput);
+
+    // Setup swipe events
     this.bgSurface.pipe(sync);
 
     sync.on('start', function(data) {

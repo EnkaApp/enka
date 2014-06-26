@@ -143,7 +143,7 @@ define(function(require, exports, module) {
   PieceGenerator.prototype.getNextColorFromQueue = function(){
     var color = this.colorQueue.shift();
 
-    this._eventOutput.emit('piece:colorsUpdated');
+    // this._eventOutput.emit('piece:colorsUpdated');
     this._eventOutput.emit('piece:colorRemoved');
 
     return color;
