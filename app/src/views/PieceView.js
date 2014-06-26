@@ -14,9 +14,6 @@ define(function(require, exports, module) {
   // Testing
   var Reflector = require('views/Reflector');
 
-  // ## Custom Modifier Classes
-  // var ReflectionModifier = require('../modifiers/ReflectionModifier');
-
   // ## Constants
 
   var DIRECTIONS = {
@@ -55,8 +52,6 @@ define(function(require, exports, module) {
       this.reflectionMod.setOrigin(origin);
       this.reflectionMod.setAlign(align);
     }
-
-    // return this.add(modifier);
   }
 
   // ## Surfaces

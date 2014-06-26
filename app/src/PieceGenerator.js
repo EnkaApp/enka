@@ -143,7 +143,7 @@ define(function(require, exports, module) {
   PieceGenerator.prototype.getNextColorFromQueue = function(){
     var color = this.colorQueue.shift();
 
-    this._eventOutput.emit('colorsUpdated');
+    this._eventOutput.emit('piece:colorsUpdated');
     this._eventOutput.emit('piece:colorRemoved');
 
     return color;
@@ -153,7 +153,7 @@ define(function(require, exports, module) {
     var color = _getRandomColor(0, colorArray.length - 1);
     this.colorQueue.push(color);
 
-    this._eventOutput.emit('colorsUpdated');
+    this._eventOutput.emit('piece:colorsUpdated');
     this._eventOutput.emit('piece:colorAdded');
   };
 
