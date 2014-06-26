@@ -40,12 +40,16 @@ define(function(require, exports, module) {
       FpsMeter.__super__.constructor.apply(this, arguments);
       this.initTime();
       this.surface = new Surface({
-        size: [60, 20],
+        size: [70, 30],
         classes: ['fpsmeter'],
-        content: ''
+        content: '',
+        properties: {
+          zIndex: 100
+        }
       });
       this.add(new Modifier({
-        origin: [1, 1],
+        origin: [1,1],
+        align: [1,1],
         transform: Transform.translate(0, 0, 10)
       })).add(this.surface);
       this.surface.on('click', this.toggleState);

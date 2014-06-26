@@ -30,127 +30,6 @@ define(function(require, exports, module) {
   var H = window.innerHeight;
   var W = window.innerWidth;
 
-  // ## View Constructors
-  function _createStagesView() {
-    this.stagesView = new StagesView();
-
-    this.stagesYModifier = new Modifier({
-      transform: function() {
-        var h = H - this.homeViewYPos.get();
-        return Transform.translate(0, h, 0);
-      }.bind(this)
-    });
-
-    this.gameXModifier = new Modifier({
-      transform: function() {
-        return Transform.translate(-this.gameViewXPos.get(), 0, 0);
-      }.bind(this)
-    });
-
-    this.add(this.stagesYModifier).add(this.gameXModifier).add(this.stagesView);
-  }
-
-  function _createHomeView() {
-    this.homeView = new HomeView();
-
-    this.homeModifier = new Modifier({
-      transform: function() {
-        return Transform.translate(0, -this.homeViewYPos.get(), 0);
-      }.bind(this)
-    });
-
-    this.gameXModifier = new Modifier({
-      transform: function() {
-        return Transform.translate(-this.gameViewXPos.get(), 0, 0);
-      }.bind(this)
-    });
-
-    this.add(this.homeModifier).add(this.gameXModifier).add(this.homeView);
-  }
-
-  function _createGameView() {
-    this.gameView = new GameView();
-
-    this.gameModifier = new Modifier({
-      opacity: function() {
-        return this.gameViewOpacity.get();
-      }.bind(this),
-      transform: function() {
-        var w = W - this.gameViewXPos.get();
-        return Transform.translate(w, 0, 0);
-      }.bind(this)
-    });
-
-    this.add(this.gameModifier).add(this.gameView);
-  }
-
-  function _createFPSView() {
-    this.fpsView = new FpsMeterView();
-
-    this.add(this.fpsView);
-  }
-
-
-  // ## Event Handlers/Listeners
-
-  function _handleSwipe() {
-    var sync = new GenericSync(
-        ['mouse', 'touch'],
-        {direction: GenericSync.DIRECTION_Y}
-    );
-
-    this.homeView.pipe(sync);
-    this.stagesView.pipe(sync);
-
-    this.stagesView.on('stagesView:scrollViewEdgeHit', function() {
-      this.delegateToScrollView = false;
-      console.log('delegateToScrollView', this.delegateToScrollView);
-    }.bind(this));
-
-    this.stagesView.on('stagesView:scrollViewInContent', function() {
-      this.delegateToScrollView = true;
-      console.log('delegateToScrollView', this.delegateToScrollView);
-    }.bind(this));
-
-    sync.on('update', function(data) {
-      // Only respond to input events if we are not within the scrollView
-      if (!this.delegateToScrollView) {
-        var pos = this.homeViewYPos.get();
-        this.homeViewYPos.set(Math.max(0, pos + -data.delta));
-      }
-    }.bind(this));
-
-    sync.on('end', function(data) {
-      // Only respond to input events if we are not within the scrollView
-      if (!this.delegateToScrollView) {
-        var velocity = data.velocity;
-        var position = this.homeViewYPos.get();
-      
-        // Show Stages
-        if (this.showingHome) {
-          // If threshold is met, trigger slideUp to show the stagesView
-          if(position > this.options.posThreshold) {
-            this.slideUp();
-            this.showingHome = false;
-          }
-          // Otherwise snap the homeView back to its starting position
-          else {
-            this.slideDown();
-          }
-        }
-        // Show Home
-        else {
-          if(position < H - this.options.posThreshold) {
-            this.slideDown();
-            this.showingHome = true;
-          } else {
-            this.slideUp();
-          }
-        }
-      }
-
-    }.bind(this));
-  }
 
   function _setListeners() {
     this.stagesView.on('nav:loadHome', function() {
@@ -229,6 +108,128 @@ define(function(require, exports, module) {
       this.showingStages = true;
     });
   };
+
+
+  // ## View Constructors
+  function _createStagesView() {
+    this.stagesView = new StagesView();
+
+    this.stagesYModifier = new Modifier({
+      transform: function() {
+        var h = H - this.homeViewYPos.get();
+        return Transform.translate(0, h, 0);
+      }.bind(this)
+    });
+
+    this.gameXModifier = new Modifier({
+      transform: function() {
+        return Transform.translate(-this.gameViewXPos.get(), 0, 0);
+      }.bind(this)
+    });
+
+    this.add(this.stagesYModifier).add(this.gameXModifier).add(this.stagesView);
+  }
+
+  function _createHomeView() {
+    this.homeView = new HomeView();
+
+    this.homeModifier = new Modifier({
+      transform: function() {
+        return Transform.translate(0, -this.homeViewYPos.get(), 0);
+      }.bind(this)
+    });
+
+    this.gameXModifier = new Modifier({
+      transform: function() {
+        return Transform.translate(-this.gameViewXPos.get(), 0, 0);
+      }.bind(this)
+    });
+
+    this.add(this.homeModifier).add(this.gameXModifier).add(this.homeView);
+  }
+
+  function _createGameView() {
+    this.gameView = new GameView();
+
+    this.gameModifier = new Modifier({
+      opacity: function() {
+        return this.gameViewOpacity.get();
+      }.bind(this),
+      transform: function() {
+        var w = W - this.gameViewXPos.get();
+        return Transform.translate(w, 0, 0);
+      }.bind(this)
+    });
+
+    this.add(this.gameModifier).add(this.gameView);
+  }
+
+  function _createFPSView() {
+    this.fpsView = new FpsMeterView();
+    this.add(this.fpsView);
+  }
+
+
+  // ## Event Handlers/Listeners
+
+  function _handleSwipe() {
+    var sync = new GenericSync(
+        ['mouse', 'touch'],
+        {direction: GenericSync.DIRECTION_Y}
+    );
+
+    this.homeView.pipe(sync);
+    this.stagesView.pipe(sync);
+
+    this.stagesView.on('stagesView:scrollViewEdgeHit', function() {
+      this.delegateToScrollView = false;
+      console.log('delegateToScrollView', this.delegateToScrollView);
+    }.bind(this));
+
+    this.stagesView.on('stagesView:scrollViewInContent', function() {
+      this.delegateToScrollView = true;
+      console.log('delegateToScrollView', this.delegateToScrollView);
+    }.bind(this));
+
+    sync.on('update', function(data) {
+      // Only respond to input events if we are not within the scrollView
+      if (!this.delegateToScrollView) {
+        var pos = this.homeViewYPos.get();
+        this.homeViewYPos.set(Math.max(0, pos + -data.delta));
+      }
+    }.bind(this));
+
+    sync.on('end', function(data) {
+      // Only respond to input events if we are not within the scrollView
+      if (!this.delegateToScrollView) {
+        var velocity = data.velocity;
+        var position = this.homeViewYPos.get();
+      
+        // Show Stages
+        if (this.showingHome) {
+          // If threshold is met, trigger slideUp to show the stagesView
+          if(position > this.options.posThreshold) {
+            this.slideUp();
+            this.showingHome = false;
+          }
+          // Otherwise snap the homeView back to its starting position
+          else {
+            this.slideDown();
+          }
+        }
+        // Show Home
+        else {
+          if(position < H - this.options.posThreshold) {
+            this.slideDown();
+            this.showingHome = true;
+          } else {
+            this.slideUp();
+          }
+        }
+      }
+
+    }.bind(this));
+  }
 
   module.exports = AppView;
 });

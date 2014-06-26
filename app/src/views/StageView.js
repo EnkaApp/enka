@@ -14,59 +14,54 @@ define(function(require, exports, module) {
   var Easing        = require('famous/transitions/Easing');
   var Timer         = require('famous/utilities/Timer');
 
+  // ## Stage Configuration
+  var StageConfig = require('StageConfig');
+
   // ## Views
   var StageLevelsView = require('views/StageLevelsView');
 
   // ## View Elements
   function _createBackground() {
     this.bg = new Surface({
-      size: [undefined, this.options.height],
-      content: this.options.content,
-      properties: {
-        backgroundColor: this.options.backgroundColor,
-        boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-        color: 'white'
-      }
+      // size: [undefined, this.options.height],
+      size: [undefined, undefined],
+      content: this.options.content
     });
 
     this.bgMod = new Modifier({
       transform: Transform.translate(0, 0, 0)
     });
 
-    this.add(this.bgMod).add(this.bg);
-    // this.node.add(this.bgMod).add(this.bg);
+    this.bg.setClasses(['stage-bg', 'stage-'+this._stageNum]);
+
+    this.node.add(this.bgMod).add(this.bg);
   }
 
-  function _createLevelButtonView() {
-    var buttonBg = new Surface({
-      size: [150, 35],
-      content: 'Start Playing',
-      properties: {
-        backgroundColor: 'black',
-        boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-        color: 'white',
-        textAlign: 'center'
-      }
+  function _createStageLevelsView() {
+    this._levels = new StageLevelsView({
+      stage: this._stageNum,
+      rows: this._stage.getRows(),
+      cols: this._stage.getCols(),
+      cellSize: this._stage.getCellSize(),
+      coords: this._stage.getCoords(),
+      warp: this._stage.getWarp()
     });
 
-    var buttonMod = new StateModifier({
-      origin: [0.5, 0.5],
-      align: [0.5, 0.5],
-      transform: Transform.inFront
+    var stageMod = new Modifier({
+      size: [undefined, undefined],
+      origin: [0, 0],
+      align: [0, 0]
     });
 
-    // this.add(buttonMod).add(buttonBg);
-    // this.node.add(buttonMod).add(buttonBg);
-    // this.add(buttonBg);
+    this.node.add(this._levels);
   }
 
   // ## Event Handlers/Listeners    
-  function _setListeners(){
+  function _setListeners() {
 
     function handleClick(e) {
       this._eventOutput.emit('selectStage', {
         index: this.options.index,
-        // backgroundColor: this.options.backgroundColor,
         node: this,
         event: e
       });
@@ -76,17 +71,30 @@ define(function(require, exports, module) {
     this.bg.on('click', handleClick.bind(this));
   }
 
+  function _getExpandedHeight() {
+    var rows = this._stage.getRows();
+    var cellSize = this._stage.getCellSize();
+    var margin = 40;
+
+    return rows * cellSize[1] + margin * 2;
+  }
+
   function StageView() {
     View.apply(this, arguments);
 
-    // var viewMod = new Modifier({
-    //   size: [undefined, this.options.height]
-    // });
+    this._levels = null;
+    this._stageNum = this.options.index + 1;
+    this._stage = new StageConfig(this._stageNum);
+    this._expandedHeight = _getExpandedHeight.call(this);
 
-    // this.node = this.add(viewMod);
+    this.rootModifier = new StateModifier({
+      size: [undefined, this.options.currentHeight]
+    });
+
+    this.node = this.add(this.rootModifier);
 
     _createBackground.call(this);
-    // _createLevelButtonView.call(this);
+    _createStageLevelsView.call(this);
 
     _setListeners.call(this);
   }
@@ -95,13 +103,14 @@ define(function(require, exports, module) {
   StageView.prototype.constructor = StageView;
 
   StageView.DEFAULT_OPTIONS = {
+    index: 0,
     height: 100,
-    expandedHeight: window.innerHeight,
-    content: 'I',
+    currentHeight: 100,
+    content: '',
     backgroundColor: 'blue'
   };
 
-  function _animateSize(node, options, callback) {
+  function _animateSize(options, callback) {
     var transition = {
       duration: 300,
       curve: Easing.inOutQuad
@@ -125,15 +134,17 @@ define(function(require, exports, module) {
         size = [pixels, pixels];
       }
 
-      node.setOptions({
-        size: size
-      });
-    };
+      this.rootModifier.setSize(size);
+    }.bind(this);
 
     var complete = function(){
       Engine.removeListener('prerender', prerender);
+
+      // Update the currentHeight of the view
+      this.options.currentHeight = end;
+      
       if (callback) callback();
-    };
+    }.bind(this);
 
     Engine.on('prerender', prerender);
 
@@ -141,20 +152,24 @@ define(function(require, exports, module) {
   }
 
   StageView.prototype.expand = function() {
-    _animateSize(this.bg, {
+    _animateSize.call(this, {
       start: this.options.height,
-      end: this.options.expandedHeight,
+      end: this._expandedHeight,
       axis: 'y'
-    });
+    }, function () {
+      this._levels.showLevels();
+    }.bind(this));
   };
 
   StageView.prototype.contract = function(callback) {
-    console.log('contract');
-    _animateSize(this.bg, {
-      start: this.options.expandedHeight,
+    _animateSize.call(this, {
+      start: this._expandedHeight,
       end: this.options.height,
       axis: 'y'
-    }, callback);
+    }, function () {
+      this._levels.hideLevels();
+      if (callback) callback.call(this);
+    }.bind(this));
   };
 
   module.exports = StageView;

@@ -1693,9 +1693,33 @@ a img {
 html {
   background: #fff;
 }
+button {
+  border: none;
+  border-radius: 0px;
+  background: black;
+  padding: 0px;
+  width: 100%;
+  display: block;
+  font-size: 14px;
+}
 .backfaceVisibility {
   -webkit-backface-visibility: visible;
   backface-visibility: visible;
+}
+.fpsmeter {
+  background: black;
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  line-height: 24px;
+}
+.header.lives-count {
+  color: white;
+  padding-left: 5px;
+}
+.header.lives-timer {
+  color: white;
+  padding-left: 5px;
 }
 .bg-home {
   background-color: #ffffff;
@@ -1703,10 +1727,19 @@ html {
 .bg-logo {
   background-color: #ddf6e8;
 }
-.btn-play.btn-bg,
-.btn-about.btn-bg,
-.btn-resume.btn-bg {
+.btn-play.btn-wrapper,
+.btn-about.btn-wrapper,
+.btn-resume.btn-wrapper {
   background-color: black;
+}
+.btn-play.btn-wrapper .btn-label,
+.btn-about.btn-wrapper .btn-label,
+.btn-resume.btn-wrapper .btn-label {
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+  font-style: italic;
+  line-height: 30px;
 }
 .btn-play.btn-title,
 .btn-about.btn-title,
@@ -1716,4 +1749,160 @@ html {
   text-transform: uppercase;
   font-size: 0.9em;
   font-style: italic;
+}
+.stage-level-front .level-number,
+.stage-level-front .fa-lock {
+  position: absolute;
+  display: block;
+  width: 100%;
+  line-height: 1;
+  font-weight: bold;
+  text-align: center;
+}
+.stage-level-front .level-number {
+  height: 60px;
+  font-size: 60px;
+  top: 50%;
+  margin-top: -30px;
+}
+.stage-level-front .fa-lock {
+  display: none;
+}
+.stage-level-front.locked .level-number {
+  display: none;
+}
+.stage-level-front.locked .fa-lock {
+  display: block;
+  height: 100px;
+  font-size: 100px;
+  top: 50%;
+  margin-top: -50px;
+}
+.stage-level-front.stage-1 .level-number,
+.stage-level-front.stage-1 .fa-lock {
+  color: #d6c89c;
+}
+.stage-level-front.stage-2 .level-number,
+.stage-level-front.stage-2 .fa-lock {
+  color: #d37f03;
+}
+.stage-level-front.stage-3 .level-number,
+.stage-level-front.stage-3 .fa-lock {
+  color: #f25b54;
+}
+.stage-level-front.stage-4 .level-number,
+.stage-level-front.stage-4 .fa-lock {
+  color: #cb6041;
+}
+.stage-level-front.stage-5 .level-number,
+.stage-level-front.stage-5 .fa-lock {
+  color: #62e8cc;
+}
+.stage-level-front.stage-6 .level-number,
+.stage-level-front.stage-6 .fa-lock {
+  color: #357472;
+}
+.stage-level-back.stage-level-backing {
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
+}
+.stage-level-back .description {
+  text-align: center;
+  color: #d6c89c;
+  padding: 50px 25px 0;
+}
+.stage-level-back .btn-play {
+  display: block;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  background: #bee3d2;
+  color: white;
+  border: 5px solid #d0ebde;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 99em;
+}
+.stage-bg.active {
+  border-bottom: 10px solid white;
+}
+.stage-1.stage-bg {
+  background-color: #f4f0e4;
+}
+.stage-1.stage-bg.active {
+  border-color: #ede6d2;
+}
+.stage-1.stage-level-front {
+  background-color: #e5dcc0;
+}
+.stage-1.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-2.stage-bg {
+  background-color: #fcb040;
+}
+.stage-2.stage-bg.active {
+  border-color: #fca627;
+}
+.stage-2.stage-level-front {
+  background-color: #fb9b0e;
+}
+.stage-2.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-2.stage-level-incomplete {
+  background-color: #fb9b0e;
+}
+.stage-3.stage-bg {
+  background-color: #f9b6b3;
+}
+.stage-3.stage-bg.active {
+  border-color: #f79f9b;
+}
+.stage-3.stage-level-front {
+  background-color: #f58984;
+}
+.stage-3.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-4.stage-bg {
+  background-color: #e1a391;
+}
+.stage-4.stage-bg.active {
+  border-color: #dc927d;
+}
+.stage-4.stage-level-front {
+  background-color: #d68169;
+}
+.stage-4.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-5.stage-bg {
+  background-color: #bbf5e9;
+}
+.stage-5.stage-bg.active {
+  border-color: #a5f2e2;
+}
+.stage-5.stage-level-front {
+  background-color: #8feedb;
+}
+.stage-5.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
+}
+.stage-6.stage-bg {
+  background-color: #5ab4b2;
+}
+.stage-6.stage-bg.active {
+  border-color: #4ca8a6;
+}
+.stage-6.stage-level-front {
+  background-color: #449795;
+}
+.stage-6.stage-level-current {
+  font-weight: bold;
+  text-decoration: underline;
 }

@@ -40,6 +40,8 @@
     "famous-metrics": "0.0.9"
   },
   "scripts": {
+    "install": "bower install",
+    "postinstall": "git submodule update --init --recursive",
     "test": "grunt test"
   },
   "dependencies": {

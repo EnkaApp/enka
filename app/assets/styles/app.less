@@ -7,10 +7,31 @@ html {
   // font-family:"FontAwesome", "Helvetica-Neue", Arial, sans-serif;
 }
 
+button {
+  border: none;
+  border-radius: 0px;
+  background: black;
+  padding: 0px;
+  width: 100%;
+  display: block;
+  font-size: 14px;
+}
+
 .backfaceVisibility {
   -webkit-backface-visibility: visible;
   backface-visibility: visible;
 }
 
+.fpsmeter {
+  background: black;
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  line-height: 24px;
+}
+
 // Application Styles
+@import "_partials/_header";
 @import "_partials/_home";
+@import "_partials/_stage-level";
+@import "_partials/_stages";

@@ -5,6 +5,22 @@ define(function(require, exports, module) {
   var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
+  var Transitionable = require('famous/transitions/Transitionable');
+  var SpringTransition = require('famous/transitions/SpringTransition');
+  var Timer         = require('famous/utilities/Timer');
+  var Easing        = require('famous/transitions/Easing');
+
+  Transitionable.registerMethod('spring', SpringTransition);
+
+  var TOP_MARGIN = 40; // button top margin
+  var DELAY = 200; // milliseconds between button intro animations
+
+  // Button Intro Transition
+  var spring = {
+    method: 'spring',
+    period: 1000,
+    dampingRatio: 0.5
+  };
 
   // ## Views
   var HomeButtonView = require('./HomeButtonView');
@@ -16,10 +32,12 @@ define(function(require, exports, module) {
     });
 
     var mod = new StateModifier({
-      transform: Transform.translate(0, 0, 0)
+      transform: Transform.translate(0, window.innerHeight, 0)
     });
 
+    this._modifiers.push(mod);
     this.add(mod).add(this.btnResumeGame);
+
   }
 
   function _createPlayButton() {
@@ -29,9 +47,10 @@ define(function(require, exports, module) {
     });
 
     var mod = new StateModifier({
-      transform: Transform.translate(0, 50, 0)
+      transform: Transform.translate(0, window.innerHeight, 0)
     });
-
+    
+    this._modifiers.push(mod);
     this.add(mod).add(this.btnPlay);
   }
 
@@ -42,9 +61,10 @@ define(function(require, exports, module) {
     });
 
     var mod = new StateModifier({
-      transform: Transform.translate(0, 100, 0)
+      transform: Transform.translate(0, window.innerHeight, 0)
     });
 
+    this._modifiers.push(mod);
     this.add(mod).add(this.btnAbout);
   }
 
@@ -65,9 +85,12 @@ define(function(require, exports, module) {
   function HomeMenuView() {
     View.apply(this, arguments);
 
+    // Array of button modifiers
+    this._modifiers = [];
+
+    _createResumeGameButton.call(this);
     _createPlayButton.call(this);
     _createAboutButton.call(this);
-    _createResumeGameButton.call(this);
 
     // Pipe the event up
     _setListeners.call(this);
@@ -77,6 +100,20 @@ define(function(require, exports, module) {
   HomeMenuView.prototype.constructor = HomeMenuView;
 
   HomeMenuView.DEFAULT_OPTIONS = {};
+
+  HomeMenuView.prototype.showButtons = function() {
+    
+    function _callback(i) {
+      this._modifiers[i].setTransform(Transform.translate(0, i*TOP_MARGIN, 0), {
+        curve: Easing.inSine,
+        duration: 500
+      });
+    }
+
+    for (var i = 0; i < this._modifiers.length; i++) {
+      Timer.setTimeout(_callback.bind(this, i), (i+1) * DELAY);
+    }
+  };
 
   module.exports = HomeMenuView;
 });
