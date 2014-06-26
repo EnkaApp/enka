@@ -7,7 +7,45 @@ define(function(require, exports, module) {
   GAMETYPE_SURVIVAL = 1;
   GAMETYPE_DESTROY = 2;
 
-  var stages = [
+  // Possible grid configurations.
+  // To be used by levels
+  var GRID_TYPES = {
+    'small': [4,4],
+    'standard': [5,5],
+    'large': [8,8],
+    'xlarge': [10,10],
+    
+    'wide': [8,4],
+    'fat': [8,3],
+
+    'tall': [4,8],
+    'skinny': [3,8],
+  };
+
+  function _getLevelDef(type, grid, goal, startIndex, obstacles) {
+    type = type || GAMETYPE_DESTROY;
+    goal = goal || 15;
+
+    if (grid && typeof grid === 'string') {
+      grid = GRID_TYPES[grid];
+    } else if (Array.isArray(grid)) {
+      grid = grid;
+    } else {
+      grid = GRID_TYPES['standard'];
+    }
+
+    startIndex = startIndex || Math.floor((grid[0] * grid[1])/2);
+
+    return {
+      gametype: type,
+      grid: grid,
+      goal: goal,
+      startIndex: startIndex,
+      obstacles: []
+    };
+  }
+
+  var STAGES = [
 
     // ## Stage 1
     {
@@ -16,6 +54,39 @@ define(function(require, exports, module) {
         size: [50,60]
       },
       grid: [4, 5],
+
+      //  Array of tuples containing level type and difficulty
+      levels: [
+        _getLevelDef(null, null, 10),
+        _getLevelDef(null, null, 15),
+        _getLevelDef(null, 'wide', 15),
+        _getLevelDef(null, 'large', 15),
+        _getLevelDef(GAMETYPE_SURVIVAL, null, 25),
+
+        _getLevelDef(null, 'tall', 25),
+        _getLevelDef(null, 'fat', 15),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 15),
+        _getLevelDef(GAMETYPE_SURVIVAL, null, 25),
+        _getLevelDef(null, null, 30),
+
+        _getLevelDef(null, 'wide', 25),
+        _getLevelDef(null, 'large', 35),
+        _getLevelDef(GAMETYPE_SURVIVAL, null, 15),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 15),
+        _getLevelDef(null, 'skinny', 20),
+
+        _getLevelDef(null, 'wide', 25),
+        _getLevelDef(GAMETYPE_SURVIVAL, null, 40),
+        _getLevelDef(null, null, 15),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'tall', 35),
+        _getLevelDef(null, 'skinny', 20),
+
+        _getLevelDef(GAMETYPE_SURVIVAL, null, 25),
+        _getLevelDef(null, 'xlarge', 40),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'small', 20),
+        _getLevelDef(null, 'tall', 15),
+        _getLevelDef(null, 'skinny', 20),
+      ],
     },
 
     // ## Stage 2
@@ -79,6 +150,9 @@ define(function(require, exports, module) {
     else if (type === GAMETYPE_DESTROY) {
       return 'Destroy ' + goal + ' blocks to win';
     }
+    else {
+      return 'This is just a placeholder. We are working hard to bring this to you.';
+    }
   }
 
   function StageConfig(stage) {
@@ -88,36 +162,43 @@ define(function(require, exports, module) {
   // ## Static Methods
 
   StageConfig.getStagesCount = function() {
-    return stages.length;
+    return STAGES.length;
   };
 
 
   // ## Instance Methods
 
   StageConfig.prototype.getLevelCount = function() {
-    var grid = stages[this.index].grid;
+    var grid = STAGES[this.index].grid;
     return grid[0] * grid[1];
   };
 
   StageConfig.prototype.getCols = function() {
-    return stages[this.index].grid[0];
+    return STAGES[this.index].grid[0];
   };
 
   StageConfig.prototype.getRows = function() {
-    return stages[this.index].grid[1];
+    return STAGES[this.index].grid[1];
   };
 
   StageConfig.prototype.getLevelConfig = function(level) {
-    return stages[this.index].levels[level];
+    return STAGES[this.index].levels[level];
   };
 
   StageConfig.prototype.getIcon = function() {
-    return stages[this.index].icon;
+    return STAGES[this.index].icon;
   };
 
   StageConfig.prototype.getGameDesc = function(level) {
-    var type = stages[this.index].levels[level-1].gametype;
-    var goal = stages[this.index].levels[level-1].goal;
+    var levels = STAGES[this.index].levels;
+    var levelDef = levels && levels[level-1] || {};
+    var type = '';
+    var goal = '';
+
+    if (levelDef) {
+      type = levelDef.gametype;
+      goal = levelDef.goal;
+    }
     
     return _getGameTypeDesc(type, goal);
   };

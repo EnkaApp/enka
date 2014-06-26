@@ -18,7 +18,7 @@ define(function(require, exports, module) {
 
         // if user exists in the db, load him/her
         if (created) {
-          console.log('loading user');
+          console.log('Loading user');
 
           var options = {};
           var promises = [];
@@ -38,6 +38,7 @@ define(function(require, exports, module) {
         }
         // otherwise create a new user
         else {
+          console.log('Creating new user');
 
           if (!this.options.created) {
             this.options.created = Date.now();

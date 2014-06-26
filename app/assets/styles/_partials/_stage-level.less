@@ -1,3 +1,9 @@
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+// Stage Front
+
 .stage-level-front {
   .level-number, .fa-lock {
     position: absolute;
@@ -68,4 +74,59 @@
   .level-number, .fa-lock {
     color: darken(@cc1-seagreen, 20%);
   }
+}
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+// Stage Back
+
+.stage-level-back {
+
+  &.stage-level-backing {
+    box-shadow: 2px 2px 7px rgba(0,0,0,0.2);
+  }
+
+  .description {
+    text-align: center;
+    color: darken(@cc1-baige, 20%);
+    padding: 50px 25px 0;
+  }
+
+  .btn-play {
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    background: @cc3-green;
+    color: white;
+    border: 5px solid lighten(@cc3-green, 5%);
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 99em;
+  }
+}
+
+.stage-level-back.stage-1 {
+
+}
+
+.stage-level-back.stage-2 {
+
+}
+
+.stage-level-back.stage-3 {
+
+}
+
+.stage-level-back.stage-4 {
+
+}
+
+.stage-level-back.stage-5 {
+
+}
+
+.stage-level-back.stage-6 {
+
 }

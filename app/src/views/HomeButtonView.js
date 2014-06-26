@@ -6,15 +6,28 @@ define(function(require, exports, module) {
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
 
-  function _createBackground() {
-    this.buttonBackground = new Surface({
-      size: [this.options.width, this.options.height]
+  // ## Templates
+  var tplHomeBtn = require('hbs!templates/homeBtn');
+
+  function _createBacking() {
+
+    var content = tplHomeBtn({
+      label: this.options.content
     });
 
-    var classes = ['btn-bg'].concat(this.options.classes);
-    this.buttonBackground.setClasses(classes);
+    this.button = new Surface({
+      size: [this.options.width, this.options.height],
+      content: content
+    });
 
-    this.add(this.buttonBackground);
+    var classes = ['btn-wrapper'].concat(this.options.classes);
+    this.button.setClasses(classes);
+
+    this.buttonMod = new StateModifier({
+      transform: Transform.translate(0, 0, 0)
+    });
+
+    this.add(this.buttonMod).add(this.button);
   }
 
   function _createTitle() {
@@ -22,7 +35,8 @@ define(function(require, exports, module) {
     var title = new Surface({
       content: this.options.content,
       properties: {
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        zIndex: 1
       }
     });
 
@@ -30,14 +44,17 @@ define(function(require, exports, module) {
     title.setClasses(classes);
 
     var mod = new StateModifier({
-      transform: Transform.translate(0, 6, 0)
+      origin: [0.5, 0.5],
+      align: [0.5,0.5],
+      size: [this.options.width, this.options.height],
+      // transform: Transform.translate(0, 0, 0)
     });
 
     this.add(mod).add(title);
   }
 
   function _setListeners() {
-    this.buttonBackground.on('click', function() {
+    this.button.on('click', function() {
       this._eventOutput.emit('click');
     }.bind(this));
   }
@@ -45,8 +62,8 @@ define(function(require, exports, module) {
   function HomeButtonView() {
     View.apply(this, arguments);
 
-    _createBackground.call(this);
-    _createTitle.call(this);
+    _createBacking.call(this);
+    // _createTitle.call(this);
 
     // Pipe click event up
     _setListeners.call(this);

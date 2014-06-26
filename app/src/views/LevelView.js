@@ -12,6 +12,9 @@ define(function(require, exports, module) {
   var Lightbox      = require('famous/views/Lightbox');
   var Easing        = require('famous/transitions/Easing');
 
+  // ## Configurations
+  var StageConfig = require('StageConfig');
+
   // ## Models
   var User = require('UserModel');
 
@@ -21,6 +24,7 @@ define(function(require, exports, module) {
   // ## Templates
   var tplLevelFront = require('hbs!templates/levelFront');
   var tplLevelDetail = require('hbs!templates/levelDetail');
+  var tplLevelDetailPlayBtn = require('hbs!templates/levelDetailPlayBtn');
 
   // ## Shared
   var user = new User();
@@ -265,6 +269,8 @@ define(function(require, exports, module) {
   function LevelBackView() {
     View.apply(this, arguments);
 
+    this._config = new StageConfig(this.options.stage);
+
     this.rootModifier = new StateModifier({
       size: [this.options.width, this.options.height],
       origin: [0.5, 0.5],
@@ -274,10 +280,14 @@ define(function(require, exports, module) {
     this.node = this.add(this.rootModifier);
 
     _createLFBBacking.call(this);
+    _createLFBPlayButton.call(this);
+
     _setLBVListeners.call(this);
   }
 
   LevelBackView.DEFAULT_OPTIONS = {
+    width: 250,
+    height: 250,
     stage: 1,
     level: 1,
     color: 1,
@@ -297,7 +307,7 @@ define(function(require, exports, module) {
 
   function _getLFBContent() {
     var data = {
-      description: 'Test description'
+      description: this._config.getGameDesc(this.options.level)
     };
 
     return tplLevelDetail(data);
@@ -315,8 +325,9 @@ define(function(require, exports, module) {
 
     this.backing.setClasses([
       'stage-level-back',
+      'stage-level-backing',
       'stage-'+this.options.stage,
-      'stage-level--color'+this.options.color
+      'stage-level--color'+this.options.color,
     ]);
 
     if (this.options.current) {
@@ -328,6 +339,32 @@ define(function(require, exports, module) {
     }
 
     this.node.add(this.backing);
+  }
+
+  function _createLFBPlayButton() {
+
+    var content = tplLevelDetailPlayBtn({
+      label: 'Play'
+    });
+
+    this.playButton = new Surface({
+      content: content,
+    });
+
+    this.playButton.setClasses([
+      'stage-level-back',
+      'stage-'+this.options.stage,
+      'stage-level--color'+this.options.color
+    ]);
+
+    this.playButtonMod = new StateModifier({
+      size: [this.options.width-50, 50],
+      origin: [0.5, 1],
+      align: [0.5, 1],
+      transform: Transform.translate(0, -50, 0)
+    });
+
+    this.node.add(this.playButtonMod).add(this.playButton);
   }
 
   module.exports = LevelView;

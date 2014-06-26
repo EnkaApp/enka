@@ -1693,9 +1693,25 @@ a img {
 html {
   background: #fff;
 }
+button {
+  border: none;
+  border-radius: 0px;
+  background: black;
+  padding: 0px;
+  width: 100%;
+  display: block;
+  font-size: 14px;
+}
 .backfaceVisibility {
   -webkit-backface-visibility: visible;
   backface-visibility: visible;
+}
+.fpsmeter {
+  background: black;
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  line-height: 24px;
 }
 .header.lives-count {
   color: white;
@@ -1711,10 +1727,19 @@ html {
 .bg-logo {
   background-color: #ddf6e8;
 }
-.btn-play.btn-bg,
-.btn-about.btn-bg,
-.btn-resume.btn-bg {
+.btn-play.btn-wrapper,
+.btn-about.btn-wrapper,
+.btn-resume.btn-wrapper {
   background-color: black;
+}
+.btn-play.btn-wrapper .btn-label,
+.btn-about.btn-wrapper .btn-label,
+.btn-resume.btn-wrapper .btn-label {
+  color: white;
+  text-align: center;
+  text-transform: uppercase;
+  font-style: italic;
+  line-height: 30px;
 }
 .btn-play.btn-title,
 .btn-about.btn-title,
@@ -1776,6 +1801,26 @@ html {
 .stage-level-front.stage-6 .level-number,
 .stage-level-front.stage-6 .fa-lock {
   color: #357472;
+}
+.stage-level-back.stage-level-backing {
+  box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
+}
+.stage-level-back .description {
+  text-align: center;
+  color: #d6c89c;
+  padding: 50px 25px 0;
+}
+.stage-level-back .btn-play {
+  display: block;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  background: #bee3d2;
+  color: white;
+  border: 5px solid #d0ebde;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 99em;
 }
 .stage-bg.active {
   border-bottom: 10px solid white;
