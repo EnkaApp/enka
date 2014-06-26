@@ -43,7 +43,7 @@ define(function(require, exports, module) {
   }
 
   function _getModifierAtIndex(index) {
-    return this._state[index]._modifier;
+    return this._state[index]._mod;
   }
 
   function _setListeners() {
@@ -64,6 +64,7 @@ define(function(require, exports, module) {
       // gets new index (2, 4, 15, etc) based off current index and swipe direction
       var newIndex = this.getNewIndex(this._currentIndex, direction);
       
+      // Checking direction prevents clicks from causing pieces to be placed
       if(direction){
         
         this._turns++;
@@ -72,21 +73,19 @@ define(function(require, exports, module) {
 
           // generate new Piece
           var piece = this.pieceGenerator.getPiece(direction);
-          this.placePiece(piece);
+          this.placePiece(piece, newIndex);
 
           console.log('upcoming pieces: ', this.pieceGenerator.colorQueue);
-
-          this._state[this._currentIndex] = piece;
+          
+          this._state[newIndex] = piece;
 
           piece._piece.reflect();
 
           // delete all legal matches. if no matches, check if we are trapped
           piece._piece.on('reflected', function(){
-            this.deleteMatches.call(this, this._currentIndex);
-            this.checkIfTrapped.call(this, this._currentIndex);
+            this.deleteMatches(newIndex);
+            this.checkIfTrapped(newIndex);
           }.bind(this));
-
-          this._currentIndex = newIndex;
         }
       }
     }.bind(this)); // <---- END SYNC.ON('END')
@@ -138,7 +137,7 @@ define(function(require, exports, module) {
 
     // creates first Piece to put on board
     var firstPiece = this.pieceGenerator.getPiece();
-    this.placePiece(firstPiece);
+    this.placePiece(firstPiece, this._currentIndex);
 
     this._state[this._currentIndex] = firstPiece;
 
@@ -160,14 +159,19 @@ define(function(require, exports, module) {
   BoardView.prototype = Object.create(View.prototype);
   BoardView.prototype.constructor = BoardView;
 
-  BoardView.prototype.placePiece = function(piece) {
-    var pos = this._lastPiecePosition = this.gridController.getXYCoords(this._currentIndex, this._pieceSize[0]);
+  BoardView.prototype.placePiece = function(piece, newIndex) {
+    var pos = this.gridController.getXYCoords(this._currentIndex, this._pieceSize[0]);
     
-    console.info('Placing piece at', pos);
+    console.info('Placing piece at', this._lastPiecePosition);
     
     piece._mod.setTransform(
       Transform.translate(pos[0], pos[1], 0)
     );
+
+    // Update the current index to the index of the piece we just placed
+    // and save the newly placed piece to the board state
+    this._currentIndex = newIndex;
+    this._lastPiecePosition = this.gridController.getXYCoords(newIndex, this._pieceSize[0]);
 
     this.node.add(piece);
   };
@@ -176,11 +180,12 @@ define(function(require, exports, module) {
     var alreadyChecked = [];
     var connections = 0;
     var initialIndex = index;
-    alreadyChecked[index] = true;
 
+    alreadyChecked[index] = true;
+    
     seekAndDestroy.call(this, index);
 
-    function seekAndDestroy(index){
+    function seekAndDestroy(index) {
       var matches = this.checkIfAnyNeighborHasMatch(index);
 
       for(var i = 0; i < matches.length; i++){
@@ -207,43 +212,45 @@ define(function(require, exports, module) {
 
   BoardView.prototype.checkIfAnyNeighborHasMatch = function(index) {
     var matches = [];
-    directions = {
-      left : this.checkIfDirectionHasMatch(index, 'left'),
-      right : this.checkIfDirectionHasMatch(index, 'right'),
-      up : this.checkIfDirectionHasMatch(index, 'up'),
-      down : this.checkIfDirectionHasMatch(index, 'down')
+    var directions = {
+      left: this.checkIfDirectionHasMatch(index, 'left'),
+      right: this.checkIfDirectionHasMatch(index, 'right'),
+      up: this.checkIfDirectionHasMatch(index, 'up'),
+      down: this.checkIfDirectionHasMatch(index, 'down')
     };
+
     for(var direction in directions){
       if(this.isInBounds(direction)){
         matches.push(directions[direction]);
       }
     }
+
     return matches;
   };
 
   BoardView.prototype.checkIfDirectionHasMatch = function(index, direction){
     var isMatchAtIndex = [];
-    var matchColor = this.getColorFromIndex(index);
+    var matchColor = this.getColorFromIndex(index); // color to match to
 
     // check neighbor in specified this.direction for match
     var neighborIndex = this.getNewIndex(index, direction);
 
     // check if neighbor is null
-    if(this._state[neighborIndex] && this.isInBounds(direction)){
+    // if(this._state[neighborIndex] && this.isInBounds(direction)){
+    if (this._state[neighborIndex]) {
       isMatch = this.getColorFromIndex(neighborIndex) === matchColor;
       isMatchAtIndex.push(neighborIndex, isMatch);
       return isMatchAtIndex;
-    }else {
+    } else {
       isMatch = false;
       isMatchAtIndex.push(neighborIndex, isMatch);
       return isMatchAtIndex;
     }
   };
 
-  BoardView.prototype.getColorFromIndex = function(index){
+  BoardView.prototype.getColorFromIndex = function(index) {
     if(this._state[index]){
       var color = _getPieceAtIndex.call(this, index).getOption('backBgColor');
-
       return color;
     }
   };
@@ -252,10 +259,10 @@ define(function(require, exports, module) {
     var trueFlag = 0;
     var canMove = [];
     var directions = {
-      left : this.isInBounds('left'),
-      right : this.isInBounds('right'),
-      up : this.isInBounds('up'),
-      down : this.isInBounds('down')
+      left: this.isInBounds('left'),
+      right: this.isInBounds('right'),
+      up: this.isInBounds('up'),
+      down: this.isInBounds('down')
     };
 
     for(var direction in directions){
@@ -276,7 +283,8 @@ define(function(require, exports, module) {
     }
   };
 
-  BoardView.prototype.isInBounds = function(direction){
+  BoardView.prototype.isInBounds = function(direction) {
+    var res = true;
     var viewPortSize = this.viewSize;
     var pieceSize = this._pieceSize;
     var boardWidth = this.options.columns * pieceSize[0];
@@ -285,22 +293,22 @@ define(function(require, exports, module) {
     var newYPosition = this._lastPiecePosition[1] + pieceSize[1];
 
     if(direction === 'left' && this._lastPiecePosition[0] === 0){
-      return false;
+      res = false;
     }
-    if(direction === 'right' && newXPosition === (boardWidth - pieceSize[0])){
-      return false;
+    if(direction === 'right' && newXPosition === boardWidth){
+      res = false;
     }
     if(direction === 'up' && this._lastPiecePosition[1] === 0){
-      return false;
+      res = false;
     }
-    if(direction === 'down' && newYPosition === (boardHeight - pieceSize[1])){
-      return false;
+    if(direction === 'down' && newYPosition === boardHeight){
+      res = false;
     }
 
-    return true;
+    return res;
   };
 
-  BoardView.prototype.deletePiece = function(index){
+  BoardView.prototype.deletePiece = function(index) {
     this.pieceGenerator.addDeletedPiece(this._state[index]);
     _getModifierAtIndex.call(this, index).setTransform(Transform.translate(2000, 2000, 0));
     this._state[index] = null;
