@@ -68,7 +68,7 @@ define(function(require, exports, module) {
         
         this._turns++;
 
-        if(this.isInBounds(direction, this._currentIndex) && !this._state[newIndex]) {
+        if(this.isInBounds(direction) && !this._state[newIndex]) {
 
           // generate new Piece
           var piece = this.pieceGenerator.getPiece(direction);
@@ -208,7 +208,7 @@ define(function(require, exports, module) {
       down : this.checkIfDirectionHasMatch(index, 'down')
     };
     for(var direction in directions){
-      if(this.isInBounds(index, direction)){
+      if(this.isInBounds(direction)){
         matches.push(directions[direction]);
       }
     }
@@ -223,7 +223,7 @@ define(function(require, exports, module) {
     var neighborIndex = this.getNewIndex(index, direction);
 
     // check if neighbor is null
-    if(this._state[neighborIndex] && this.isInBounds(direction, index)){
+    if(this._state[neighborIndex] && this.isInBounds(direction)){
       isMatch = this.getColorFromIndex(neighborIndex) === matchColor;
       isMatchAtIndex.push(neighborIndex, isMatch);
       return isMatchAtIndex;
@@ -246,10 +246,10 @@ define(function(require, exports, module) {
     var trueFlag = 0;
     var canMove = [];
     var directions = {
-      left : this.isInBounds('left', index),
-      right : this.isInBounds('right', index),
-      up : this.isInBounds('up', index),
-      down : this.isInBounds('down', index)
+      left : this.isInBounds('left'),
+      right : this.isInBounds('right'),
+      up : this.isInBounds('up'),
+      down : this.isInBounds('down')
     };
 
     for(var direction in directions){
@@ -273,19 +273,21 @@ define(function(require, exports, module) {
   BoardView.prototype.isInBounds = function(direction){
     var viewPortSize = this.viewSize;
     var pieceSize = this._pieceSize;
+    var boardWidth = this.options.columns * pieceSize[0];
     var boardHeight = this.options.rows * pieceSize[1];
-    var yLowerBounds = boardHeight - pieceSize[0];
+    var newXPosition = this._lastPiecePosition[0] + pieceSize[0];
+    var newYPosition = this._lastPiecePosition[1] + pieceSize[1];
 
     if(direction === 'left' && this._lastPiecePosition[0] === 0){
       return false;
     }
-    if(direction === 'right' && this._lastPiecePosition[0] === (viewPortSize[0] - pieceSize[0])){
+    if(direction === 'right' && newXPosition === (boardWidth - pieceSize[0])){
       return false;
     }
     if(direction === 'up' && this._lastPiecePosition[1] === 0){
       return false;
     }
-    if(direction === 'down' && this._lastPiecePosition[1] === yLowerBounds){
+    if(direction === 'down' && newYPosition === (boardHeight - pieceSize[1])){
       return false;
     }
 
