@@ -72,6 +72,14 @@ define(function(require, exports, module) {
       viewHeight: this.options.viewHeight
     });
 
+    this.rootMod = new StateModifier({
+      size: this.gridController.getBoardSize(),
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5]
+    });
+
+    this.node = this.add(this.rootMod);
+
     _createBackground.call(this);
 
     this.viewSize = this.getSize();
@@ -165,7 +173,7 @@ define(function(require, exports, module) {
       Transform.translate(pos[0], pos[1], 0)
     );
 
-    this.add(piece);
+    this.node.add(piece);
   };
 
   BoardView.prototype.deleteMatches = function(index){
@@ -345,13 +353,7 @@ define(function(require, exports, module) {
       }
     });
 
-    var mod = new StateModifier({
-      size: this.gridController.getBoardSize(),
-      origin: [0.5, 0.5],
-      align: [0.5, 0.5]
-    });
-
-    this.add(mod).add(this.bgSurface);
+    this.node.add(this.bgSurface);
   }
 
   BoardView.DEFAULT_OPTIONS = {
