@@ -45,11 +45,57 @@ define(function(require, exports, module) {
   function _getModifierAtIndex(index) {
     return this._state[index]._modifier;
   }
+
+  function _setListeners() {
+
+    this.bgSurface.pipe(sync);
+
+    sync.on('start', function(data) {
+      xStart = data.clientX;
+      yStart = data.clientY;
+    });
+
+    sync.on('end', function(data){
+      xEnd = data.clientX;
+      yEnd = data.clientY;
+      
+      var direction = this.getSwipeDirection(xStart, yStart, xEnd, yEnd);
+      
+      // gets new index (2, 4, 15, etc) based off current index and swipe direction
+      var newIndex = this.getNewIndex(this._currentIndex, direction);
+      
+      if(direction){
+        
+        this._turns++;
+
+        if(this.isInBounds(direction, this._currentIndex) && !this._state[newIndex]) {
+
+          // generate new Piece
+          var piece = this.pieceGenerator.getPiece(direction);
+          this.placePiece(piece);
+
+          console.log('upcoming pieces: ', this.pieceGenerator.colorQueue);
+
+          this._state[this._currentIndex] = piece;
+
+          piece._piece.reflect();
+
+          // delete all legal matches. if no matches, check if we are trapped
+          piece._piece.on('reflected', function(){
+            this.deleteMatches.call(this, this._currentIndex);
+            this.checkIfTrapped.call(this, this._currentIndex);
+          }.bind(this));
+
+          this._currentIndex = newIndex;
+        }
+      }
+    }.bind(this)); // <---- END SYNC.ON('END')
+  }
    
   function BoardView(options) {
     View.apply(this, arguments);
     
-    var turns = 0;
+    this._turns = 0;
 
     // Setup the options manager
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
@@ -96,63 +142,7 @@ define(function(require, exports, module) {
 
     this._state[this._currentIndex] = firstPiece;
 
-    // this.bgSurface.pipe(sync);
-
-    // sync.on('start', function(data){ 
-    //   xStart = data.clientX;
-    //   yStart = data.clientY;
-    // });
-
-
-    // sync.on('end', function(data){
-
-    //   xEnd = data.clientX;
-    //   yEnd = data.clientY;
-
-    //   console.log('index: ', this._currentIndex);
-
-      
-    //   var direction = this.getSwipeDirection(xStart, yStart, xEnd, yEnd);
-    //   // gets new index (2, 4, 15, etc) based off current index, swipe this.direction, and #of columns
-    //   var index = this._currentIndex;
-    //   var newIndex = this.getNewIndex(index, direction);
-      
-
-    //   if(direction){
-    //     turns++;
-    //     if(this.isInBounds(direction, this._currentIndex) && !this._state[newIndex]){  
-
-    //       // generate new Piece
-    //       // var lastColor = this._state[this._currentIndex].piece.getOption('backBgColor');
-          
-    //       var piece = null;
-    //       this._currentIndex = newIndex;
-          
-    //       // this.pieceGenerator.placePiece.call(this, this.direction, position);
-
-    //       var piece = this.pieceGenerator.getPiece(direction);
-    //       this.placePiece(piece);
-
-    //       console.log('upcoming pieces: ', this.pieceGenerator.colorQueue);
-
-    //       // this._state[this._currentIndex] = {
-    //       //   mod: pieceModifier,
-    //       //   piece: piece
-    //       // };
-    //       this._state[this._currentIndex] = piece;
-
-    //       piece._piece.reflect();
-
-    //       // delete all legal matches. if no matches, check if we are trapped
-    //       piece._piece.on('reflected', function(){
-    //         this.deleteMatches.call(this, this._currentIndex);
-    //         this.checkIfTrapped.call(this, this._currentIndex);
-    //       }.bind(this));
-            
-    //       // position = this.gridController.getXYCoords(this._currentIndex, pieceSize[0]);
-    //     }
-    //   }
-    // }.bind(this)); // <---- END SYNC.ON('END')
+    _setListeners.call(this);
 
   }// <---- END BOARDVIEW FUNCTION ----------------------------------------
 
