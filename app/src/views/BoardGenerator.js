@@ -5,12 +5,9 @@ define(function(require, exports, module) {
   var RenderNode    = require('famous/core/RenderNode');
   var OptionsManager = require('famous/core/OptionsManager');
 
-  var boardView = null;
-
   // coords: [gridSize: [2, 4],
   // startCoords: [2, 4]
   // obstacles: [3, 5]
-
 
   function BoardGenerator(options) {
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
@@ -18,12 +15,14 @@ define(function(require, exports, module) {
     if (options) this.setOptions(options);
   }
 
-  BoardGenerator.DEFAULT_OPTIONS = {
-    rows: 7,
-    columns: 5,
-    viewWidth: window.innerWidth,
-    viewHeight: window.innerHeight
-  };
+  // BoardGenerator.DEFAULT_OPTIONS = {
+  //   rows: 7,
+  //   columns: 5,
+  //   viewWidth: window.innerWidth,
+  //   viewHeight: window.innerHeight
+  // };
+
+  BoardGenerator._boardView = null;
 
   /**
    * Look up options value by key
@@ -32,18 +31,23 @@ define(function(require, exports, module) {
    * @param {string} key key
    * @return {Object} associated object
    */
-  BoardGenerator.prototype.getOptions = function getOptions() {
-    return this._optionsManager.value();
-  };
+  // BoardGenerator.prototype.getOptions = function getOptions() {
+  //   return this._optionsManager.value();
+  // };
 
-  BoardGenerator.prototype.getNewBoard = function(){
-    // TODO UPDATE OPTIONS
-    if(!boardView){
-      boardView = new BoardView(this.options);
+  BoardGenerator.prototype.getNewBoard = function(options) {
+    
+    if(!this._boardView){
+      this._boardView = new BoardView(this.options);
     } else {
-      boardView.setOptions(this.options);
+      this._boardView.setOptions(this.options);
     }
-  }
+
+    // @TODO make sure that boardview is reinitialized with the new options
+
+    // return boardview
+    return this._boardView;
+  };
 
   /*
    *  Set internal options.
@@ -51,9 +55,9 @@ define(function(require, exports, module) {
    *  @method setOptions
    *  @param {Object} options
    */
-  BoardGenerator.prototype.setOptions = function setOptions(options) {
-    this._optionsManager.patch(options);
-  };
+  // BoardGenerator.prototype.setOptions = function setOptions(options) {
+  //   this._optionsManager.patch(options);
+  // };
  
 
   module.exports = BoardGenerator;
