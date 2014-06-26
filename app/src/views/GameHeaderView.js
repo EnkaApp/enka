@@ -11,23 +11,47 @@ define(function(require, exports, module) {
   var Easing          = require('famous/transitions/Easing');
   var StateModifier   = require('famous/modifiers/StateModifier');
   
+  // ## App Dependencies
   var PieceGenerator  = require('PieceGenerator');
+
+  // ## Views
   var BoardView = require('views/BoardView');
+
+  // ## Shared
+  var open = true;
 
   function _setListeners() {
     this.pieceGenerator._eventOutput.on('piece:colorsUpdated', function() {
       this.updateColors();
     }.bind(this));
+
+    this.menuButton.on('click', function() {
+      this._eventOutput.emit('game:toggleMenu', open);
+      open = !open;
+    }.bind(this));
+
+    this._eventInput.on('game:closeMenu', function() {
+      open = true;
+    });
   }
 
   function GameHeaderView(options) {
     View.apply(this, arguments);
+
+    this.rootMod = new StateModifier({
+      origin: [0.5, 0],
+      align: [0.5, 0],
+      transform: Transform.translate(0, 0, 1)
+    });
     
     this.pieceGenerator = new PieceGenerator();
 
     this.upcomingColors = [];
 
+    this.node = this.add(this.rootMod);
+
     _createBacking.call(this);
+    _createMenuButton.call(this);
     _initPieces.call(this);
     _setListeners.call(this);
   }
@@ -103,7 +127,24 @@ define(function(require, exports, module) {
       transform: Transform.behind
     });
 
-     this.add(backingMod).add(this.backing);
+     this.node.add(backingMod).add(this.backing);
+  }
+
+  function _createMenuButton() {
+    this.menuButton = new Surface({
+      properties: {
+        backgroundColor: 'white'
+      }
+    });
+
+    var mod = new StateModifier({
+      size: [20, 20],
+      origin: [1, 0.5],
+      align: [1, 0.5],
+      transform: Transform.translate(-10, 0, 0)
+    });
+
+    this.node.add(mod).add(this.menuButton);
   }
 
   function _initPieces() {
@@ -115,7 +156,7 @@ define(function(require, exports, module) {
       transform: Transform.translate(10, 0, 0)
     });
 
-    var node = this.add(mod);
+    var node = this.node.add(mod);
 
     for(var i = 0; i < 4; i++) {
 

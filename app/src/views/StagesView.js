@@ -40,6 +40,11 @@ define(function(require, exports, module) {
     this.homeIcon.on('click', function() {
       this._eventOutput.emit('nav:loadHome');
     }.bind(this));
+
+    this._eventInput.on('nav:loadGame', function(data) {
+      console.log(data);
+      this._eventOutput.emit('nav:loadGame', data);
+    }.bind(this));
   }
 
   function StagesView() {
@@ -68,6 +73,49 @@ define(function(require, exports, module) {
     activeStage: 1
   };
 
+  StagesView.prototype.scrollToStage = function(data) {
+    var e = data.event;
+    var index = data.stage - 1;
+    var node = data.node;
+
+    // stop from executing if their is a second click on an already active node
+    if (this.activeIndex === index) return;
+
+    this.prevIndex = this.activeIndex;
+    this.activeIndex = index;
+
+    var bgColor = data.backgroundColor;
+    var yOffset = _getYOffset.call(this, e.y);
+
+    this.expandStage();
+    _scrollOrigin.call(this, yOffset, function() {
+      this.closeExpanded();
+    }.bind(this));
+  };
+
+  StagesView.prototype.closeExpanded = function(callback) {
+    var prevNode = _getNodeAtIndex.call(this, this.prevIndex);
+    var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
+
+    // close the currently expanded node
+    if (this.prevIndex !== this.activeIndex) {
+      prevNode.contract(callback);
+    }
+  };
+
+  StagesView.prototype.expandStage = function() {
+    var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
+    
+    // open the new node
+    activeNode.expand();
+  };
+
+  StagesView.prototype.loadStage = function() {
+    this.expandStage();
+  };
+
+  // ## Create layout
+
   function _createLayout() {
     this.layout = new Layout({
       headerSize: this.options.headerHeight
@@ -86,7 +134,7 @@ define(function(require, exports, module) {
 
     var livesController = new LivesController();
 
-    // temp
+    // @NOTE TEMP... to be removed
     livesController.remove();
 
     var headerMod = new StateModifier({
@@ -217,8 +265,13 @@ define(function(require, exports, module) {
       expandedHeight: options.expandedHeight
     });
 
+    // Pipe all view events to the scrollview so we can scroll and
+    // respond to level click events
     view.pipe(this.scrollView);
     view.on('stage:select', this.scrollToStage.bind(this));
+    view.on('nav:loadGame', function() {
+      this._eventInput.emit('nav:loadGame');
+    }.bind(this));
 
     return view;
   }
@@ -360,47 +413,6 @@ define(function(require, exports, module) {
     
     transitionable.set(delta, transition, complete);
   }
-
-  StagesView.prototype.scrollToStage = function(data) {
-    var e = data.event;
-    var index = data.stage - 1;
-    var node = data.node;
-
-    // stop from executing if their is a second click on an already active node
-    if (this.activeIndex === index) return;
-
-    this.prevIndex = this.activeIndex;
-    this.activeIndex = index;
-
-    var bgColor = data.backgroundColor;
-    var yOffset = _getYOffset.call(this, e.y);
-
-    this.expandStage();
-    _scrollOrigin.call(this, yOffset, function() {
-      this.closeExpanded();
-    }.bind(this));
-  };
-
-  StagesView.prototype.closeExpanded = function(callback) {
-    var prevNode = _getNodeAtIndex.call(this, this.prevIndex);
-    var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
-
-    // close the currently expanded node
-    if (this.prevIndex !== this.activeIndex) {
-      prevNode.contract(callback);
-    }
-  };
-
-  StagesView.prototype.expandStage = function() {
-    var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
-    
-    // open the new node
-    activeNode.expand();
-  };
-
-  StagesView.prototype.loadStage = function() {
-    this.expandStage();
-  };
 
   function _getNodeAtIndex(index) {
     return this.scrollViewNodes[index];

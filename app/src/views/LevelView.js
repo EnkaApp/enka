@@ -11,6 +11,8 @@ define(function(require, exports, module) {
   var StateModifier = require('famous/modifiers/StateModifier');
   var Lightbox      = require('famous/views/Lightbox');
   var Easing        = require('famous/transitions/Easing');
+  var Transitionable = require('famous/transitions/Transitionable');
+  var SpringTransition = require('famous/transitions/SpringTransition');
 
   // ## Configurations
   var StageConfig = require('StageConfig');
@@ -24,12 +26,30 @@ define(function(require, exports, module) {
   // ## Templates
   var tplLevelFront = require('hbs!templates/levelFront');
   var tplLevelDetail = require('hbs!templates/levelDetail');
-  var tplLevelDetailPlayBtn = require('hbs!templates/levelDetailPlayBtn');
+  var tplBtn = require('hbs!templates/btn');
 
   // ## Shared
   var user = new User();
 
+  // Button Intro Transition
+  var spring = {
+    method: 'spring',
+    period: 700,
+    dampingRatio: 0.5
+  };
+
   function _createListeners() {
+
+    function play(e) {
+      // Tell downstream listeners that a user wants to play
+      this._eventOutput.emit('level:play', {
+        index: this.options.level - 1,
+        stage: this.options.stage,
+        level: this.options.level,
+        node: this,
+        event: e
+      });
+    }
     
     function select(e) {
       // Flip the card
@@ -61,7 +81,8 @@ define(function(require, exports, module) {
 
     if (!this._locked) {
       this.front.on('click', select.bind(this));
-      this.back.on('click', close.bind(this));
+      this.back.playButton.on('click', play.bind(this));
+      this.back.backing.on('click', close.bind(this));
     }
     
     this.front.pipe(this._eventOutput);
@@ -106,7 +127,7 @@ define(function(require, exports, module) {
     level: 1,
     stage: 1,
     colors: 1,
-    start: [-10000, -10000, 0]
+    start: [-window.innerWidth * 4, -window.innerHeight, 0]
   };
 
   LevelView.prototype.hide = function(transition) {
@@ -116,7 +137,7 @@ define(function(require, exports, module) {
       duration: 300
     };
 
-    transition = transition !== undefined ? transition : easeOut;
+    transition = transition !== undefined ? transition : spring;
 
     this.rootMod.setOpacity(0.001, transition, function() {
       this.rootMod.setTransform(this._transform);
@@ -127,10 +148,10 @@ define(function(require, exports, module) {
     
     var easeOut = {
       curve: 'easeOut',
-      duration: 300
+      duration: 500
     };
 
-    transition = transition !== undefined ? transition : easeOut;
+    transition = transition !== undefined ? transition : spring;
     
     this.rootMod.setOpacity(0.999, transition);
     this.rootMod.setTransform(Transform.translate(0,0,1), transition);
@@ -264,6 +285,7 @@ define(function(require, exports, module) {
 
   function _setLBVListeners() {
     this.backing.pipe(this._eventOutput);
+    this.playButton.pipe(this._eventOutput);
   }
 
   function LevelBackView() {
@@ -343,8 +365,9 @@ define(function(require, exports, module) {
 
   function _createLFBPlayButton() {
 
-    var content = tplLevelDetailPlayBtn({
-      label: 'Play'
+    var content = tplBtn({
+      label: 'Play',
+      classes: 'btn-play'
     });
 
     this.playButton = new Surface({

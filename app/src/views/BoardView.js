@@ -122,8 +122,6 @@ define(function(require, exports, module) {
       rows: this.options.rows,
       columns: this.options.columns,
       pieceSize: this._pieceSize
-      // viewWidth: this.options.viewWidth,
-      // viewHeight: this.options.viewHeight
     });
 
     this.rootMod = new StateModifier({
@@ -135,6 +133,7 @@ define(function(require, exports, module) {
     this.node = this.add(this.rootMod);
 
     _createBackground.call(this);
+    _createOverlay.call(this);
 
     this.viewSize = this.getSize();
 
@@ -357,6 +356,38 @@ define(function(require, exports, module) {
 
     return direction;
   };
+
+  BoardView.prototype.show = function() {
+    this.dimmer.setOpacity(0.001, {
+      curve: 'linear',
+      duration: 300
+    }, function() {
+      this.dimmer.setTransform(Transform.translate(0, 0, -10));
+    }.bind(this));
+  };
+
+  BoardView.prototype.dim = function() {
+    this.dimmer.setTransform(Transform.translate(0, 0, 5));
+    this.dimmer.setOpacity(0.7, {
+      curve: 'linear',
+      duration: 300
+    });
+  };
+
+  function _createOverlay() {
+    this.overlay = new Surface({
+      properties: {
+        backgroundColor: '#e5e5e5'
+      }
+    });
+
+    this.dimmer = new StateModifier({
+      opacity: 0.001,
+      transform: Transform.translate(0, 0, -10)
+    });
+
+    this.add(this.dimmer).add(this.overlay);
+  }
 
   function _createBackground() {
     this.backing = new Surface({

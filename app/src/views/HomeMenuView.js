@@ -13,17 +13,17 @@ define(function(require, exports, module) {
   Transitionable.registerMethod('spring', SpringTransition);
 
   var TOP_MARGIN = 40; // button top margin
-  var DELAY = 200; // milliseconds between button intro animations
+  var DELAY = 300; // milliseconds between button intro animations
 
   // Button Intro Transition
   var spring = {
     method: 'spring',
     period: 1000,
-    dampingRatio: 0.5
+    dampingRatio: 0.7
   };
 
   // ## Views
-  var HomeButtonView = require('./HomeButtonView');
+  var HomeButtonView = require('views/HomeButtonView');
 
   function _createResumeGameButton() {
     this.btnResumeGame = new HomeButtonView({
@@ -32,7 +32,7 @@ define(function(require, exports, module) {
     });
 
     var mod = new StateModifier({
-      transform: Transform.translate(0, window.innerHeight, 0)
+      transform: Transform.translate(0, window.innerHeight / 2, 0)
     });
 
     this._modifiers.push(mod);
@@ -47,7 +47,7 @@ define(function(require, exports, module) {
     });
 
     var mod = new StateModifier({
-      transform: Transform.translate(0, window.innerHeight, 0)
+      transform: Transform.translate(0, window.innerHeight / 2, 0)
     });
     
     this._modifiers.push(mod);
@@ -61,7 +61,7 @@ define(function(require, exports, module) {
     });
 
     var mod = new StateModifier({
-      transform: Transform.translate(0, window.innerHeight, 0)
+      transform: Transform.translate(0, window.innerHeight / 2, 0)
     });
 
     this._modifiers.push(mod);
@@ -102,12 +102,14 @@ define(function(require, exports, module) {
   HomeMenuView.DEFAULT_OPTIONS = {};
 
   HomeMenuView.prototype.showButtons = function() {
+
+      // {
+      //   curve: Easing.inSine,
+      //   duration: 500
+      // }
     
     function _callback(i) {
-      this._modifiers[i].setTransform(Transform.translate(0, i*TOP_MARGIN, 0), {
-        curve: Easing.inSine,
-        duration: 500
-      });
+      this._modifiers[i].setTransform(Transform.translate(0, i*TOP_MARGIN, 0), spring);
     }
 
     for (var i = 0; i < this._modifiers.length; i++) {

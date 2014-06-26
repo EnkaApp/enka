@@ -26,7 +26,14 @@ define(function(require, exports, module) {
   // ## Event Handlers/Listeners    
   function _setListeners() {
 
-    function levelSelect(data) {}
+    function levelSelect(data) {
+      console.log('level:select');
+    }
+
+    function play(data) {
+      console.log('level:play', data);
+      this._eventOutput.emit('nav:loadGame', data);
+    }
 
     function stageSelect(e) {
       this._eventOutput.emit('stage:select', {
@@ -38,10 +45,11 @@ define(function(require, exports, module) {
 
     this.bg.on('click', stageSelect.bind(this));
     this._eventInput.on('level:select', levelSelect.bind(this));
+    this._eventInput.on('level:play', play.bind(this));
 
     // Make sure that scroll/swipe events are passed downstream
-    this.grid.pipe(this._eventOutput);
-    this.bg.pipe(this._eventOutput);
+    this.grid.pipe(this._eventInput);
+    this.bg.pipe(this._eventInput);
     this._eventInput.pipe(this._eventOutput);
   }
 

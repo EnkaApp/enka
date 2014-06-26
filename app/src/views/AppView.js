@@ -36,6 +36,15 @@ define(function(require, exports, module) {
       this.slideDown();
     }.bind(this));
 
+    this.stagesView.on('nav:loadGame', function(data) {
+      this.slideLeft();
+      this.gameView._eventInput.emit('game:load', data);
+    }.bind(this));
+
+    this.gameView.on('nav:loadStages', function() {
+      this.slideRight();
+    }.bind(this));
+
     this.homeView.on('nav:loadStages', function(){
       this.slideUp();
     }.bind(this));

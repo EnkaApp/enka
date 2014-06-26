@@ -1692,6 +1692,22 @@ a img {
 }
 html {
   background: #fff;
+  font-family: "Helvetica-Neue", Arial, sans-serif;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+span,
+button,
+strong,
+em,
+i {
+  font-family: "Helvetica-Neue", Arial, sans-serif;
 }
 button {
   border: none;
@@ -1701,6 +1717,7 @@ button {
   width: 100%;
   display: block;
   font-size: 14px;
+  font-weight: 300;
 }
 .backfaceVisibility {
   -webkit-backface-visibility: visible;
@@ -1712,6 +1729,25 @@ button {
   text-align: center;
   font-size: 14px;
   line-height: 24px;
+}
+.gamemenu.gamemenu-description {
+  text-align: center;
+}
+.gamemenu-buttons .btn {
+  display: block;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  background: #cfcfcf;
+  border: 5px solid #e8e8e8;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 99em;
+  color: white;
+}
+.gamemenu-buttons .btn-resume {
+  background: #9ad4b9;
+  border-color: #bee3d2;
 }
 .header.lives-count {
   color: white;

@@ -8,10 +8,21 @@ define(function (require, exports, module) {
   var Easing        = require('famous/transitions/Easing');
   var Timer         = require('famous/utilities/Timer');
   var GridLayout    = require('famous/views/GridLayout');
+  var Transitionable = require('famous/transitions/Transitionable');
+  var SpringTransition = require('famous/transitions/SpringTransition');
+
+  Transitionable.registerMethod('spring', SpringTransition);
 
   var transition = {
     curve: 'easeOut',
     duration: 500
+  };
+
+  // Button Intro Transition
+  var spring = {
+    method: 'spring',
+    period: 1000,
+    dampingRatio: 0.5
   };
 
   function _setListeners() {

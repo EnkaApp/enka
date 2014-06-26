@@ -198,7 +198,7 @@ define(function(require, exports, module) {
 
         if (this.backNode){
             result.push({
-                transform: Transform.moveThen([0, 0, -SEPERATION_LENGTH], backTransform),
+                transform: Transform.moveThen([0, 0, -0.1], backTransform),
                 target: this.backNode.render()
             });
         }
