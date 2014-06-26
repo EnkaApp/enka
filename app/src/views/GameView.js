@@ -15,11 +15,16 @@ define(function(require, exports, module) {
   var BoardView = require('./BoardView');
 
   function _createBoardView() {
+
     var layout = new HeaderFooterLayout({
-      headerSize: 44
+      headerSize: this.options.headerSize
     });
 
-    this.boardView = new BoardView();
+    this.boardView = new BoardView({
+      viewHeight: window.innerHeight - this.options.headerSize,
+      viewWidth: window.innerWidth - 10
+    });
+
     this.gameHeaderView = new GameHeaderView();
 
     layout.header.add(this.gameHeaderView);
@@ -40,7 +45,9 @@ define(function(require, exports, module) {
   GameView.prototype = Object.create(View.prototype);
   GameView.prototype.constructor = GameView;
 
-  GameView.DEFAULT_OPTIONS = {};
+  GameView.DEFAULT_OPTIONS = {
+    headerSize: 44
+  };
 
   module.exports = GameView;
 });
