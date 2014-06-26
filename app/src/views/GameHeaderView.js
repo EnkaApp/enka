@@ -14,6 +14,12 @@ define(function(require, exports, module) {
   var PieceGenerator  = require('PieceGenerator');
   var BoardView = require('views/BoardView');
 
+  function _setListeners() {
+    this.pieceGenerator._eventOutput.on('piece:colorsUpdated', function() {
+      this.updateColors();
+    }.bind(this));
+  }
+
   function GameHeaderView(options) {
     View.apply(this, arguments);
     
@@ -21,40 +27,9 @@ define(function(require, exports, module) {
 
     this.upcomingColors = [];
 
-    for(var i = 0; i < 4; i++) {
-
-      var properties = {};
-      var pw = this.options.pieceSize[0];
-
-      // create modifier
-      var modifier = new StateModifier({
-        origin: [0, 0.5],
-        align: [0, 0.5],
-        transform: Transform.translate(i * (pw + 5), 0, 0)
-      });
-
-      // the fourth piece will be used to make the animation look better
-      // so it does not need a color
-      if (i < 3) {
-        properties.backgroundColor = this.pieceGenerator.colorQueue[i];
-      }
-
-      var surface = new Surface({
-        size: this.options.pieceSize,
-        properties: properties
-      });
-
-      surface._modifier = modifier;
-
-      this.upcomingColors.push(surface);
-
-      this.add(modifier).add(surface);
-    }
-
-    this.pieceGenerator._eventOutput.on('piece:colorsUpdated', function() {
-      this.updateColors();
-    }.bind(this));
-
+    _createBacking.call(this);
+    _initPieces.call(this);
+    _setListeners.call(this);
   }
   
   GameHeaderView.prototype = Object.create(View.prototype);
@@ -114,6 +89,64 @@ define(function(require, exports, module) {
   GameHeaderView.DEFAULT_OPTIONS = {
     pieceSize: [20, 20]
   };
+
+  function _createBacking() {
+
+    this.backing = new Surface({
+      properties: {
+        classes: ['navbar'],
+        backgroundColor: 'black'
+      }
+    });
+
+     var backingMod = new StateModifier({
+      transform: Transform.behind
+    });
+
+     this.add(backingMod).add(this.backing);
+  }
+
+  function _initPieces() {
+
+    var mod = new StateModifier({
+      size: [70, 20],
+      origin: [0, 0.5],
+      align: [0, 0.5],
+      transform: Transform.translate(10, 0, 0)
+    });
+
+    var node = this.add(mod);
+
+    for(var i = 0; i < 4; i++) {
+
+      var properties = {};
+      var pw = this.options.pieceSize[0];
+
+      // create modifier
+      var modifier = new StateModifier({
+        origin: [0, 0.5],
+        align: [0, 0.5],
+        transform: Transform.translate(i * (pw + 5), 0, 0)
+      });
+
+      // the fourth piece will be used to make the animation look better
+      // so it does not need a color
+      if (i < 3) {
+        properties.backgroundColor = this.pieceGenerator.colorQueue[i];
+      }
+
+      var surface = new Surface({
+        size: this.options.pieceSize,
+        properties: properties
+      });
+
+      surface._modifier = modifier;
+
+      this.upcomingColors.push(surface);
+
+      node.add(modifier).add(surface);
+    }
+  }
 
   module.exports = GameHeaderView;
 });

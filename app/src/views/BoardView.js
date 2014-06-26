@@ -52,7 +52,8 @@ define(function(require, exports, module) {
     this.pieceGenerator._eventOutput.pipe(this._eventOutput);
 
     // Setup swipe events
-    this.bgSurface.pipe(sync);
+    // this.bgSurface.pipe(sync);
+    this.backing.pipe(sync);
 
     sync.on('start', function(data) {
       xStart = data.clientX;
@@ -150,8 +151,8 @@ define(function(require, exports, module) {
   }// <---- END BOARDVIEW FUNCTION ----------------------------------------
 
   BoardView.DEFAULT_OPTIONS = {
-    startIndex: 0,
-    rows: 7,
+    startIndex: 12,
+    rows: 5,
     columns: 5,
     viewWidth: window.innerWidth,
     viewHeight: window.innerHeight
@@ -357,13 +358,23 @@ define(function(require, exports, module) {
   };
 
   function _createBackground() {
-    this.bgSurface = new Surface({
+    this.backing = new Surface({
       properties: {
-        backgroundColor: 'black'
+        classes: ['gameboard-backing'],
+        backgroundColor: '#f5f5f5',
       }
     });
 
-    this.node.add(this.bgSurface);
+    this.boardSurface = new Surface({
+      properties: {
+        classes: ['gameboard'],
+        backgroundColor: 'white',
+        pointerEvents: 'none'
+      }
+    });
+
+    this.add(this.backing);
+    this.node.add(this.boardSurface);
   }
 
   module.exports = BoardView;
