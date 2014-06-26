@@ -146,10 +146,16 @@ define(function(require, exports, module) {
 
   }// <---- END BOARDVIEW FUNCTION ----------------------------------------
 
+  BoardView.DEFAULT_OPTIONS = {
+    startIndex: 0,
+    rows: 7,
+    columns: 5,
+    viewWidth: window.innerWidth,
+    viewHeight: window.innerHeight
+  };
 
-
-    // ADD METHODS
-//-------------------------------------------------------------------------
+  // ADD METHODS
+  //-------------------------------------------------------------------------
 
   BoardView.prototype = Object.create(View.prototype);
   BoardView.prototype.constructor = BoardView;
@@ -338,7 +344,7 @@ define(function(require, exports, module) {
     return direction;
   };
 
-  function _createBackground(){
+  function _createBackground() {
     this.bgSurface = new Surface({
       properties: {
         backgroundColor: 'black'
@@ -347,14 +353,6 @@ define(function(require, exports, module) {
 
     this.node.add(this.bgSurface);
   }
-
-  BoardView.DEFAULT_OPTIONS = {
-    startIndex: 0,
-    rows: 7,
-    columns: 5,
-    viewWidth: window.innerWidth,
-    viewHeight: window.innerHeight
-  };
 
   module.exports = BoardView;
 });

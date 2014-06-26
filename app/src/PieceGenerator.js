@@ -22,7 +22,6 @@ define(function(require, exports, module) {
     this._eventOutput = new EventHandler();
     this._eventInput = new EventHandler();
 
-    this._isFirstPiece = true;
     this._lastColor = '';
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
@@ -53,15 +52,19 @@ define(function(require, exports, module) {
   function _useExistingPiece(direction) {
     var node = deletedPieces.pop();
     var piece = node._piece;
-    var color = this.getNextColorFromQueue();
+    var backColor = this.getNextColorFromQueue();
 
     console.info('Using Existing Piece');
     
+    // Create the piece before reassigning last color
     piece.updateOptions({
       direction: direction,
       frontBgColor: this._lastColor,
-      backBgColor: color
+      backBgColor: backColor
     });
+
+    // Save the last used back color
+    this._lastColor = backColor;
 
     this.addColorToQueue();
 
@@ -85,16 +88,13 @@ define(function(require, exports, module) {
 
     // save a reference to the modifier
     node._mod = modifier;
-
-    // create the piece
-    if (!this._lastColor) {
-      this._lastColor = this.getNextColorFromQueue();
-      this.addColorToQueue();
-    }
-
+    
     var backColor = this.getNextColorFromQueue();
-
     this.addColorToQueue();
+
+    // The only time this._lastColor is falsy is when we are
+    // placeing the first piece on the board
+    if (!this._lastColor) this._lastColor = backColor;
 
     var options = {
       width: this.options.pieceSize,
@@ -104,18 +104,16 @@ define(function(require, exports, module) {
       direction: direction
     };
 
-    if (this._isFirstPiece) {
-      options.backBgColor = this._lastColor;
-      piece = new PieceView(options);
-    } else {
-      piece = new PieceView(options);
-    }
+    piece = new PieceView(options);
 
     // save a reference to the piece
     node._piece = piece;
 
     // add modifier and piece to node
     node.add(node._mod).add(node._piece);
+
+    // Save the last used back color
+    this._lastColor = backColor;
 
     return node;
   }
