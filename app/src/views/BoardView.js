@@ -152,8 +152,8 @@ define(function(require, exports, module) {
 
   BoardView.DEFAULT_OPTIONS = {
     startIndex: 12,
-    rows: 5,
-    columns: 5,
+    rows: 8,
+    columns: 3,
     viewWidth: window.innerWidth,
     viewHeight: window.innerHeight
   };

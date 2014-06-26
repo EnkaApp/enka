@@ -92,7 +92,7 @@ define(function(require, exports, module) {
 
     var rows = this.options.rows;
     var viewHeight = this.options.viewHeight;
-    var hSize =  viewHeight / columns;
+    var hSize =  viewHeight / rows;
 
     if(wSize < hSize){
       return [wSize, wSize];
