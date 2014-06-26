@@ -115,11 +115,15 @@ define(function(require, exports, module) {
       viewHeight: this.options.viewHeight
     });
 
+    // sets piece size based off of view size
+    this._pieceSize = this.gridController.getCellSize();
+
     this.pieceGenerator = new PieceGenerator({
-      columns: this.options.columns,
       rows: this.options.rows,
-      viewWidth: this.options.viewWidth,
-      viewHeight: this.options.viewHeight
+      columns: this.options.columns,
+      pieceSize: this._pieceSize
+      // viewWidth: this.options.viewWidth,
+      // viewHeight: this.options.viewHeight
     });
 
     this.rootMod = new StateModifier({
@@ -136,9 +140,6 @@ define(function(require, exports, module) {
 
     // Initialize data structure to store the board state
     _stateInit.call(this);
-
-    // sets piece size based off of view size
-    this._pieceSize = this.gridController.getCellSize();
 
     // creates first Piece to put on board
     var firstPiece = this.pieceGenerator.getPiece();
@@ -165,8 +166,8 @@ define(function(require, exports, module) {
   BoardView.prototype.constructor = BoardView;
 
   BoardView.prototype.placePiece = function(piece, newIndex) {
-    var pos = this.gridController.getXYCoords(this._currentIndex, this._pieceSize[0]);
-    
+    var pos = this.gridController.getXYCoords(this._currentIndex);
+    console.log(this._pieceSize[0]);
     console.info('Placing piece at', this._lastPiecePosition);
     
     piece._mod.setTransform(
@@ -176,7 +177,7 @@ define(function(require, exports, module) {
     // Update the current index to the index of the piece we just placed
     // and save the newly placed piece to the board state
     this._currentIndex = newIndex;
-    this._lastPiecePosition = this.gridController.getXYCoords(newIndex, this._pieceSize[0]);
+    this._lastPiecePosition = this.gridController.getXYCoords(newIndex);
 
     this.node.add(piece);
   };

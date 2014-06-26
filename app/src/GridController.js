@@ -1,4 +1,3 @@
-
 define(function(require, exports, module) {
   var StateModifier = require('famous/modifiers/StateModifier');
   var Transform     = require('famous/core/Transform');
@@ -88,11 +87,11 @@ define(function(require, exports, module) {
   GridController.prototype.getCellSize = function() {
     var columns = this.options.columns;
     var viewWidth = this.options.viewWidth;
-    var wSize =  viewWidth / columns;
+    var wSize =  Math.floor(viewWidth / columns);
 
     var rows = this.options.rows;
     var viewHeight = this.options.viewHeight;
-    var hSize =  viewHeight / rows;
+    var hSize =  Math.floor(viewHeight / rows);
 
     if(wSize < hSize){
       return [wSize, wSize];

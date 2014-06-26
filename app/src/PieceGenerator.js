@@ -42,7 +42,7 @@ define(function(require, exports, module) {
     rows: 7,
     columns: 5,
     colors: 3,
-    pieceSize: 64
+    pieceSize: [64, 64]
   };
 
   PieceGenerator.prototype.setOptions = function(options){
@@ -84,7 +84,7 @@ define(function(require, exports, module) {
     var modifier = new StateModifier({
       origin: [0, 0],
       align: [0, 0],
-      size: [this.options.pieceSize, this.options.pieceSize],
+      size: this.options.pieceSize
     });
 
     // save a reference to the modifier so we can access it easily later
@@ -98,8 +98,8 @@ define(function(require, exports, module) {
     if (!this._lastColor) this._lastColor = backColor;
 
     var options = {
-      width: this.options.pieceSize,
-      height: this.options.pieceSize,
+      width: this.options.pieceSize[0],
+      height: this.options.pieceSize[1],
       frontBgColor: this._lastColor,
       backBgColor: backColor,
       direction: direction

@@ -75,7 +75,7 @@ define(function(require, exports, module) {
             this.options.direction === Reflector.DIRECTION_RIGHT) {
             this.axis = Reflector.AXIS_Y;
         }
-    }
+    };
 
     /**
      * Toggles the rotation between the front and back renderables
