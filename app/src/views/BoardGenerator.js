@@ -40,9 +40,9 @@ define(function(require, exports, module) {
     // TODO UPDATE OPTIONS
     if(!boardView){
       boardView = new BoardView(this.options);
-    } else{
+    } else {
       boardView.setOptions(this.options);
-    }  
+    }
   }
 
   /*

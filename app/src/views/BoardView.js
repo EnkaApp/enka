@@ -48,44 +48,38 @@ define(function(require, exports, module) {
    
   function BoardView(options) {
     View.apply(this, arguments);
+    
     var turns = 0;
 
+    // Setup the options manager
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
     if (options) this.setOptions(options);
 
-    // var flag = 0;
-
-    //store columns and rows
-    this.columns = this.options.columns;
-    this.rows = this.options.rows;
-    this.viewWidth = this.options.viewWidth;
-    this.viewHeight = this.options.viewHeight;
-
     this._currentIndex = this.options.startIndex;
 
     this.gridController = new GridController({
-      columns: this.columns,
-      rows: this.rows,
-      viewWidth: this.viewWidth,
-      viewHeight: this.viewHeight
+      columns: this.options.columns,
+      rows: this.options.rows,
+      viewWidth: this.options.viewWidth,
+      viewHeight: this.options.viewHeight
     });
 
     this.pieceGenerator = new PieceGenerator({
-      columns: this.columns,
-      rows: this.rows,
-      viewWidth: this.viewWidth,
-      viewHeight: this.viewHeight
+      columns: this.options.columns,
+      rows: this.options.rows,
+      viewWidth: this.options.viewWidth,
+      viewHeight: this.options.viewHeight
     });
 
     _createBackground.call(this);
 
     this.viewSize = this.getSize();
-    // this._state = this.pieceGenerator._state;
+
+    // Initialize data structure to store the board state
     _stateInit.call(this);
 
     // sets piece size based off of view size
-    // this._pieceSize = this.gridController.getPieceSize(this.viewSize);
     this._pieceSize = this.gridController.getCellSize();
 
     // creates first Piece to put on board
@@ -162,17 +156,13 @@ define(function(require, exports, module) {
   BoardView.prototype = Object.create(View.prototype);
   BoardView.prototype.constructor = BoardView;
 
-  // BoardView.prototype.getCenterIndex = function(){
-  //   var length = this.options.columns * this.options.rows;
-  //   return (length - 1) / 2;
-  // }
-
   BoardView.prototype.placePiece = function(piece) {
-    this._lastPiecePosition = this.gridController.getXYCoords(this._currentIndex, this._pieceSize[0]);
+    var pos = this._lastPiecePosition = this.gridController.getXYCoords(this._currentIndex, this._pieceSize[0]);
     
-    // piece._modifier.setTransform(
+    console.info('Placing piece at', pos);
+    
     piece._mod.setTransform(
-      Transform.translate(this._lastPiecePosition[0], this._lastPiecePosition[1], 0)
+      Transform.translate(pos[0], pos[1], 0)
     );
 
     this.add(piece);
@@ -182,25 +172,25 @@ define(function(require, exports, module) {
     var alreadyChecked = [];
     var connections = 0;
     var initialIndex = index;
-    alreadyChecked[index] = true; 
+    alreadyChecked[index] = true;
 
     seekAndDestroy.call(this, index);
 
     function seekAndDestroy(index){
       var matches = this.checkIfAnyNeighborHasMatch(index);
+
       for(var i = 0; i < matches.length; i++){
         if(matches[i]){
           var newIndexToCheck = matches[i][0];
-          // console.log(matches[i]);
+    
           if(matches[i][1] === true && !alreadyChecked[newIndexToCheck]){
             alreadyChecked[newIndexToCheck] = true;
             connections++;
-            // positionsToCheck.push(newIndexToCheck);
             seekAndDestroy.call(this, newIndexToCheck);
-          }  
+          }
         }
       }
-    } 
+    }
 
     if(connections > 1){
       for(var i = 0; i < alreadyChecked.length; i++){
@@ -209,7 +199,7 @@ define(function(require, exports, module) {
         }
       }
     }
-  } // end deleteMatches
+  }; // end deleteMatches
 
   BoardView.prototype.checkIfAnyNeighborHasMatch = function(index) {
     var matches = [];
@@ -221,11 +211,11 @@ define(function(require, exports, module) {
     };
     for(var direction in directions){
       if(this.isInBounds(index, direction)){
-        matches.push(directions[direction]); 
+        matches.push(directions[direction]);
       }
     }
     return matches;
-  }
+  };
 
   BoardView.prototype.checkIfDirectionHasMatch = function(index, direction){
     var isMatchAtIndex = [];
@@ -236,25 +226,26 @@ define(function(require, exports, module) {
 
     // check if neighbor is null
     if(this._state[neighborIndex] && this.isInBounds(direction, index)){
-      isMatch = this.getColorFromIndex(neighborIndex) === matchColor
-      isMatchAtIndex.push(neighborIndex, isMatch)
+      isMatch = this.getColorFromIndex(neighborIndex) === matchColor;
+      isMatchAtIndex.push(neighborIndex, isMatch);
       return isMatchAtIndex;
     }else {
       isMatch = false;
-      isMatchAtIndex.push(neighborIndex, isMatch)
+      isMatchAtIndex.push(neighborIndex, isMatch);
       return isMatchAtIndex;
     }
-  }
+  };
 
   BoardView.prototype.getColorFromIndex = function(index){
     if(this._state[index]){
-      // console.log('this._state[index]: ', this._state[index]);
       var color = _getPieceAtIndex.call(this, index).getOption('backBgColor');
+
       return color;
     }
-  }
+  };
 
   BoardView.prototype.checkIfTrapped = function(index){
+    var trueFlag = 0;
     var canMove = [];
     var directions = {
       left : this.isInBounds('left', index),
@@ -262,6 +253,7 @@ define(function(require, exports, module) {
       up : this.isInBounds('up', index),
       down : this.isInBounds('down', index)
     };
+
     for(var direction in directions){
       var indexToCheck = this.getNewIndex(index, direction);
       if(directions[direction]){
@@ -269,46 +261,44 @@ define(function(require, exports, module) {
       }
     }
 
-    var trueFlag = 0;
     for(var i = 0; i < canMove.length; i++){
       if(canMove[i]){
         trueFlag++;
       }
     }
+
     if(!trueFlag){
       console.log('Game Over');
     }
-  }
+  };
 
   BoardView.prototype.isInBounds = function(direction){
     var viewPortSize = this.viewSize;
-    var cellSize = this.gridController.getPieceSize(viewPortSize);
-
-    // this.piecePosition = this.gridController.getXYCoords(this._currentIndex);
-
-    var boardHeight = this.rows * cellSize[1];
-    var yLowerBounds = boardHeight - cellSize[0];
+    var pieceSize = this._pieceSize;
+    var boardHeight = this.options.rows * pieceSize[1];
+    var yLowerBounds = boardHeight - pieceSize[0];
 
     if(direction === 'left' && this._lastPiecePosition[0] === 0){
-      return false
+      return false;
     }
-    if(direction === 'right' && this._lastPiecePosition[0] === (viewPortSize[0] - cellSize[0])){
-      return false
-    } 
+    if(direction === 'right' && this._lastPiecePosition[0] === (viewPortSize[0] - pieceSize[0])){
+      return false;
+    }
     if(direction === 'up' && this._lastPiecePosition[1] === 0){
-      return false
+      return false;
     }
     if(direction === 'down' && this._lastPiecePosition[1] === yLowerBounds){
-      return false
+      return false;
     }
+
     return true;
-  }
+  };
 
   BoardView.prototype.deletePiece = function(index){
     this.pieceGenerator.addDeletedPiece(this._state[index]);
     _getModifierAtIndex.call(this, index).setTransform(Transform.translate(2000, 2000, 0));
     this._state[index] = null;
-  }
+  };
 
   BoardView.prototype.getNewIndex = function(index, direction){
     if(direction === 'left'){
@@ -318,12 +308,12 @@ define(function(require, exports, module) {
       return index + 1;
     }
     if(direction === 'up'){
-      return index - this.columns;
+      return index - this.options.columns;
     }
     if(direction === 'down'){
-      return index + this.columns;
+      return index + this.options.columns;
     }
-  }
+  };
 
   BoardView.prototype.getSwipeDirection = function(xStart, yStart, xEnd, yEnd){
     var direction = '';
@@ -346,7 +336,7 @@ define(function(require, exports, module) {
     }
 
     return direction;
-  }
+  };
 
   function _createBackground(){
     this.bgSurface = new Surface({
@@ -360,7 +350,6 @@ define(function(require, exports, module) {
       origin: [0.5, 0.5],
       align: [0.5, 0.5]
     });
-
 
     this.add(mod).add(this.bgSurface);
   }

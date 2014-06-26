@@ -115,7 +115,7 @@ define(function(require, exports, module) {
     this.reflector.setBack(this.back);
 
     _initReflectionModifier.call(this);
-    this.add(this.reflectionMod).add(this.reflector);               
+    this.add(this.reflectionMod).add(this.reflector);
   }
 
   PieceView.prototype = Object.create(View.prototype);
@@ -173,19 +173,9 @@ define(function(require, exports, module) {
   };
 
   PieceView.prototype.reflect = function() {
-    // var toggle = false;
-    // var angle = toggle ? 0 : Math.PI;
-    // var angle = Math.PI;
-    // this.reflector.setAngle(angle, {curve : 'linear', duration : 500}, function(){
-    //   this._eventOutput.emit('reflected');
-    // }.bind(this));
-
-    console.log('reflect piece');
-    
     this.reflector.reflect({curve : 'linear', duration : 500}, function(){
       this._eventOutput.emit('reflected');
     }.bind(this));
-    // toggle = !toggle;
   };
 
   module.exports = PieceView;
