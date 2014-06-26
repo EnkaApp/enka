@@ -63,7 +63,8 @@ define(function(require, exports, module) {
       backBgColor: backColor
     });
 
-    // Save the last used back color
+    // Save the last used back color. This will be used as the 
+    // front color of the next played piece
     this._lastColor = backColor;
 
     this.addColorToQueue();
@@ -79,14 +80,14 @@ define(function(require, exports, module) {
 
     var node = new RenderNode();
 
-    // Create the modifier here
+    // Create the modifier
     var modifier = new StateModifier({
       origin: [0, 0],
       align: [0, 0],
       size: [this.options.pieceSize, this.options.pieceSize],
     });
 
-    // save a reference to the modifier
+    // save a reference to the modifier so we can access it easily later
     node._mod = modifier;
     
     var backColor = this.getNextColorFromQueue();
@@ -106,13 +107,14 @@ define(function(require, exports, module) {
 
     piece = new PieceView(options);
 
-    // save a reference to the piece
+    // save a reference to the piece so we can access it easily later
     node._piece = piece;
 
     // add modifier and piece to node
     node.add(node._mod).add(node._piece);
 
-    // Save the last used back color
+    // Save the last used back color. This will be used as the 
+    // front color of the next played piece
     this._lastColor = backColor;
 
     return node;

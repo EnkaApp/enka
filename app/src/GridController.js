@@ -122,17 +122,6 @@ define(function(require, exports, module) {
    * @param {number} index
    * @param {number} pieceSize DEPRECATED
    */
-
-  GridController.prototype.createBackground = function(){
-    this.bgSurface = new Surface({
-      size: [window.innerWidth, window.innerHeight],
-      properties: {
-        backgroundColor: 'back'
-      }
-    });
-    this.add(this.bgSurface);
-  }
-
   GridController.prototype.getXYCoords = function(index, pieceSize) {
     var size;
 

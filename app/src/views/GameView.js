@@ -14,15 +14,6 @@ define(function(require, exports, module) {
   // ## Views
   var BoardView = require('./BoardView');
 
-  // function _createContainer() {
-  //   this.container = new ContainerSurface({
-  //     size: [undefined, undefined],
-  //     properties: {
-  //       visibility: 'hidden'
-  //     }
-  //   });
-  // }
-
   function _createBoardView() {
     var layout = new HeaderFooterLayout({
       headerSize: 44
@@ -43,7 +34,6 @@ define(function(require, exports, module) {
   function GameView() {
     View.apply(this, arguments);
 
-    // _createContainer.call(this);
     _createBoardView.call(this);
   }
 
