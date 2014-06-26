@@ -1,59 +1,153 @@
 define(function(require, exports, module) {
+	var OptionsManager 	= require('famous/core/OptionsManager');
+  	var StateModifier  	= require('famous/modifiers/StateModifier');
+  	var Transform      	= require('famous/core/Transform');
+  	var EventHandler	= require('famous/core/EventHandler');
+  	var RenderNode	= require('famous/core/RenderNode');
 
   	var PieceView     = require('./views/PieceView');
-  	var colorArray = ['blue', 'green', 'red'];
+  	
+  	var colorArray = ['blue', 'green', 'red'];  
+	var deletedPieces = [];
 
   	// initializes this.colorQueue with 3 colors
-	function PieceGenerator(){
-		this.colorQueue = [];
-		for(var i = 0; i < 3; i++){
-			var color = getRandomColor(0, colorArray.length - 1); 
-			this.colorQueue.push(color);	
+	function PieceGenerator(options){
+
+		if(PieceGenerator._instance){
+			return PieceGenerator._instance;
 		}
+
+		this._eventOutput = new EventHandler();
+		this._eventInput = new EventHandler();
+
+		this._isFirstPiece = true;
+		this._lastColor = '';
+		this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
+	    this._optionsManager = new OptionsManager(this.options);
+	    this.colorQueue = [];
+
+	    if (options) this.setOptions(options);
+
+		for(var i = 0; i < 3; i++){
+			this.addColorToQueue();
+		}
+
+		console.log('new PieceGenerator');
+		PieceGenerator._instance = this;
 	}
 
-	PieceGenerator.prototype.createNewPiece = function(size, lastColor, direction, isNotFirst){
-		if(!lastColor){
-			lastColor = this.getNextColorFromQueue();
-			this.addColorToQueue.call(this);
+	PieceGenerator._instance = null;
+
+	PieceGenerator.prototype.setOptions = function(options){
+		this._optionsManager.patch(options);
+	}
+
+	function _useExistingPiece(direction) {
+        // var color = this.colorQueue.shift();
+        var node = deletedPieces.pop();
+        var piece = node._piece;
+        var color = this.getNextColorFromQueue();
+        
+        // piece = pieceObject.piece;
+        
+        piece.updateOptions({
+          direction: direction,
+          frontBgColor: this._lastColor,
+          backBgColor: color
+        });
+
+        this.addColorToQueue()
+
+        // return piece;
+        return node;
+	}
+
+	function _createNewPiece(direction) {
+
+		if(!direction) direction = 'left';
+
+		var node = new RenderNode();
+
+		// Create the modifier here
+		var modifier = new StateModifier({
+			origin: [0, 0],
+			align: [0, 0],
+            size: this.options.size,
+		});
+
+		// save a reference to the modifier
+		console.log('heres that modifier', modifier);
+		node._mod = modifier;
+
+		// create the piece
+
+		if (!this._lastColor) {
+			this._lastColor = this.getNextColorFromQueue();
+			this.addColorToQueue();
 		}
-		if(!direction){
-			direction = 'left';
-		}
+
 		var backColor = this.getNextColorFromQueue();
-		this.addColorToQueue.call(this);
+
+		this.addColorToQueue();
+
 		var options = {
-			width: size,
-			height: size,
-			frontBgColor: lastColor,
+			width: this.options.pieceSize,
+			height: this.options.pieceSize,
+			frontBgColor: this._lastColor,
 			backBgColor: backColor,
 			direction: direction
-		}
-		if(!isNotFirst){
-			var options = {
-				width: size,
-				height: size,
-				frontBgColor: lastColor,
-				backBgColor: lastColor,
-				direction: direction
-			}
-			var piece = new PieceView(options);
-			return piece;
-		}else{
-			var piece = new PieceView(options);
-			return piece;
+		};
+
+		// if(!isNotFirst){
+		if (this._isFirstPiece) {
+			options.backBgColor = this._lastColor;
+			piece = new PieceView(options);
+		} else {
+			piece = new PieceView(options);
 		}
 
+		// save a reference to the piece
+		node._piece = piece;
+
+		// add modifier and piece to node
+		node.add(node._mod).add(node._piece);
+
+		return node;
 	}
+
+	PieceGenerator.prototype.getPiece = function(direction, position) {
+		var node = null;
+
+		// If deletedPieces.length === 0, create a new piece
+		if(deletedPieces.length === 0){
+	        console.log('about to call create');
+	        node = _createNewPiece.call(this, direction);
+
+	    } 
+
+	    // otherwise use an existing piece
+	    else {     
+	        // reuse existing 
+	        node = _useExistingPiece.call(this, direction);
+	    }
+
+		return node;
+	}
+	PieceGenerator.prototype.addDeletedPiece = function(node) {
+		deletedPieces.push(node);
+	};
 
 	PieceGenerator.prototype.getNextColorFromQueue = function(){
 		return this.colorQueue.shift();
+		this._eventOutput.emit('colorsUpdated');
+		this._eventOutput.emit('piece:colorRemoved');
 	}
 
-	PieceGenerator.prototype.addColorToQueue  = function(){
+	PieceGenerator.prototype.addColorToQueue = function(){
 		var color = getRandomColor(0, colorArray.length - 1);
 		this.colorQueue.push(color);
-		// console.log(this.colorQueue)
+		this._eventOutput.emit('colorsUpdated');
+		this._eventOutput.emit('piece:colorAdded');
 	}
 
 	function getRandomColor (min, max){
@@ -61,9 +155,12 @@ define(function(require, exports, module) {
 		return colorArray[num];
 	}
 
- // create an unending array of random colors.
- // 
+ 	PieceGenerator.DEFAULT_OPTIONS = {
+ 		rows: 7,
+   		columns: 5,
+ 		colors: 3,
+ 		pieceSize: 64
+ 	}
 
 	module.exports = PieceGenerator;
 });
- // TODO: START WORK ON PIECE CREATION USING COLOR array

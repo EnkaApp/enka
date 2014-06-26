@@ -2,6 +2,7 @@
 define(function(require, exports, module) {
   var StateModifier = require('famous/modifiers/StateModifier');
   var Transform     = require('famous/core/Transform');
+  var Surface        = require('famous/core/Surface');
   var RenderNode    = require('famous/core/RenderNode');
   var OptionsManager = require('famous/core/OptionsManager');
   
@@ -26,17 +27,9 @@ define(function(require, exports, module) {
 
     return index % columns;
   }
-
-  function _createGrid() {
-    var length = this.options.rows * this.options.columns;
-
-    for (var i = 0; i < length; i++) {
-      this._state.push(null);
-    }
-  }
+ 
 
   function GridController(options) {
-    this._state = [];
     this._dimensions = [];
 
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
@@ -46,8 +39,6 @@ define(function(require, exports, module) {
 
     this._dimensions = [this.options.rows, this.options.columns];
     this._cellSize = this.getCellSize();
-
-    _createGrid.call(this);
   }
 
   GridController.DEFAULT_OPTIONS = {
@@ -97,9 +88,26 @@ define(function(require, exports, module) {
   GridController.prototype.getCellSize = function() {
     var columns = this.options.columns;
     var viewWidth = this.options.viewWidth;
-    var size =  viewWidth / columns;
+    var wSize =  viewWidth / columns;
 
-    return [size, size];
+    var rows = this.options.rows;
+    var viewHeight = this.options.viewHeight;
+    var hSize =  viewHeight / columns;
+
+    if(wSize < hSize){
+      return [wSize, wSize];
+    }
+
+    return [hSize, hSize];
+
+  };
+
+  GridController.prototype.getBoardSize = function() {
+    var cellSize = this.getCellSize();
+    var width = cellSize[0] * this.options.columns;
+    var height = cellSize[0] * this.options.rows;
+
+    return [width, height];
   };
 
   GridController.prototype.getXYCoordsFromGridCoords = function(coords) {
@@ -114,6 +122,17 @@ define(function(require, exports, module) {
    * @param {number} index
    * @param {number} pieceSize DEPRECATED
    */
+
+  GridController.prototype.createBackground = function(){
+    this.bgSurface = new Surface({
+      size: [window.innerWidth, window.innerHeight],
+      properties: {
+        backgroundColor: 'back'
+      }
+    });
+    this.add(this.bgSurface);
+  }
+
   GridController.prototype.getXYCoords = function(index, pieceSize) {
     var size;
 

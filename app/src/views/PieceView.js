@@ -74,7 +74,8 @@ define(function(require, exports, module) {
     });
 
     // @TODO add color label class
-    back.setClasses(['piece', 'piece-back']);
+    back.setClasses(['piece', 'piece-back', this.options.backBgColor]);
+
 
     return back;
   }
@@ -94,7 +95,7 @@ define(function(require, exports, module) {
     });
 
     // @TODO add color label class
-    front.setClasses(['piece', 'piece-front']);
+    front.setClasses(['piece', 'piece-front', this.options.frontBgColor]);
 
     return front;
   }

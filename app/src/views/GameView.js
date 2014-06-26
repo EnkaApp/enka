@@ -1,5 +1,4 @@
 /* globals define */
-
 /**
  * GameView contains all the gameplay views, i.e. GameHeaderView and BoardView
  */
@@ -9,6 +8,8 @@ define(function(require, exports, module) {
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
   var ContainerSurface = require('famous/surfaces/ContainerSurface');
+  var GameHeaderView = require('./GameHeaderView');
+  var HeaderFooterLayout = require("famous/views/HeaderFooterLayout");
 
   // ## Views
   var BoardView = require('./BoardView');
@@ -23,10 +24,20 @@ define(function(require, exports, module) {
   // }
 
   function _createBoardView() {
-    this.boardView = new BoardView();
-    this.boardModifier = new StateModifier();
+    var layout = new HeaderFooterLayout({
+      headerSize: 44
+    });
 
-    this.add(this.boardModifier).add(this.boardView);
+    this.boardView = new BoardView();
+    this.gameHeaderView = new GameHeaderView();
+
+    layout.header.add(this.gameHeaderView);
+    layout.content.add(this.boardView);
+
+    this.add(layout);
+
+    // Setup event listeners
+    this.boardView.pipe(this.gameHeaderView);
   }
 
   function GameView() {

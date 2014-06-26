@@ -1,7 +1,7 @@
 /* globals define */
 define(function(require, exports, module) {
 
-  var Engine         = require('famous/core/Engine')
+  var Engine         = require('famous/core/Engine');
   var View           = require('famous/core/View');
   var Surface        = require('famous/core/Surface');
   var Transform      = require('famous/core/Transform');
@@ -14,8 +14,9 @@ define(function(require, exports, module) {
   var GridController = require('../GridController');
   var PieceGenerator = require('../PieceGenerator');
   var Timer          = require('famous/utilities/Timer');
+  var BoardGenerator = require('./BoardGenerator');
+  var OptionsManager = require('famous/core/OptionsManager');
 
-  
   var xStart, yStart, xEnd, yEnd;
 
   GenericSync.register({
@@ -27,197 +28,129 @@ define(function(require, exports, module) {
     "touch"  : {},
     // "scroll" : {scale : .5}
   });
-   
-  function _createBackground() {
-    this.bgSurface = new Surface({
-      size: [window.innerWidth, window.innerHeight],
-      properties: {
-        backgroundColor: 'black'
-      }
-    });
 
-    this.add(this.bgSurface);
+  function _stateInit() {
+    var length = this.options.rows * this.options.columns;
+    
+    this._state = [];
+    for (var i = 0; i < length; i++) {
+      this._state.push(null);
+    }
   }
 
-  
+  function _getPieceAtIndex(index) {
+    return this._state[index]._piece;
+  }
 
-  function BoardView() {
+  function _getModifierAtIndex(index) {
+    return this._state[index]._modifier;
+  }
+   
+  function BoardView(options) {
     View.apply(this, arguments);
-    // initializes colorQueue
-    var pieceGenerator = new PieceGenerator();
-    var flag = 0;
+    var turns = 0;
 
+    this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
+    this._optionsManager = new OptionsManager(this.options);
+    if (options) this.setOptions(options);
+
+    // var flag = 0;
 
     //store columns and rows
-    this.columns = this.options.dimensions[0];
-    this.rows = this.options.dimensions[1];
-    this.deletedPieces = [];
+    this.columns = this.options.columns;
+    this.rows = this.options.rows;
+    this.viewWidth = this.options.viewWidth;
+    this.viewHeight = this.options.viewHeight;
 
+    this._currentIndex = this.options.startIndex;
 
-    // index variables;
-    // currentIndex starts at center
-    var currentIndex = this.getCenterIndex();
-    var nextIndex;
-
-    // creates blackBackground
-    _createBackground.call(this);
-
-    // size of viewport
-    this.viewSize = this.getSize();
-
-    //creates array of state, set to null
-    //gives us access to this.gridControllerMethods
     this.gridController = new GridController({
       columns: this.columns,
       rows: this.rows,
-      viewWidth: this.viewSize[0],
-      viewHeight: this.viewSize[1]
+      viewWidth: this.viewWidth,
+      viewHeight: this.viewHeight
     });
 
-    this.state = this.gridController._state;
+    this.pieceGenerator = new PieceGenerator({
+      columns: this.columns,
+      rows: this.rows,
+      viewWidth: this.viewWidth,
+      viewHeight: this.viewHeight
+    });
 
+    _createBackground.call(this);
 
-
-
-
-
-    // SETUP BOARD WITH FIRST PIECE IN CENTER
-// ----------------------------------------------------------------------
+    this.viewSize = this.getSize();
+    // this._state = this.pieceGenerator._state;
+    _stateInit.call(this);
 
     // sets piece size based off of view size
-    var pieceSize = this.gridController.getPieceSize(this.viewSize);
-
-    // determines coordinates of piece on grid relative to (0, 0)
-    // based on index and pieceSize
-    var piecePosition = this.gridController.getXYCoords(currentIndex);
-
-    // responsible for placing piece at center (after attaching piece)
-    var centerModifier = new StateModifier({
-      origin: [0,0],
-      align: [0,0],
-      size: pieceSize,
-      transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
-    });
-
-    // attach modifier to board
-    var centerNode = this.add(centerModifier);
+    // this._pieceSize = this.gridController.getPieceSize(this.viewSize);
+    this._pieceSize = this.gridController.getCellSize();
 
     // creates first Piece to put on board
-    var centerPiece = pieceGenerator.createNewPiece(pieceSize[0]);
-    
-    // attach piece to centerModifier to drop piece in middle
-    centerNode.add(centerPiece);
-    this.state[currentIndex] = {
-          mod: centerModifier,
-          piece: centerPiece
-        };
-    // this.state[currentIndex] = centerNode;
+    var firstPiece = this.pieceGenerator.getPiece();
+    this.placePiece(firstPiece);
 
-    this.bgSurface.pipe(sync);
+    this._state[this._currentIndex] = firstPiece;
 
-    sync.on('start', function(data){ // add same color piece here
-      xStart = data.clientX;
-      yStart = data.clientY;
-    });
+    // this.bgSurface.pipe(sync);
 
-    sync.on('end', function(data){ // animate 
-      xEnd = data.clientX;
-      yEnd = data.clientY;
-      var direction;
+    // sync.on('start', function(data){ 
+    //   xStart = data.clientX;
+    //   yStart = data.clientY;
+    // });
 
-      // GET SWIPE DIRECTION
-      // swipe right
-      if(xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)){
-        direction = 'right';
-      }
-      // swipe left
-      if(xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd) ){
-        direction = 'left';
-      }
-      // swipe down
-      if(yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)){
-        direction = 'down';
-      }
-      // swipe up
-      if(yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ){
-        direction = 'up';
-      }
-      // END GET SWIPE DIRECTION
 
-      // gets new index (2, 4, 15, etc) based off current index, swipe direction, and #of columns
-      var newIndex = this.getNewIndex(currentIndex, direction, this.columns);
+    // sync.on('end', function(data){
 
-      // if the newIndex does not have a piece already on it and it is in bounds
-      // then we can add a new piece
-      console.log(pieceGenerator.colorQueue);
+    //   xEnd = data.clientX;
+    //   yEnd = data.clientY;
 
-      if(this.isInBounds(direction, currentIndex) && !this.state[newIndex]){    
-     
-        var lastColor = this.state[currentIndex].piece.getOption('backBgColor');
-        
-        var piece = null;
-        currentIndex = newIndex;
-        
-        // create modifier
-        if(this.deletedPieces.length === 0){
-          piece = pieceGenerator.createNewPiece(pieceSize[0], lastColor, direction, true);
-          console.log('piece: ', piece);
+    //   console.log('index: ', this._currentIndex);
 
-          var pieceModifier = new StateModifier({
-            origin: [0,0],
-            align: [0,0],
-            size: pieceSize,
-            transform: Transform.translate(piecePosition[0], piecePosition[1], 0)
-          });
+      
+    //   var direction = this.getSwipeDirection(xStart, yStart, xEnd, yEnd);
+    //   // gets new index (2, 4, 15, etc) based off current index, swipe this.direction, and #of columns
+    //   var index = this._currentIndex;
+    //   var newIndex = this.getNewIndex(index, direction);
+      
 
-          // add piece to modifier and modifier to BoardView, then reflect()
-         this.add(pieceModifier).add(piece);
-          // this.state[currentIndex] = node;
-        }else{
-          console.log('sorry, you must reuse a piece');
-          console.log('pieces to use', this.deletedPieces.length);
-        
-          var pieceObject = this.deletedPieces.pop();
+    //   if(direction){
+    //     turns++;
+    //     if(this.isInBounds(direction, this._currentIndex) && !this._state[newIndex]){  
 
-          console.log('pieces remaining to use', this.deletedPieces.length);
-
-          console.log('piece: ', pieceObject.piece);
-          var pieceModifier = pieceObject.mod;
-          console.log('pieceModifier: ', pieceModifier)
-          var color = pieceGenerator.colorQueue.shift();
+    //       // generate new Piece
+    //       // var lastColor = this._state[this._currentIndex].piece.getOption('backBgColor');
           
-          piece = pieceObject.piece;
-          piece.updateOptions({
-            direction: direction,
-            frontBgColor: lastColor,
-            backBgColor: color
-          });
-
-          pieceGenerator.addColorToQueue();
-
-          pieceModifier.setTransform(Transform.translate(piecePosition[0], piecePosition[1], 0));
-
-          console.log('pieceAfter: ', piece);
-        }
-
-        this.state[currentIndex] = {
-          mod: pieceModifier,
-          piece: piece
-        };
-
-        piece.reflect();
-
-        // delete all legal matches. if no matches, check if we are trapped
-        piece.on('reflected', function(){
-          this.deleteMatches.call(this, currentIndex);
-          this.checkIfTrapped.call(this, currentIndex);
-        }.bind(this));
+    //       var piece = null;
+    //       this._currentIndex = newIndex;
           
+    //       // this.pieceGenerator.placePiece.call(this, this.direction, position);
 
-        piecePosition = this.gridController.getXYCoords(currentIndex, pieceSize[0]);
+    //       var piece = this.pieceGenerator.getPiece(direction);
+    //       this.placePiece(piece);
 
-      }
-    }.bind(this)); // <---- END SYNC.ON('END')
+    //       console.log('upcoming pieces: ', this.pieceGenerator.colorQueue);
+
+    //       // this._state[this._currentIndex] = {
+    //       //   mod: pieceModifier,
+    //       //   piece: piece
+    //       // };
+    //       this._state[this._currentIndex] = piece;
+
+    //       piece._piece.reflect();
+
+    //       // delete all legal matches. if no matches, check if we are trapped
+    //       piece._piece.on('reflected', function(){
+    //         this.deleteMatches.call(this, this._currentIndex);
+    //         this.checkIfTrapped.call(this, this._currentIndex);
+    //       }.bind(this));
+            
+    //       // position = this.gridController.getXYCoords(this._currentIndex, pieceSize[0]);
+    //     }
+    //   }
+    // }.bind(this)); // <---- END SYNC.ON('END')
 
   }// <---- END BOARDVIEW FUNCTION ----------------------------------------
 
@@ -229,10 +162,21 @@ define(function(require, exports, module) {
   BoardView.prototype = Object.create(View.prototype);
   BoardView.prototype.constructor = BoardView;
 
-  BoardView.prototype.getCenterIndex = function(){
-    var length = this.options.dimensions[0] * this.options.dimensions[1];
-    return (length - 1) / 2;
-  }
+  // BoardView.prototype.getCenterIndex = function(){
+  //   var length = this.options.columns * this.options.rows;
+  //   return (length - 1) / 2;
+  // }
+
+  BoardView.prototype.placePiece = function(piece) {
+    this._lastPiecePosition = this.gridController.getXYCoords(this._currentIndex, this._pieceSize[0]);
+    
+    // piece._modifier.setTransform(
+    piece._mod.setTransform(
+      Transform.translate(this._lastPiecePosition[0], this._lastPiecePosition[1], 0)
+    );
+
+    this.add(piece);
+  };
 
   BoardView.prototype.deleteMatches = function(index){
     var alreadyChecked = [];
@@ -269,7 +213,7 @@ define(function(require, exports, module) {
 
   BoardView.prototype.checkIfAnyNeighborHasMatch = function(index) {
     var matches = [];
-    var directions = {
+    directions = {
       left : this.checkIfDirectionHasMatch(index, 'left'),
       right : this.checkIfDirectionHasMatch(index, 'right'),
       up : this.checkIfDirectionHasMatch(index, 'up'),
@@ -287,10 +231,11 @@ define(function(require, exports, module) {
     var isMatchAtIndex = [];
     var matchColor = this.getColorFromIndex(index);
 
-    // check neighbor in specified direction for match
+    // check neighbor in specified this.direction for match
     var neighborIndex = this.getNewIndex(index, direction);
+
     // check if neighbor is null
-    if(this.state[neighborIndex] && this.isInBounds(direction, index)){
+    if(this._state[neighborIndex] && this.isInBounds(direction, index)){
       isMatch = this.getColorFromIndex(neighborIndex) === matchColor
       isMatchAtIndex.push(neighborIndex, isMatch)
       return isMatchAtIndex;
@@ -302,9 +247,9 @@ define(function(require, exports, module) {
   }
 
   BoardView.prototype.getColorFromIndex = function(index){
-    if(this.state[index]){
-      // console.log('this.state[index]: ', this.state[index]);
-      var color = this.state[index].piece.getOption('backBgColor');
+    if(this._state[index]){
+      // console.log('this._state[index]: ', this._state[index]);
+      var color = _getPieceAtIndex.call(this, index).getOption('backBgColor');
       return color;
     }
   }
@@ -320,7 +265,7 @@ define(function(require, exports, module) {
     for(var direction in directions){
       var indexToCheck = this.getNewIndex(index, direction);
       if(directions[direction]){
-        canMove.push(this.state[indexToCheck] === null);
+        canMove.push(this._state[indexToCheck] === null);
       }
     }
 
@@ -335,57 +280,97 @@ define(function(require, exports, module) {
     }
   }
 
-  BoardView.prototype.isInBounds = function(direction, currentIndex){
+  BoardView.prototype.isInBounds = function(direction){
     var viewPortSize = this.viewSize;
     var cellSize = this.gridController.getPieceSize(viewPortSize);
 
-    piecePosition = this.gridController.getXYCoords(currentIndex)
+    // this.piecePosition = this.gridController.getXYCoords(this._currentIndex);
+
     var boardHeight = this.rows * cellSize[1];
     var yLowerBounds = boardHeight - cellSize[0];
 
-    if(direction === 'left' && piecePosition[0] === 0){
+    if(direction === 'left' && this._lastPiecePosition[0] === 0){
       return false
     }
-    if(direction === 'right' && piecePosition[0] === (viewPortSize[0] - cellSize[0])){
+    if(direction === 'right' && this._lastPiecePosition[0] === (viewPortSize[0] - cellSize[0])){
       return false
     } 
-    if(direction === 'up' && piecePosition[1] === 0){
+    if(direction === 'up' && this._lastPiecePosition[1] === 0){
       return false
     }
-    if(direction === 'down' && piecePosition[1] === yLowerBounds){
+    if(direction === 'down' && this._lastPiecePosition[1] === yLowerBounds){
       return false
     }
     return true;
   }
 
   BoardView.prototype.deletePiece = function(index){
-    this.deletedPieces.push(this.state[index]);
-    this.state[index].mod.setTransform(Transform.translate(2000, 2000, 0));
-    this.state[index] = null;
-    console.log('add deletedPieces: ', this.deletedPieces.length);
+    this.pieceGenerator.addDeletedPiece(this._state[index]);
+    _getModifierAtIndex.call(this, index).setTransform(Transform.translate(2000, 2000, 0));
+    this._state[index] = null;
   }
 
-  BoardView.prototype.getNewIndex = function(currentIndex, direction){
+  BoardView.prototype.getNewIndex = function(index, direction){
     if(direction === 'left'){
-      return currentIndex - 1;
+      return index - 1;
     }
     if(direction === 'right'){
-      return currentIndex + 1;
+      return index + 1;
     }
     if(direction === 'up'){
-      return currentIndex - this.columns;
+      return index - this.columns;
     }
     if(direction === 'down'){
-      return currentIndex + this.columns;
+      return index + this.columns;
     }
   }
 
-// ADD DEFAULT OPTIONS TO BOARVIEW AND AND BOARDVIEW TO EXPORTS
-//-------------------------------------------------------------------------
+  BoardView.prototype.getSwipeDirection = function(xStart, yStart, xEnd, yEnd){
+    var direction = '';
 
+    // swipe right
+    if(xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)){
+      direction = 'right';
+    }
+    // swipe left
+    if(xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd) ){
+      direction = 'left';
+    }
+    // swipe down
+    if(yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)){
+      direction = 'down';
+    }
+    // swipe up
+    if(yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ){
+      direction = 'up';
+    }
+
+    return direction;
+  }
+
+  function _createBackground(){
+    this.bgSurface = new Surface({
+      properties: {
+        backgroundColor: 'black'
+      }
+    });
+
+    var mod = new StateModifier({
+      size: this.gridController.getBoardSize(),
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5]
+    });
+
+
+    this.add(mod).add(this.bgSurface);
+  }
 
   BoardView.DEFAULT_OPTIONS = {
-    dimensions: [5, 7]
+    startIndex: 0,
+    rows: 7,
+    columns: 5,
+    viewWidth: window.innerWidth,
+    viewHeight: window.innerHeight
   };
 
   module.exports = BoardView;
