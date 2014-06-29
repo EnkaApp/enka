@@ -17,7 +17,7 @@ define(function(require, exports, module) {
   var PieceGenerator = require('PieceGenerator');
 
   // ## Controllers
-  var GridController = require('GridController');
+  var GridController = require('controllers/GridController');
   var GameController = require('controllers/GameController');
 
   var xStart, yStart, xEnd, yEnd;

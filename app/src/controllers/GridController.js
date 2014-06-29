@@ -3,75 +3,27 @@ define(function(require, exports, module) {
   var Transform       = require('famous/core/Transform');
   var Surface         = require('famous/core/Surface');
   var OptionsManager  = require('famous/core/OptionsManager');
-  
-  // ## View
-  var PieceView     = require('./views/PieceView'); // deprecated
 
-  function _getY(index) {
-    var columns = this.options.columns;
-    var rows = this.options.rows;
+  // ## Controllers
+  var Controller = require('controllers/Controller');
 
-    for (var row = 0; row < rows; row++) {
-      if (index < columns) {
-        return row;
-      } else if ((index >= (columns * row)) && index < ( columns * (row + 1))) {
-        return row;
-      }
-    }
-  }
+  function GridController() {
 
-  function _getX(index) {
-    var columns = this.options.columns;
+    Controller.apply(this, arguments);
 
-    return index % columns;
-  }
- 
-
-  function GridController(options) {
     this._dimensions = [];
-
-    this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
-    this._optionsManager = new OptionsManager(this.options);
-
-    if (options) this.setOptions(options);
-
     this._dimensions = [this.options.rows, this.options.columns];
     this._cellSize = this.getCellSize();
   }
+
+  GridController.prototype = Object.create(Controller.prototype);
+  GridController.prototype.constructor = GridController;
 
   GridController.DEFAULT_OPTIONS = {
     rows: 7,
     columns: 5,
     viewWidth: window.innerWidth,
     viewHeight: window.innerHeight
-  };
-
-  /**
-   * Look up options value by key
-   * @method getOptions
-   *
-   * @param {string} key key
-   * @return {Object} associated object
-   */
-  GridController.prototype.getOptions = function getOptions() {
-      return this._optionsManager.value();
-  };
-
-  /*
-   *  Set internal options.
-   *
-   *  @method setOptions
-   *  @param {Object} options
-   */
-  GridController.prototype.setOptions = function setOptions(options) {
-      this._optionsManager.patch(options);
-  };
-
-  // Deprectated
-  // Moved to PieceGenerator
-  GridController.prototype.newPiece = function(options) {
-    var piece = new PieceView(options);
-    return piece;
   };
 
   // Deprectated
@@ -82,7 +34,6 @@ define(function(require, exports, module) {
     return this.getCellSize();
   };
 
-  // 
   GridController.prototype.getCellSize = function() {
     var columns = this.options.columns;
     var viewWidth = this.options.viewWidth;
@@ -146,6 +97,27 @@ define(function(require, exports, module) {
   GridController.prototype.isEmpty = function(index) {
     return this._state === null;
   };
+
+  // ## Private Helpers
+
+  function _getY(index) {
+    var columns = this.options.columns;
+    var rows = this.options.rows;
+
+    for (var row = 0; row < rows; row++) {
+      if (index < columns) {
+        return row;
+      } else if ((index >= (columns * row)) && index < ( columns * (row + 1))) {
+        return row;
+      }
+    }
+  }
+
+  function _getX(index) {
+    var columns = this.options.columns;
+
+    return index % columns;
+  }
 
   module.exports = GridController;
 });
