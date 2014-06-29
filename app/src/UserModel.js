@@ -18,7 +18,7 @@ define(function(require, exports, module) {
 
         // if user exists in the db, load him/her
         if (created) {
-          console.log('Loading user');
+          // console.log('Loading user');
 
           var options = {};
           var promises = [];

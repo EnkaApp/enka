@@ -22,7 +22,7 @@ define(function(require, exports, module) {
 
   // Initialize User Model
   var user = new UserModel();
-  console.log(user);
+  // console.log(user);
 
 
   // Views

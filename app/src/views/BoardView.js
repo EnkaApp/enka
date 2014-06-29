@@ -17,6 +17,8 @@ define(function(require, exports, module) {
   var BoardGenerator = require('./BoardGenerator');
   var OptionsManager = require('famous/core/OptionsManager');
 
+  var _ = require('lodash');
+
   var xStart, yStart, xEnd, yEnd;
 
   GenericSync.register({
@@ -47,7 +49,6 @@ define(function(require, exports, module) {
   }
 
   function _setListeners() {
-
     // Pipe PieceGenerator events out
     this.pieceGenerator._eventOutput.pipe(this._eventOutput);
 
@@ -63,19 +64,26 @@ define(function(require, exports, module) {
     sync.on('end', function(data){
       xEnd = data.clientX;
       yEnd = data.clientY;
+      var wtf = 0;
+
+
       
       var direction = this.getSwipeDirection(xStart, yStart, xEnd, yEnd);
       
       // gets new index (2, 4, 15, etc) based off current index and swipe direction
-      var newIndex = this.getNewIndex(this._currentIndex, direction);
-      
+      // console.log('currentIndex: ', newIndex);
+      // console.log('lastIndex: ', this._currentIndex);
+      console.log('just swiped ', direction);
       // Checking direction prevents clicks from causing pieces to be placed
       if(direction){
-        
+        // console.log('state before: ', this._state)
+
         this._turns++;
-
+        console.log('lastIndex: ', this._currentIndex);
+        var newIndex = this.getNewIndex(this._currentIndex, direction);
+        console.log('newIndex: ', newIndex);
         if(this.isInBounds(direction) && !this._state[newIndex]) {
-
+          // console.log('after swiping ' + direction + ' the new index is ' + newIndex)
           // generate new Piece
           var piece = this.pieceGenerator.getPiece(direction);
           this.placePiece(piece, newIndex);
@@ -87,11 +95,21 @@ define(function(require, exports, module) {
           piece._piece.reflect();
 
           // delete all legal matches. if no matches, check if we are trapped
-          piece._piece.on('reflected', function(){
+          var onReflected = function(){
+            wtf++;
+            if(wtf > 1) debugger;
             this.deleteMatches(newIndex);
             this.checkIfTrapped(newIndex);
-          }.bind(this));
-        }
+          };
+          Timer.setTimeout(onReflected.bind(this), 500);
+          // ## eventing was sending multiple events per swipe
+          // Timer.setTimeout is a workaround for this.
+
+          console.log('state after: ', this._state)
+          console.log('turns: ', this._turns);
+          // console.log('turns: ', this._turns);
+
+        } 
       }
     }.bind(this)); // <---- END SYNC.ON('END')
   }
@@ -167,8 +185,8 @@ define(function(require, exports, module) {
 
   BoardView.prototype.placePiece = function(piece, newIndex) {
     var pos = this.gridController.getXYCoords(this._currentIndex);
-    console.log(this._pieceSize[0]);
-    console.info('Placing piece at', this._lastPiecePosition);
+    // console.log(this._pieceSize[0]);
+    // console.info('Placing piece at', this._lastPiecePosition);
     
     piece._mod.setTransform(
       Transform.translate(pos[0], pos[1], 0)
@@ -178,38 +196,46 @@ define(function(require, exports, module) {
     // and save the newly placed piece to the board state
     this._currentIndex = newIndex;
     this._lastPiecePosition = this.gridController.getXYCoords(newIndex);
-
+    console.log('after adding piece: ');
+    console.log('this._currentIndex: ', this._currentIndex);
+    console.log('this._lastPiecePosition', this._lastPiecePosition);
+    console.log('piece placed: ', piece);
     this.node.add(piece);
   };
 
   BoardView.prototype.deleteMatches = function(index){
-    var alreadyChecked = [];
+    console.log('\ninside deleteMatches');
+    var matched = [];
     var connections = 0;
     var initialIndex = index;
+    console.log('initialIndex: ', initialIndex);
 
-    alreadyChecked[index] = true;
-    
+    matched[index] = true;
     seekAndDestroy.call(this, index);
 
     function seekAndDestroy(index) {
-      var matches = this.checkIfAnyNeighborHasMatch(index);
+      var matches = this.checkIfAnyNeighborHasMatch(index);      
+      // console.log('The following indices have matches: ', matches);
 
       for(var i = 0; i < matches.length; i++){
+        // matches has matches of all neighbors
         if(matches[i]){
           var newIndexToCheck = matches[i][0];
-    
-          if(matches[i][1] === true && !alreadyChecked[newIndexToCheck]){
-            alreadyChecked[newIndexToCheck] = true;
+          if(matches[i][1] === true && !matched[newIndexToCheck]){
+            matched[newIndexToCheck] = true;
+            // console.log('matched for deletion: ', matched)
             connections++;
+            // console.log('connections: ', connections);
             seekAndDestroy.call(this, newIndexToCheck);
           }
         }
       }
     }
-
     if(connections > 1){
-      for(var i = 0; i < alreadyChecked.length; i++){
-        if(alreadyChecked[i] && i !== initialIndex){
+
+      for(var i = 0; i < matched.length; i++){
+        if(matched[i] && i !== initialIndex){
+          // console.log('deleting ', i);
           this.deletePiece(i);
         }
       }
@@ -224,10 +250,13 @@ define(function(require, exports, module) {
       up: this.checkIfDirectionHasMatch(index, 'up'),
       down: this.checkIfDirectionHasMatch(index, 'down')
     };
-
+    // console.log('checking if any neighbor has match: ');
+    // console.log('starts with 4 checks for neighbor is in bounds...');
+    // console.log('-----------------------------------');
     for(var direction in directions){
       if(this.isInBounds(direction)){
-        matches.push(directions[direction]);
+        if(directions[direction])
+          matches.push(directions[direction]);
       }
     }
 
@@ -237,19 +266,26 @@ define(function(require, exports, module) {
   BoardView.prototype.checkIfDirectionHasMatch = function(index, direction){
     var isMatchAtIndex = [];
     var matchColor = this.getColorFromIndex(index); // color to match to
-
-    // check neighbor in specified this.direction for match
+    // check neighbor in specified this.direction for matches
     var neighborIndex = this.getNewIndex(index, direction);
 
     // check if neighbor is null
     // if(this._state[neighborIndex] && this.isInBounds(direction)){
-    if (this._state[neighborIndex]) {
-      isMatch = this.getColorFromIndex(neighborIndex) === matchColor;
+    var inBounds  = this.isInBounds(direction, index);
+    var neighborExists = this._state[neighborIndex];
+    console.log();
+    if (neighborExists && inBounds ) {
+      var neighborColor = this.getColorFromIndex(neighborIndex);
+      // console.log('i am index ' + index + ' and i am checking my neighbor at index ' + neighborIndex);
+      // console.log('attempting to match my color ' + matchColor + ' with neighbor color ' + neighborColor);
+      isMatch = neighborColor === matchColor;
       isMatchAtIndex.push(neighborIndex, isMatch);
       return isMatchAtIndex;
     } else {
+
       isMatch = false;
       isMatchAtIndex.push(neighborIndex, isMatch);
+
       return isMatchAtIndex;
     }
   };
@@ -264,6 +300,9 @@ define(function(require, exports, module) {
   BoardView.prototype.checkIfTrapped = function(index){
     var trueFlag = 0;
     var canMove = [];
+    // console.log('checkingIfTrapped: ');
+    // console.log('-----------------------------------');
+
     var directions = {
       left: this.isInBounds('left'),
       right: this.isInBounds('right'),
@@ -285,32 +324,60 @@ define(function(require, exports, module) {
     }
 
     if(!trueFlag){
+      // debugger;
       console.log('Game Over');
     }
   };
 
-  BoardView.prototype.isInBounds = function(direction) {
+  BoardView.prototype.isInBounds = function(direction, index) {
+
+    if(!index) {
+      var newIndexCoords = this._lastPiecePosition;
+    }else{
+      var newIndexCoords = this.gridController.getXYCoords(index);
+    }
+
     var res = true;
     var viewPortSize = this.viewSize;
     var pieceSize = this._pieceSize;
     var boardWidth = this.options.columns * pieceSize[0];
     var boardHeight = this.options.rows * pieceSize[1];
-    var newXPosition = this._lastPiecePosition[0] + pieceSize[0];
-    var newYPosition = this._lastPiecePosition[1] + pieceSize[1];
+    var newXPosition = newIndexCoords[0] + pieceSize[0];
+    var newYPosition = newIndexCoords[1] + pieceSize[1];
 
-    if(direction === 'left' && this._lastPiecePosition[0] === 0){
+
+
+    if(direction === 'left' && newIndexCoords[0] === 0){
       res = false;
+    // console.log('left is out of bounds: ');
+
     }
     if(direction === 'right' && newXPosition === boardWidth){
       res = false;
+    // console.log('right is out of bounds: ');
+
     }
-    if(direction === 'up' && this._lastPiecePosition[1] === 0){
+    if(direction === 'up' && newIndexCoords[1] === 0){
       res = false;
+    // console.log('up is out of bounds : ');
+
     }
     if(direction === 'down' && newYPosition === boardHeight){
       res = false;
-    }
+    // console.log('down is out of bounds: ', res);
 
+    }
+    // console.log('\nisInBounds info: ');
+    // console.log('position being checked: (just moved from) ', this._lastPiecePosition);
+    // console.log('direction checked: ', direction);
+    // console.log('right position checked: (newXPosition) ', newXPosition);
+    // console.log('down position checked: (newYPosition) ', newYPosition);
+    // console.log('left check: this._lastPiecePosition[0] === ', 0);
+    // console.log('up check: this._lastPiecePosition[1] === ', 0);
+    // console.log('right check: newXPosition === ', boardWidth);
+    // console.log('down check: newYposition === ', boardHeight);
+    // console.log('direction ' + direction +  ' is in bounds? ', res);
+    // console.log('\n');
     return res;
   };
 
