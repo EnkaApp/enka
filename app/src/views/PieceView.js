@@ -169,6 +169,7 @@ define(function(require, exports, module) {
 
   PieceView.prototype.reflect = function() {
     this.reflector.reflect({curve : 'linear', duration : 500}, function(){
+      console.log('reflected piece', this);
       this._eventOutput.emit('reflected');
     }.bind(this));
   };

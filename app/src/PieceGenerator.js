@@ -10,7 +10,6 @@ define(function(require, exports, module) {
   var PieceView = require('./views/PieceView');
 
   var colorArray = ['blue', 'green', 'red'];
-  var deletedPieces = [];
 
   // initializes this.colorQueue with 3 colors
   function PieceGenerator(options) {
@@ -19,6 +18,7 @@ define(function(require, exports, module) {
       return PieceGenerator._instance;
     }
 
+    this._deletedPieces = [];
     this._eventOutput = new EventHandler();
     this._eventInput = new EventHandler();
 
@@ -50,7 +50,7 @@ define(function(require, exports, module) {
   };
 
   function _useExistingPiece(direction) {
-    var node = deletedPieces.pop();
+    var node = this._deletedPieces.pop();
     var piece = node._piece;
     var backColor = this.getNextColorFromQueue();
 
@@ -74,7 +74,7 @@ define(function(require, exports, module) {
 
 	function _createNewPiece(direction) {
 
-    console.info('Creating New Piece');
+    // console.info('Creating New Piece');
 
     if(!direction) direction = 'left';
 
@@ -123,8 +123,8 @@ define(function(require, exports, module) {
   PieceGenerator.prototype.getPiece = function(direction, position) {
     var node = null;
 
-    // If deletedPieces.length === 0, create a new piece
-    if(deletedPieces.length === 0){
+    // If this._deletedPieces.length === 0, create a new piece
+    if(this._deletedPieces.length === 0){
       node = _createNewPiece.call(this, direction);
     }
 
@@ -137,7 +137,7 @@ define(function(require, exports, module) {
   };
 
   PieceGenerator.prototype.addDeletedPiece = function(node) {
-    deletedPieces.push(node);
+    this._deletedPieces.push(node);
   };
 
   PieceGenerator.prototype.getNextColorFromQueue = function(){
