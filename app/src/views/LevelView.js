@@ -18,7 +18,7 @@ define(function(require, exports, module) {
   var StageConfig = require('StageConfig');
 
   // ## Models
-  var User = require('UserModel');
+  var User = require('models/UserModel');
 
   // ## Views
   var Flipper = require('famous/views/Flipper');
@@ -30,6 +30,8 @@ define(function(require, exports, module) {
 
   // ## Shared
   var user = new User();
+  var W = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+  var H = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
   // Button Intro Transition
   var spring = {
@@ -127,7 +129,7 @@ define(function(require, exports, module) {
     level: 1,
     stage: 1,
     colors: 1,
-    start: [-window.innerWidth * 4, -window.innerHeight, 0]
+    start: [-W * 4, -H, 0]
   };
 
   LevelView.prototype.hide = function(transition) {

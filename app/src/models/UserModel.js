@@ -8,43 +8,32 @@ define(function(require, exports, module) {
   var Timer = require('famous/utilities/Timer');
 
   // ## App Dependencies
-  var LivesController = require('LivesController');
+  var LivesController = require('controllers/LivesController');
 
   function _init() {
 
     db.ready().then(function() {
       
-      db.getItem('created').then(function(created) {
+      db.getItem('user').then(function(user) {
 
         // if user exists in the db, load him/her
-        if (created) {
-          console.log('Loading user');
+        if (user) {
+          console.info('Loading user');
 
-          var options = {};
-          var promises = [];
-
-          _.each(this.constructor.DEFAULT_OPTIONS, function(val, key) {
-            var promise = db.getItem(key).then(function(value) {
-              options[key] = value;
-            }.bind(this));
-
-            promises.push(promise);
-          }.bind(this));
-
-          Promise.all(promises).then(function() {
-            this.setOptions(options);
+          db.getItem('user', function(user) {
+            this.setOptions(user);
           }.bind(this));
 
         }
         // otherwise create a new user
         else {
-          console.log('Creating new user');
+          console.info('Creating new user');
 
           if (!this.options.created) {
             this.options.created = Date.now();
           }
 
-          this.save(this.options);
+          this.save();
         }
 
       }.bind(this));
@@ -80,14 +69,20 @@ define(function(require, exports, module) {
     lastRecharge: ''
   };
 
-  User.prototype.save = function(data) {
+  User.prototype.save = function() {
     db.ready().then(function() {
-      _.each(data, function(val, key) {
-        db.setItem(key, val, function() {
-          console.log('Saved `' + key + '` to DB with value `' + val + '`');
-        });
+      db.setItem('user', this.options, function() {
+        console.info('Successfully saved user');
       });
     }.bind(this));
+  };
+
+  User.prototype.delete = function() {
+    db.ready().then(function() {
+      db.removeItem('user', function() {
+        console.info('Successfully deleted user');
+      });
+    });
   };
 
   /**
@@ -146,7 +141,7 @@ define(function(require, exports, module) {
     this.setOptions(options);
 
     // save to database
-    this.save(options);
+    this.save();
   };
 
   module.exports = User;

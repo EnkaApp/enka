@@ -6,6 +6,9 @@ define(function(require, exports, module) {
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
 
+  // ## Controller
+  var GameController = require('controllers/GameController');
+
   // ## Templates
   var tplBtn = require('hbs!templates/btn');
 
@@ -24,6 +27,10 @@ define(function(require, exports, module) {
   function BoardMenuView() {
     View.apply(this, arguments);
 
+    // Retrieve an instance of GameController so that we can
+    // get the game description and load it into the view
+    this._controller = new GameController();
+
     this.rootMod = new StateModifier({
       align: [0.5, 0],
       origin: [0.5, 0],
@@ -39,6 +46,9 @@ define(function(require, exports, module) {
     _createDescription.call(this);
     _createButtons.call(this);
     _setListeners.call(this);
+
+    // Make sure that the description is set
+    this.update();
   }
 
   BoardMenuView.prototype = Object.create(View.prototype);
@@ -46,11 +56,17 @@ define(function(require, exports, module) {
 
   BoardMenuView.DEFAULT_OPTIONS = {
     height: 100,
-    description: 'Level description here'
+    description: ''
   };
 
-  BoardMenuView.prototype.updateOptions = function(data) {
-    console.log(data);
+  BoardMenuView.prototype.update = function() {
+    var options = this._controller.getOptions();
+
+    this.setOptions({
+      description: this._controller.getDescription()
+    });
+
+    this.desc.setContent(this.options.description);
   };
 
   function _createBacking() {
@@ -66,11 +82,7 @@ define(function(require, exports, module) {
 
   function _createDescription() {
     this.desc = new Surface({
-      content: this.options.description,
-      classes: ['gamemenu', 'gamemenu-description'],
-      properties: {
-        // backgroundColor: '#f5f5f5'
-      }
+      classes: ['gamemenu', 'gamemenu-description']
     });
 
     var mod = new StateModifier({

@@ -15,7 +15,10 @@ define(function(require, exports, module) {
   var BoardMenuView = require('views/BoardMenuView');
   var GameHeaderView = require('views/GameHeaderView');
 
-  var MENU_HEIGHT = Math.floor(window.innerHeight / 2);
+  // ## Controllers
+  var GameController = require('controllers/GameController');
+
+  var MENU_HEIGHT = 220;
 
   function _setListeners() {
 
@@ -66,12 +69,41 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this._eventInput.on('game:load', function(data) {
-      this.boardMenuView.updateOptions(data);
+
+      // check to see if the stage/level that is loading is the same
+      // as the one that the user has been playing... if not, update
+      // the game controller with the new game data
+      if (!this._controller.isSameGame(data)) {
+
+        console.info('Loading new game :: stage:', data.stage, ', level:', data.level);
+
+        // update the game controller with the new stage/level info
+        this._controller.update({
+          level: data.level,
+          stage: data.stage,
+          turns: 0,
+          destroyed: 0,
+          state: null
+        });
+
+        _updateChildView.call(this);
+      }
+
     }.bind(this));
+  }
+
+  function _updateChildView() {
+    this.boardMenuView.update();
+    this.boardView.update();
+
+    // @TODO implement these
+    // this.gameHeaderView.update();
   }
 
   function GameView() {
     View.apply(this, arguments);
+
+    this._controller = new GameController();
 
     this.gameHeaderView = new GameHeaderView();
 

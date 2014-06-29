@@ -9,7 +9,8 @@ define(function(require, exports, module) {
   var ImageSurface = require('famous/surfaces/ImageSurface');
   
   var db = require('localforage');
-  var UserModel = require('UserModel');
+  var UserModel = require('models/UserModel');
+  var GameModel = require('models/GameModel');
 
   // Configure database (using localforage)
   db.config({
@@ -22,8 +23,9 @@ define(function(require, exports, module) {
 
   // Initialize User Model
   var user = new UserModel();
-  console.log(user);
 
+  // Initialize Game Model
+  var game = new GameModel();
 
   // Views
   var AppView = require('views/AppView');

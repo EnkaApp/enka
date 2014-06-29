@@ -1,9 +1,8 @@
 define(function(require, exports, module) {
-  var StateModifier = require('famous/modifiers/StateModifier');
-  var Transform     = require('famous/core/Transform');
-  var Surface        = require('famous/core/Surface');
-  var RenderNode    = require('famous/core/RenderNode');
-  var OptionsManager = require('famous/core/OptionsManager');
+  var StateModifier   = require('famous/modifiers/StateModifier');
+  var Transform       = require('famous/core/Transform');
+  var Surface         = require('famous/core/Surface');
+  var OptionsManager  = require('famous/core/OptionsManager');
   
   // ## View
   var PieceView     = require('./views/PieceView'); // deprecated

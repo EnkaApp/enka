@@ -11,21 +11,25 @@ define(function(require, exports, module) {
   var TouchSync      = require('famous/inputs/TouchSync');
   var GenericSync    = require('famous/inputs/GenericSync');
   var Transitionable = require('famous/transitions/Transitionable');
-  var GridController = require('../GridController');
-  var PieceGenerator = require('../PieceGenerator');
   var Timer          = require('famous/utilities/Timer');
-  var BoardGenerator = require('./BoardGenerator');
   var OptionsManager = require('famous/core/OptionsManager');
 
+  var PieceGenerator = require('PieceGenerator');
+
+  // ## Controllers
+  var GridController = require('GridController');
+  var GameController = require('controllers/GameController');
+
   var xStart, yStart, xEnd, yEnd;
+
 
   GenericSync.register({
     'touch': TouchSync
   });
 
   var sync = new GenericSync({
-    "mouse"  : {},
-    "touch"  : {},
+    'mouse'  : {},
+    'touch'  : {},
     // "scroll" : {scale : .5}
   });
 
@@ -73,6 +77,7 @@ define(function(require, exports, module) {
       if(direction){
         
         this._turns++;
+        this._controller._eventInput.emit('game:turn++');
 
         if(this.isInBounds(direction) && !this._state[newIndex]) {
 
@@ -80,7 +85,7 @@ define(function(require, exports, module) {
           var piece = this.pieceGenerator.getPiece(direction);
           this.placePiece(piece, newIndex);
 
-          console.log('upcoming pieces: ', this.pieceGenerator.colorQueue);
+          // console.log('upcoming pieces: ', this.pieceGenerator.colorQueue);
           
           this._state[newIndex] = piece;
 
@@ -101,12 +106,17 @@ define(function(require, exports, module) {
     
     this._turns = 0;
 
+    this._controller = new GameController();
+
     // Setup the options manager
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
     if (options) this.setOptions(options);
 
     this._currentIndex = this.options.startIndex;
+
+    // this._model = new GameModel();
+    this._controller = new GameController();
 
     this.gridController = new GridController({
       columns: this.options.columns,
@@ -164,9 +174,24 @@ define(function(require, exports, module) {
   BoardView.prototype = Object.create(View.prototype);
   BoardView.prototype.constructor = BoardView;
 
+  /*
+   * Updates BoardView from current Stage Configurations
+   */
+  BoardView.prototype.update = function() {
+    this.setOptions({
+      rows: this._controller.getRows(),
+      cols: this._controller.getCols(),
+      startIndex: this._controller.getStartIndex()
+    });
+
+    // reset and rebuild the board
+
+    // place the first piece
+  };
+
   BoardView.prototype.placePiece = function(piece, newIndex) {
     var pos = this.gridController.getXYCoords(this._currentIndex);
-    console.log(this._pieceSize[0]);
+    // console.log(this._pieceSize[0]);
     console.info('Placing piece at', this._lastPiecePosition);
     
     piece._mod.setTransform(

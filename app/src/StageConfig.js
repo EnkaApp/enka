@@ -159,6 +159,9 @@ define(function(require, exports, module) {
     this.index = stage - 1 || 0;
   }
 
+  StageConfig.GAMETYPE_SURVIVAL = GAMETYPE_SURVIVAL;
+  StageConfig.GAMETYPE_DESTROY = GAMETYPE_DESTROY;
+
   // ## Static Methods
 
   StageConfig.getStagesCount = function() {
@@ -167,19 +170,6 @@ define(function(require, exports, module) {
 
 
   // ## Instance Methods
-
-  StageConfig.prototype.getLevelCount = function() {
-    var grid = STAGES[this.index].grid;
-    return grid[0] * grid[1];
-  };
-
-  StageConfig.prototype.getCols = function() {
-    return STAGES[this.index].grid[0];
-  };
-
-  StageConfig.prototype.getRows = function() {
-    return STAGES[this.index].grid[1];
-  };
 
   StageConfig.prototype.getLevelConfig = function(level) {
     return STAGES[this.index].levels[level];

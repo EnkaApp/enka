@@ -9,6 +9,9 @@ define(function(require, exports, module) {
   var StateModifier = require('famous/modifiers/StateModifier');
   var Transitionable  = require('famous/transitions/Transitionable');
 
+  // ## App Dependencies
+  var utils = require('utils');
+
   // ## Views
   var GameView      = require('views/GameView');
   var HomeView      = require('views/HomeView');
@@ -27,8 +30,8 @@ define(function(require, exports, module) {
   });
 
   // ## Shared Variables
-  var H = window.innerHeight;
-  var W = window.innerWidth;
+  var W = utils.getViewportWidth();
+  var H = utils.getViewportHeight();
 
 
   function _setListeners() {

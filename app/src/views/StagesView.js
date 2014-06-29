@@ -27,7 +27,7 @@ define(function(require, exports, module) {
   var LevelsView = require('views/LevelsView');
 
   // ## Controllers
-  var LivesController = require('LivesController');
+  var LivesController = require('controllers/LivesController');
 
   // ## Shared
   var H = window.innerHeight;
@@ -269,8 +269,8 @@ define(function(require, exports, module) {
     // respond to level click events
     view.pipe(this.scrollView);
     view.on('stage:select', this.scrollToStage.bind(this));
-    view.on('nav:loadGame', function() {
-      this._eventInput.emit('nav:loadGame');
+    view.on('nav:loadGame', function(data) {
+      this._eventInput.emit('nav:loadGame', data);
     }.bind(this));
 
     return view;
