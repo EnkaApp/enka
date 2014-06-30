@@ -18,6 +18,9 @@ define(function(require, exports, module) {
   // ## Layout
   var GridLayout = require('famous/views/GridLayout');
 
+  // ## Controllers
+  var GameController = require('controllers/GameController');
+
   // ## Views
   var Lightbox = require('famous/views/Lightbox');
   var LevelView = require('views/LevelView');
@@ -51,12 +54,26 @@ define(function(require, exports, module) {
     this.grid.pipe(this._eventInput);
     this.bg.pipe(this._eventInput);
     this._eventInput.pipe(this._eventOutput);
+
+    this._gameController._eventOutput.on('game:unlockNextLevel', function() {
+      var levelObj = this._gameController.getLatestLevel();
+
+      _unlockNextLevel.call(this, levelObj.stage, levelObj.level);
+    }.bind(this));
+  }
+
+  function _unlockNextLevel(stage, level) {
+    if (this.options.stage === stage) {
+      var levelView = this.levels[level-1];
+      levelView.unlock();
+    }
   }
 
   function LevelsView() {
     View.apply(this, arguments);
 
     this.config = new StageConfig(this.options.stage);
+    this._gameController = new GameController();
 
     this.rootMod = new StateModifier({
       size: [undefined, this.options.currentHeight],
@@ -202,6 +219,7 @@ define(function(require, exports, module) {
 
     // Create the cells
     var cells = _createCells.call(this);
+    this.levels = cells;
 
     this.gridMod = new StateModifier({
       // origin: [0.5, 1],

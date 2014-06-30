@@ -45,16 +45,28 @@ define(function(require, exports, module) {
     pieceSize: [64, 64]
   };
 
-  PieceGenerator.prototype.setOptions = function(options){
+  PieceGenerator.prototype.setOptions = function(options) {
     this._optionsManager.patch(options);
+  };
+
+  /*
+   * Should only be used when a new game is starting
+   */
+  PieceGenerator.prototype.resetLastColor = function() {
+    this._lastColor = '';
   };
 
   function _useExistingPiece(direction) {
     var node = this._deletedPieces.pop();
     var piece = node._piece;
+    var mod = node._mod;
     var backColor = this.getNextColorFromQueue();
 
     console.info('Using Existing Piece');
+
+    // The only time this._lastColor is falsy is when we are
+    // placeing the first piece on the board
+    if (!this._lastColor) this._lastColor = backColor;
     
     // Create the piece before reassigning last color
     piece.updateOptions({
@@ -62,6 +74,10 @@ define(function(require, exports, module) {
       frontBgColor: this._lastColor,
       backBgColor: backColor
     });
+
+    // Update the opacity and piece size
+    mod.setOpacity(0.999);
+    mod.setSize(this.options.pieceSize);
 
     // Save the last used back color. This will be used as the 
     // front color of the next played piece
@@ -84,7 +100,8 @@ define(function(require, exports, module) {
     var modifier = new StateModifier({
       origin: [0, 0],
       align: [0, 0],
-      size: this.options.pieceSize
+      size: this.options.pieceSize,
+      opacity: 0.999
     });
 
     // save a reference to the modifier so we can access it easily later
@@ -143,7 +160,6 @@ define(function(require, exports, module) {
   PieceGenerator.prototype.getNextColorFromQueue = function(){
     var color = this.colorQueue.shift();
 
-    // this._eventOutput.emit('piece:colorsUpdated');
     this._eventOutput.emit('piece:colorRemoved');
 
     return color;

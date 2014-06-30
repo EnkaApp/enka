@@ -1,14 +1,20 @@
 define(function(require, exports, module) {
+  
+  // ## Famous Dependencies
+  var Engine = require('famous/core/Engine');
+  var OptionsManager = require('famous/core/OptionsManager');
+  var Timer = require('famous/utilities/Timer');
+
   // ## Dependencies
   var _ = require('lodash');
   var db = require('localforage');
 
-  // ## Famous Dependencies
-  var OptionsManager = require('famous/core/OptionsManager');
-  var Timer = require('famous/utilities/Timer');
-
   // ## App Dependencies
+  var Model = require('models/Model');
   var LivesController = require('controllers/LivesController');
+
+  // ## StageConfig
+  var StageConfig = require('StageConfig');
 
   function _init() {
 
@@ -18,12 +24,8 @@ define(function(require, exports, module) {
 
         // if user exists in the db, load him/her
         if (user) {
-          console.info('Loading user');
-
-          db.getItem('user', function(user) {
-            this.setOptions(user);
-          }.bind(this));
-
+          console.info('Loading user', user);
+          this.setOptions(user);
         }
         // otherwise create a new user
         else {
@@ -36,31 +38,39 @@ define(function(require, exports, module) {
           this.save();
         }
 
+        Engine.emit('user:loaded');
+
       }.bind(this));
     }.bind(this));
   }
 
-  function User(options) {
-    
-    if (User._instance) {
-      return User._instance;
+  function UserModel() {
+
+    if (UserModel._instance) {
+      // Engine.emit('user:loaded');
+      return UserModel._instance;
     }
 
-    this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
-    this._optionsManager = new OptionsManager(this.options);
+    Model.apply(this, arguments);
 
-    if (options) this.setOptions(options);
+    // this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
+    // this._optionsManager = new OptionsManager(this.options);
+
+    // if (options) this.setOptions(options);
     _.extend(this.options, this.constructor.DEFAULT_OPTIONS);
 
-    // initialize user
+    // initialize UserModel
     _init.call(this);
 
-    User._instance = this;
+    UserModel._instance = this;
   }
 
-  User._instance = null;
+  UserModel.prototype = Object.create(Model.prototype);
+  UserModel.prototype.constructor = UserModel;
 
-  User.DEFAULT_OPTIONS = {
+  UserModel._instance = null;
+
+  UserModel.DEFAULT_OPTIONS = {
     created: '',
     latestStage: 1, // latest stage progressed to
     latestLevel: 1, // furthest level of latest stage
@@ -69,7 +79,7 @@ define(function(require, exports, module) {
     lastRecharge: ''
   };
 
-  User.prototype.save = function() {
+  UserModel.prototype.save = function() {
     db.ready().then(function() {
       db.setItem('user', this.options, function() {
         console.info('Successfully saved user');
@@ -77,7 +87,7 @@ define(function(require, exports, module) {
     }.bind(this));
   };
 
-  User.prototype.delete = function() {
+  UserModel.prototype.delete = function() {
     db.ready().then(function() {
       db.removeItem('user', function() {
         console.info('Successfully deleted user');
@@ -92,7 +102,7 @@ define(function(require, exports, module) {
    * @param {string} key key
    * @return {Object} associated object
    */
-  User.prototype.getOptions = function getOptions() {
+  UserModel.prototype.getOptions = function getOptions() {
       return this._optionsManager.value();
   };
 
@@ -102,11 +112,11 @@ define(function(require, exports, module) {
    *  @method setOptions
    *  @param {Object} options
    */
-  User.prototype.setOptions = function setOptions(options) {
+  UserModel.prototype.setOptions = function setOptions(options) {
       this._optionsManager.patch(options);
   };
 
-  User.prototype.hasUnlockedLevel = function(stage, level) {
+  UserModel.prototype.hasUnlockedLevel = function(stage, level) {
     var res = false;
 
     if (stage < this.options.latestStage) {
@@ -120,22 +130,35 @@ define(function(require, exports, module) {
     return res;
   };
 
-  /**
-   * 
+  /*
+   * Returns users latest level and stage
    */
-  User.prototype.getLatestLevel = function() {
+  UserModel.prototype.getLatestLevel = function() {
     return {
       stage: this.options.latestStage,
       level: this.options.latestLevel
     };
   };
 
-  User.prototype.setLatestLevel = function(stage, level) {
+  /*
+   * Alias for getLatestLevel
+   */
+  UserModel.prototype.getLatestStage = function() {
+    return this.getLatestLevel();
+  };
+
+  UserModel.prototype.setLatestLevel = function(stage, level) {
+
+    // Something is firing this with no info... so stop
+    // @TODO track down why
+    if (!stage || !level) return;
 
     var options = {
       latestStage: stage,
       latestLevel: level
     };
+
+    console.log(options);
     
     // update options
     this.setOptions(options);
@@ -144,5 +167,23 @@ define(function(require, exports, module) {
     this.save();
   };
 
-  module.exports = User;
+  UserModel.prototype.unlockNextLevel = function() {
+    var level = this.options.latestLevel;
+    var stage = this.options.latestStage;
+    var stageConfig = new StageConfig(this.options.latestStage);
+
+    console.log(level, stage);
+
+    // If we are on the final level of the stage... unlock the next stage
+    if (this.options.latestLevel === stageConfig.getLevelCount()) {
+      level = 1;
+      stage += 1;
+    } else {
+      level += 1;
+    }
+
+    this.setLatestLevel(stage, level);
+  };
+
+  module.exports = UserModel;
 });

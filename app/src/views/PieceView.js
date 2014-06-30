@@ -5,11 +5,11 @@
  */
 define(function(require, exports, module) {
   var View          = require('famous/core/View');
-  var RenderNode = require('famous/core/RenderNode');
+  var RenderNode    = require('famous/core/RenderNode');
   var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
-  // var StateModifier = require('famous/modifiers/StateModifier');
-  var Modifier = require('famous/core/Modifier');
+  var StateModifier = require('famous/modifiers/StateModifier');
+  var Modifier      = require('famous/core/Modifier');
 
   // Testing
   var Reflector = require('views/Reflector');
@@ -44,7 +44,7 @@ define(function(require, exports, module) {
     }
 
     if (!this.reflectionMod) {
-      this.reflectionMod = new Modifier({
+      this.reflectionMod = new StateModifier({
         origin: origin,
         align: align
       });
@@ -58,7 +58,7 @@ define(function(require, exports, module) {
   function _createBack() {
     var back = new Surface({
       content: '',
-      size: [this.options.width, this.options.height],
+      // size: [this.options.width, this.options.height],
       origin: [0.5, 0.5],
       align: [0.5, 0.5],
       properties: {
@@ -79,7 +79,7 @@ define(function(require, exports, module) {
     // console.log(size)
     var front = new Surface({
       content: '',
-      size: [this.options.width, this.options.height],
+      // size: [this.options.width, this.options.height],
       origin: [0.5, 0.5],
       align: [0.5, 0.5],
       properties: {
@@ -132,14 +132,8 @@ define(function(require, exports, module) {
   PieceView.prototype.updateOptions = function(options) {
     this.reset();
 
-
-    console.log('update with new options', options);
-
     // update the options
     this.setOptions(options);
-
-    console.log('new back color', this.options.backBgColor);
-    console.log('new front color', this.options.frontBgColor);
 
     // reiniatialize the back, front, reflectionModifier, and reflector
     //
@@ -169,7 +163,6 @@ define(function(require, exports, module) {
 
   PieceView.prototype.reflect = function() {
     this.reflector.reflect({curve : 'linear', duration : 500}, function(){
-      console.log('reflected piece', this);
       this._eventOutput.emit('reflected');
     }.bind(this));
   };

@@ -43,6 +43,8 @@ define(function(require, exports, module) {
   function _createListeners() {
 
     function play(e) {
+      if (this._locked) return;
+      
       // Tell downstream listeners that a user wants to play
       this._eventOutput.emit('level:play', {
         index: this.options.level - 1,
@@ -54,6 +56,8 @@ define(function(require, exports, module) {
     }
     
     function select(e) {
+      if (this._locked) return;
+
       // Flip the card
       this.flipper.flip();
 
@@ -68,6 +72,8 @@ define(function(require, exports, module) {
     }
 
     function close(e) {
+      if (this._locked) return;
+
       // Flip the card
       this.flipper.flip();
 
@@ -81,11 +87,9 @@ define(function(require, exports, module) {
       });
     }
 
-    if (!this._locked) {
-      this.front.on('click', select.bind(this));
-      this.back.playButton.on('click', play.bind(this));
-      this.back.backing.on('click', close.bind(this));
-    }
+    this.front.on('click', select.bind(this));
+    this.back.playButton.on('click', play.bind(this));
+    this.back.backing.on('click', close.bind(this));
     
     this.front.pipe(this._eventOutput);
   }

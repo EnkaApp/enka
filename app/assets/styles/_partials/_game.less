@@ -4,6 +4,7 @@
   }
 }
 
+.gameboard-buttons,
 .gamemenu-buttons {
   .btn {
     display: block;
@@ -18,11 +19,19 @@
     color: white;
   }
 
+  .btn-continue,
   .btn-resume {
     background: darken(@cc3-green, 10%);
     border-color: lighten(@cc3-green, 0%);
   }
 
   .btn-quit {
+  }
+}
+
+.gameboard-win {
+  .message {
+    text-align: center;
+    padding: 20px 0 0;
   }
 }

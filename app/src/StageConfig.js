@@ -10,9 +10,9 @@ define(function(require, exports, module) {
   // Possible grid configurations.
   // To be used by levels
   var GRID_TYPES = {
-    'small': [4,4],
-    'standard': [5,5],
-    'large': [8,8],
+    'small': [4,6],
+    'standard': [5,8],
+    'large': [6,10],
     'xlarge': [10,10],
     
     'wide': [8,4],
@@ -22,6 +22,13 @@ define(function(require, exports, module) {
     'skinny': [3,8],
   };
 
+  /*
+   * @param {int} type - gametype, either GAMETYPE_DESTROY or GAMETYPE_SURVIVAL
+   * @param {array} grid - tuple containing the grid col and row size
+   * @param {int} goal - win condition, i.e. number of blocks that need to be destroyed or turns survived
+   * @param {int} startIndex - where the first piece should be placed
+   * @params {array} obstacles - array of indices where obstacles should be placed
+   */
   function _getLevelDef(type, grid, goal, startIndex, obstacles) {
     type = type || GAMETYPE_DESTROY;
     goal = goal || 15;
@@ -53,20 +60,22 @@ define(function(require, exports, module) {
         url: '/images/mayan-1.png',
         size: [50,60]
       },
+
+      // grid to lay out the levels
       grid: [4, 5],
 
-      //  Array of tuples containing level type and difficulty
+      // Array of level specifications
       levels: [
-        _getLevelDef(null, null, 10),
-        _getLevelDef(null, null, 15),
-        _getLevelDef(null, 'wide', 15),
-        _getLevelDef(null, 'large', 15),
-        _getLevelDef(GAMETYPE_SURVIVAL, null, 25),
+        _getLevelDef(null, 'large', 2),
+        _getLevelDef(null, 'standard', 4),
+        _getLevelDef(null, 'standard', 6),
+        _getLevelDef(null, 'standard', 8),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'standard', 8),
 
-        _getLevelDef(null, 'tall', 25),
-        _getLevelDef(null, 'fat', 15),
-        _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 15),
-        _getLevelDef(GAMETYPE_SURVIVAL, null, 25),
+        _getLevelDef(null, 'tall', 6),
+        _getLevelDef(null, 'tall', 6),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 5),
+        _getLevelDef(GAMETYPE_SURVIVAL, null, 5),
         _getLevelDef(null, null, 30),
 
         _getLevelDef(null, 'wide', 25),
@@ -95,7 +104,9 @@ define(function(require, exports, module) {
         url: '/images/mayan-2.png',
         size: [110,60]
       },
+      // grid to lay out the levels
       grid: [4, 5],
+
       levels: [
         {
           gametype: GAMETYPE_SURVIVAL,
@@ -112,6 +123,8 @@ define(function(require, exports, module) {
         url: '/images/mayan-3.png',
         size: [130,60]
       },
+
+      // grid to lay out the levels
       grid: [4, 5],
     },
 
@@ -121,6 +134,8 @@ define(function(require, exports, module) {
         url: '/images/mayan-4.png',
         size: [130,60]
       },
+
+      // grid to lay out the levels
       grid: [4, 5],
     },
 
@@ -139,6 +154,8 @@ define(function(require, exports, module) {
         url: '/images/mayan-6.png',
         size: [108,60]
       },
+
+      // grid to lay out the levels
       grid: [4, 5],
     }
   ];
@@ -171,8 +188,12 @@ define(function(require, exports, module) {
 
   // ## Instance Methods
 
+  StageConfig.prototype.getLevelCount = function() {
+    return STAGES[this.index].levels.length;
+  };
+
   StageConfig.prototype.getLevelConfig = function(level) {
-    return STAGES[this.index].levels[level];
+    return STAGES[this.index].levels[level-1];
   };
 
   StageConfig.prototype.getIcon = function() {

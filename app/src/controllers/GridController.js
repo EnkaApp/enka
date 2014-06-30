@@ -8,12 +8,7 @@ define(function(require, exports, module) {
   var Controller = require('controllers/Controller');
 
   function GridController() {
-
     Controller.apply(this, arguments);
-
-    this._dimensions = [];
-    this._dimensions = [this.options.rows, this.options.columns];
-    this._cellSize = this.getCellSize();
   }
 
   GridController.prototype = Object.create(Controller.prototype);
@@ -35,6 +30,7 @@ define(function(require, exports, module) {
   };
 
   GridController.prototype.getCellSize = function() {
+    var size;
     var columns = this.options.columns;
     var viewWidth = this.options.viewWidth;
     var wSize =  Math.floor(viewWidth / columns);
@@ -44,11 +40,14 @@ define(function(require, exports, module) {
     var hSize =  Math.floor(viewHeight / rows);
 
     if(wSize < hSize){
-      return [wSize, wSize];
+      size = [wSize, wSize];
+    } else {
+      size = [hSize, hSize];
     }
 
-    return [hSize, hSize];
+    this._cellSize = size;
 
+    return size;
   };
 
   GridController.prototype.getBoardSize = function() {

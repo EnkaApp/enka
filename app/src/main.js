@@ -23,6 +23,7 @@ define(function(require, exports, module) {
 
   // Initialize User Model
   var user = new UserModel();
+  var hasLoaded = false;
 
   // Initialize Game Model
   var game = new GameModel();
@@ -33,9 +34,12 @@ define(function(require, exports, module) {
   // create the main context
   var mainContext = Engine.createContext();
 
-  mainContext.setPerspective(500);
+  // mainContext.setPerspective(500);
 
-  var appView = new AppView();
-
-  mainContext.add(appView);
+  Engine.on('user:loaded', function() {
+    if (!hasLoaded) {
+      var appView = new AppView();
+      mainContext.add(appView);
+    }
+  });
 });

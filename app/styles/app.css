@@ -1733,6 +1733,7 @@ button {
 .gamemenu.gamemenu-description {
   text-align: center;
 }
+.gameboard-buttons .btn,
 .gamemenu-buttons .btn {
   display: block;
   height: 100%;
@@ -1745,9 +1746,16 @@ button {
   border-radius: 99em;
   color: white;
 }
+.gameboard-buttons .btn-continue,
+.gamemenu-buttons .btn-continue,
+.gameboard-buttons .btn-resume,
 .gamemenu-buttons .btn-resume {
   background: #9ad4b9;
   border-color: #bee3d2;
+}
+.gameboard-win .message {
+  text-align: center;
+  padding: 20px 0 0;
 }
 .header.lives-count {
   color: white;
@@ -1941,4 +1949,47 @@ button {
 .stage-6.stage-level-current {
   font-weight: bold;
   text-decoration: underline;
+}
+.top-triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 0 75.5px 75.5px 75.5px;
+  border-color: transparent transparent #2cb8c4 transparent;
+}
+.left-triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 75.5px 75.5px 75.5px 0;
+  border-color: transparent #2cb8c4 transparent transparent;
+}
+.right-triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 75.5px 0 75.5px 75.5px;
+  border-color: transparent transparent transparent #2cb8c4;
+}
+.bottom-triangle {
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 75.5px 75.5px 0 75.5px;
+  border-color: #2cb8c4 transparent transparent transparent;
+}
+.top-triangle.light {
+  border-color: transparent transparent #f5fafa transparent;
+}
+.left-triangle.light {
+  border-color: transparent #f5fafa transparent transparent;
+}
+.right-triangle.light {
+  border-color: transparent transparent transparent #f5fafa;
+}
+.bottom-triangle.light {
+  border-color: #f5fafa transparent transparent transparent;
+}
+.center-square {
+  background-color: #f5fafa;
 }

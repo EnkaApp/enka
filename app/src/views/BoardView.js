@@ -20,8 +20,8 @@ define(function(require, exports, module) {
   var GridController = require('controllers/GridController');
   var GameController = require('controllers/GameController');
 
-  var xStart, yStart, xEnd, yEnd;
-
+  // ## Shared Variables
+  var lastPiece = null;
 
   GenericSync.register({
     'touch': TouchSync
@@ -51,11 +51,43 @@ define(function(require, exports, module) {
   }
 
   function _setListeners() {
+    var xStart, yStart, xEnd, yEnd;
+
+    // Win Event
+    this._controller.on('game:won', function() {
+      console.log('you win');
+
+      // Delete all pieces except the winner
+      var pieces = [];
+      var lastPieceIndex;
+
+      for (var i = 0; i < this._state.length; i++) {
+        var piece = this._state[i];
+        if (piece && piece !== lastPiece) {
+          pieces.push(i);
+        } else if (piece === lastPiece) {
+          lastPieceIndex = i;
+        }
+      }
+
+      this.deletePieces(pieces, true, function() {
+        this._eventOutput.emit('game:won', {
+          piece: lastPiece,
+          index: lastPieceIndex
+        });
+      }.bind(this));
+
+    }.bind(this));
+
+    // Lose Event
+    this._controller.on('game:lost', function() {
+      console.log('you lose');
+    });
+
     // Pipe PieceGenerator events out
     this.pieceGenerator._eventOutput.pipe(this._eventOutput);
 
     // Setup swipe events
-    // this.bgSurface.pipe(sync);
     this.backing.pipe(sync);
 
     sync.on('start', function(data) {
@@ -66,7 +98,6 @@ define(function(require, exports, module) {
     sync.on('end', function(data){
       xEnd = data.clientX;
       yEnd = data.clientY;
-      // var wtf = 0;
       
       var direction = this.getSwipeDirection(xStart, yStart, xEnd, yEnd);
       
@@ -77,19 +108,15 @@ define(function(require, exports, module) {
       if(direction){
         
         this._turns++;
-        this._controller._eventInput.emit('game:turn++');
-
-        this._turns++;
-        // console.log('lastIndex: ', this._currentIndex);
+        this._controller.addTurn();
+        
         var newIndex = this.getNewIndex(this._currentIndex, direction);
-        // console.log('newIndex: ', newIndex);
+        
         if(this.isInBounds(direction) && !this._state[newIndex]) {
-          // console.log('after swiping ' + direction + ' the new index is ' + newIndex)
+          
           // generate new Piece
           var piece = this.pieceGenerator.getPiece(direction);
           this.placePiece(piece, newIndex);
-
-          // console.log('upcoming pieces: ', this.pieceGenerator.colorQueue);
           
           this._state[newIndex] = piece;
 
@@ -97,42 +124,34 @@ define(function(require, exports, module) {
 
           // delete all legal matches. if no matches, check if we are trapped
           var onReflected = function(){
-            // wtf++;
-            // if(wtf > 1) debugger;
-            this.deleteMatches(newIndex);
-            this.checkIfTrapped(newIndex);
+
+            // We need to check if the piece is trapped after deleteMatches has
+            // executed otherwise it will mistakingly check pieces that are in queue
+            // to be deleted but have not yet been deleted
+            this.deleteMatches(newIndex, function() {
+              this.checkIfTrapped(newIndex);
+            }.bind(this));
           };
+
+          // @NOTE 
+          // Previously the piece.on('reflected') event was being used to trigger
+          // the onReflected function; however this was causing problems because the
+          // 'reflected' event was being emitted multiple times instead of the expected
+          // one time. Timer.setTimeout is a workaround for this.
+          //
+          // @TODO Figure out what is wrong with the piece.on('reflected') event
           Timer.setTimeout(onReflected.bind(this), 500);
-          // ## eventing was sending multiple events per swipe
-          // Timer.setTimeout is a workaround for this.
-
-          // console.log('state after: ', this._state);
-          // console.log('turns: ', this._turns);
-          // console.log('turns: ', this._turns);
-
         }
       }
     }.bind(this)); // <---- END SYNC.ON('END')
   }
-   
-  function BoardView(options) {
-    View.apply(this, arguments);
-    
+
+  function _init() {
     this._turns = 0;
-
-    this._controller = new GameController();
-
-    // Setup the options manager
-    this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
-    this._optionsManager = new OptionsManager(this.options);
-    if (options) this.setOptions(options);
 
     this._currentIndex = this.options.startIndex;
 
-    // this._model = new GameModel();
-    this._controller = new GameController();
-
-    this.gridController = new GridController({
+    this.gridController.setOptions({
       columns: this.options.columns,
       rows: this.options.rows,
       viewWidth: this.options.viewWidth,
@@ -142,24 +161,20 @@ define(function(require, exports, module) {
     // sets piece size based off of view size
     this._pieceSize = this.gridController.getCellSize();
 
-    this.pieceGenerator = new PieceGenerator({
+    // The pieceGenerator is a singleton instance and is created by 
+    // the header first so we need to explicitly set the options
+    // otherwise the piece size and other calculations will be wrong
+    this.pieceGenerator = new PieceGenerator();
+    this.pieceGenerator.setOptions({
       rows: this.options.rows,
       columns: this.options.columns,
       pieceSize: this._pieceSize
     });
 
-    this.rootMod = new StateModifier({
-      size: this.gridController.getBoardSize(),
-      origin: [0.5, 0.5],
-      align: [0.5, 0.5]
-    });
+    // Make sure pieceGenerator is reset
+    this.pieceGenerator.resetLastColor();
 
-    this.node = this.add(this.rootMod);
-
-    _createBackground.call(this);
-    _createOverlay.call(this);
-
-    this.viewSize = this.getSize();
+    this.rootMod.setSize(this.gridController.getBoardSize());
 
     // Initialize data structure to store the board state
     _stateInit.call(this);
@@ -169,6 +184,25 @@ define(function(require, exports, module) {
     this.placePiece(firstPiece, this._currentIndex);
 
     this._state[this._currentIndex] = firstPiece;
+  }
+   
+  function BoardView() {
+    View.apply(this, arguments);
+
+    this._controller = new GameController();
+    this.gridController = new GridController();
+
+    this.rootMod = new StateModifier({
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5]
+    });
+
+    this.node = this.add(this.rootMod);
+
+    _init.call(this);
+
+    _createBackground.call(this);
+    _createOverlay.call(this);
 
     _setListeners.call(this);
 
@@ -177,7 +211,7 @@ define(function(require, exports, module) {
   BoardView.DEFAULT_OPTIONS = {
     startIndex: 12,
     rows: 8,
-    columns: 3,
+    columns: 5,
     viewWidth: window.innerWidth,
     viewHeight: window.innerHeight
   };
@@ -194,41 +228,48 @@ define(function(require, exports, module) {
   BoardView.prototype.update = function() {
     this.setOptions({
       rows: this._controller.getRows(),
-      cols: this._controller.getCols(),
+      columns: this._controller.getCols(),
       startIndex: this._controller.getStartIndex()
     });
 
-    // reset and rebuild the board
+    // clear the board
+    this.clear();
 
-    // place the first piece
+    // reinitialize the board
+    _init.call(this);
+  };
+
+  BoardView.prototype.clear = function() {
+    for (var i = this._state.length - 1; i >= 0; i--) {
+      var piece = this._state[i];
+      if (piece) {
+        this.deletePiece(i, true);
+      }
+    }
   };
 
   BoardView.prototype.placePiece = function(piece, newIndex) {
     var pos = this.gridController.getXYCoords(this._currentIndex);
     
-    console.info('Placing piece at', this._lastPiecePosition);
+    // console.info('Placing piece at', this._lastPiecePosition);
     
     piece._mod.setTransform(
-      Transform.translate(pos[0], pos[1], 0)
+      Transform.translate(pos[0], pos[1], 0.001)
     );
 
     // Update the current index to the index of the piece we just placed
     // and save the newly placed piece to the board state
     this._currentIndex = newIndex;
     this._lastPiecePosition = this.gridController.getXYCoords(newIndex);
-    console.log('after adding piece: ');
-    console.log('this._currentIndex: ', this._currentIndex);
-    console.log('this._lastPiecePosition', this._lastPiecePosition);
-    console.log('piece placed: ', piece);
     this.node.add(piece);
+
+    lastPiece = piece;
   };
 
-  BoardView.prototype.deleteMatches = function(index){
-    console.log('\ninside deleteMatches');
+  BoardView.prototype.deleteMatches = function(index, callback){
     var matched = [];
     var connections = 0;
     var initialIndex = index;
-    console.log('initialIndex: ', initialIndex);
 
     matched[index] = true;
     seekAndDestroy.call(this, index);
@@ -251,14 +292,21 @@ define(function(require, exports, module) {
         }
       }
     }
-    if(connections > 1){
 
+    if(connections > 1){
+      var pieces = [];
       for(var i = 0; i < matched.length; i++){
         if(matched[i] && i !== initialIndex){
-          // console.log('deleting ', i);
-          this.deletePiece(i);
+          pieces.push(i);
         }
       }
+
+      this.deletePieces(pieces, false, function() {
+        this._controller.doWinCheck();
+        if (callback) callback();
+      });
+    } else {
+      if (callback) callback();
     }
   }; // end deleteMatches
 
@@ -293,7 +341,7 @@ define(function(require, exports, module) {
     // if(this._state[neighborIndex] && this.isInBounds(direction)){
     var inBounds  = this.isInBounds(direction, index);
     var neighborExists = this._state[neighborIndex];
-    console.log();
+    
     if (neighborExists && inBounds ) {
       var neighborColor = this.getColorFromIndex(neighborIndex);
       // console.log('i am index ' + index + ' and i am checking my neighbor at index ' + neighborIndex);
@@ -320,8 +368,6 @@ define(function(require, exports, module) {
   BoardView.prototype.checkIfTrapped = function(index){
     var trueFlag = 0;
     var canMove = [];
-    // console.log('checkingIfTrapped: ');
-    // console.log('-----------------------------------');
 
     var directions = {
       left: this.isInBounds('left'),
@@ -344,8 +390,7 @@ define(function(require, exports, module) {
     }
 
     if(!trueFlag){
-      // debugger;
-      console.log('Game Over');
+      this._controller.gameOver();
     }
   };
 
@@ -359,7 +404,7 @@ define(function(require, exports, module) {
     }
 
     var res = true;
-    var viewPortSize = this.viewSize;
+    // var viewPortSize = this.viewSize;
     var pieceSize = this._pieceSize;
     var boardWidth = this.options.columns * pieceSize[0];
     var boardHeight = this.options.rows * pieceSize[1];
@@ -400,9 +445,41 @@ define(function(require, exports, module) {
     return res;
   };
 
-  BoardView.prototype.deletePiece = function(index) {
+  BoardView.prototype.deletePieces = function(pieces, clearing, callback) {
+
+    for (var i = pieces.length - 1; i >= 0; i--) {
+      var index = pieces[i];
+      Timer.setTimeout(this.deletePiece.bind(this, index, clearing), 100 * i);
+    }
+
+    // What until after all pieces have been cleared to firest the callback
+    if (callback) {
+      Timer.setTimeout(function() {
+        callback.call(this);
+      }.bind(this), pieces.length * 100);
+    }
+  };
+
+  BoardView.prototype.deletePiece = function(index, clearing) {
+
+    if (!clearing) {
+      this._controller.addDestroyed();
+    }
+
     this.pieceGenerator.addDeletedPiece(this._state[index]);
-    _getModifierAtIndex.call(this, index).setTransform(Transform.translate(2000, 2000, 0));
+
+    var mod = _getModifierAtIndex.call(this, index);
+    
+    var callback = function() {
+      mod.setTransform(Transform.translate(2000, 2000, 0));
+      mod.setOpacity(0.999);
+    };
+
+    mod.setOpacity(0.001, {
+      curve: 'easeOut',
+      duration: 500
+    }, callback);
+
     this._state[index] = null;
   };
 

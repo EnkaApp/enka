@@ -7,6 +7,7 @@ define(function(require, exports, module) {
   var StageConfig = require('StageConfig');
 
   // ## Models
+  var UserModel = require('models/UserModel');
   var GameModel = require('models/GameModel');
 
   function _setListeners() {
@@ -27,6 +28,7 @@ define(function(require, exports, module) {
     this._stage = stage;
     this._config = stage.getLevelConfig(this.options.level);
     this._model = new GameModel();
+    this._user = new UserModel();
   }
 
   function GameController() {
@@ -51,12 +53,23 @@ define(function(require, exports, module) {
     level: 1,
     turns: 0,
     destroyed: 0,
+    done: false,
     state: null
   };
 
-  GameController.prototype.update = function(options) {
+  GameController.prototype.newGame = function(options) {
+    options.destroyed = 0;
+    options.turns = 0;
+    options.done = false;
+    options.state = null;
+
     this.setOptions(options);
+
     _init.call(this);
+  };
+
+  GameController.prototype.gameOver = function() {
+    this.lost();
   };
 
   GameController.prototype.isSameGame = function(data) {
@@ -65,6 +78,23 @@ define(function(require, exports, module) {
 
   GameController.prototype.getLevelConfig = function() {
     return this._config;
+  };
+
+  GameController.prototype.unlockNextLevel = function() {
+    // Get Users furthest level and stage
+    var levelObj = this._user.getLatestLevel();
+
+    // If this stage/level is Users furthest level and stage increment,
+    // otherwise do nothing
+    if (levelObj.stage === this.options.stage && levelObj.level === this.options.level) {
+      this._user.unlockNextLevel();
+
+      this._eventOutput.emit('game:unlockNextLevel');
+    }
+  };
+
+  GameController.prototype.getLatestLevel = function() {
+    return this._user.getLatestLevel();
   };
 
   GameController.prototype.getDescription = function() {
@@ -87,7 +117,7 @@ define(function(require, exports, module) {
     this.options.turns++;
     
     // check win condition
-    if (_hasWon()) this.won();
+    if (_hasWon.call(this)) this.won();
 
     // send 'turn++' event to model
     this._eventOutput.emit('game:turn++');
@@ -96,23 +126,31 @@ define(function(require, exports, module) {
   GameController.prototype.addDestroyed = function() {
     this.options.destroyed++;
 
-    // check win condition
-    if (_hasWon()) this.won();
-
     // send 'destroyed++' event to model
     this._eventOutput.emit('game:destroyed++');
   };
 
-  GameController.prototype.won = function() {
-    _reset.call(this); // Reset turns and destroyed
+  GameController.prototype.doWinCheck = function() {
+    if (_hasWon.call(this)) this.won();
+  };
 
+  GameController.prototype.won = function() {
     // Send 'won' event
-    this._eventOutput.emit('game:won');
+    if (!this.options.done) {
+      this._eventOutput.emit('game:won');
+      this.options.done = true;
+    }
+  };
+
+  GameController.prototype.lost = function() {
+    // Send 'lost' event
+    if (!this.options.done) {
+      this._eventOutput.emit('game:lost');
+      this.options.done = true;
+    }
   };
 
   GameController.prototype.quit = function() {
-    _reset.call(this); // Reset turns and destroyed
-
     // Send 'quit' event and reset the model
     this._eventOutput.emit('game:quit');
   };
@@ -124,11 +162,11 @@ define(function(require, exports, module) {
     this._eventOutput.emit('game:resume');
   };
 
-  GameController.prototype.pause = function() {
+  GameController.prototype.save = function() {
     // save game state to model
 
     // send 'paused' event
-    this._eventOutput.emit('game:paused');
+    this._eventOutput.emit('game:saved');
   };
 
   // ## Private Helpers
@@ -136,7 +174,7 @@ define(function(require, exports, module) {
   function _reset() {
     this.setOptions({
       destroyed: 0,
-      turns: 0
+      turns: 0,
     });
   }
   
@@ -151,6 +189,7 @@ define(function(require, exports, module) {
       if (this.options.destroyed >= goal) won = true;
     }
 
+    // console.log(won);
     return won;
   }
 
