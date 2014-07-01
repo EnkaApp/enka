@@ -102,7 +102,7 @@ define(function(require, exports, module) {
     {
       icon: {
         url: '/images/mayan-2.png',
-        size: [110,60]
+        size: [110,65]
       },
       // grid to lay out the levels
       grid: [4, 5],
@@ -121,7 +121,7 @@ define(function(require, exports, module) {
     {
       icon: {
         url: '/images/mayan-3.png',
-        size: [130,60]
+        size: [130,65]
       },
 
       // grid to lay out the levels
@@ -132,7 +132,7 @@ define(function(require, exports, module) {
     {
       icon: {
         url: '/images/mayan-4.png',
-        size: [130,60]
+        size: [130,65]
       },
 
       // grid to lay out the levels
@@ -143,7 +143,7 @@ define(function(require, exports, module) {
     {
       icon: {
         url: '/images/mayan-5.png',
-        size: [110,60]
+        size: [120,65]
       },
       grid: [4, 5],
     },
@@ -152,7 +152,7 @@ define(function(require, exports, module) {
     {
       icon: {
         url: '/images/mayan-6.png',
-        size: [108,60]
+        size: [120,65]
       },
 
       // grid to lay out the levels
