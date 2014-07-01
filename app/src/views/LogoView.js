@@ -14,6 +14,11 @@ define(function(require, exports, module) {
   // var eventHandler = new EventHandler();
   var LetterView = require('views/LetterView');
 
+  var utils = require('utils');
+
+  // ## Shared
+  var width = utils.getViewportWidth();
+
   function _createLogoBg() {
     this.bg = new Surface({
       size: [0, this.options.height],
@@ -58,14 +63,22 @@ define(function(require, exports, module) {
   }
 
   function _createLogoBrand() {
-    var letterF = new LetterView('F');
+    // var letterF = new LetterView('F');
     
-    var fModifier = new StateModifier({
-      size: [80, 125],
+    // var fModifier = new StateModifier({
+    //   size: [80, 125],
+    //   origin: [0.5, 0.5]
+    // });
+
+    // this.add(fModifier).add(letterF);
+
+    var pyramid = new LetterView('pyramid');
+    var mod = new StateModifier({
+      size: [170, 125],
       origin: [0.5, 0.5]
     });
 
-    this.add(fModifier).add(letterF);
+    this.add(mod).add(pyramid);
   }
 
   function LogoView() {
@@ -73,21 +86,14 @@ define(function(require, exports, module) {
 
     _createLogoBg.call(this);
     this.showLogo();
-
-    // Uncomment for testing logo background
-    // var open = true;
-    // Engine.on('click', function() {
-    //   _toggleBg.call(this, open);
-    //   open = !open;
-    // }.bind(this));
   }
 
   LogoView.prototype = Object.create(View.prototype);
   LogoView.prototype.constructor = LogoView;
 
   LogoView.DEFAULT_OPTIONS = {
-    width: 190,
-    height: 190
+    width: width / 5 * 3, //192
+    height: width / 5 * 3, //192
   };
 
   LogoView.prototype.showLogo = function() {

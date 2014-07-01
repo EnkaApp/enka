@@ -12,11 +12,11 @@ define(function(require, exports, module) {
   var Timer         = require('famous/utilities/Timer');
 
   // ## Layouts
-  var HomeLayout = require('./HomeLayout');
+  var HomeLayout = require('views/HomeLayout');
 
   // ## Views
-  var HomeMenuView = require('./HomeMenuView');
-  var LogoView = require('./LogoView');
+  var HomeMenuView = require('views/HomeMenuView');
+  var LogoView = require('views/LogoView');
 
   function _createLayout() {
     this.layout = new HomeLayout({

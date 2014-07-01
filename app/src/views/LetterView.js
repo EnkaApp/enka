@@ -33,12 +33,39 @@ define(function(require, exports, module) {
         translate: Transform.translate(0, 46, 0),
         zIndex: 0
       }]
+    },
+
+    pyramid: {
+      animationChain: ['height', 'height', 'height'],
+      surfaces:[{
+        origin: [0.5, 1],
+        size: [160, 40],
+        backgroundColor: '#18C5DC',
+        classes: ['logo', 'logo-brick', 'logo-bottom'],
+        translate: Transform.translate(0, 0, 0),
+        zIndex: 1
+      }, {
+        origin: [0.5, 1],
+        size: [100, 25],
+        backgroundColor: '#FA1435',
+        classes: ['logo', 'logo-brick', 'logo-middle'],
+        translate: Transform.translate(0, -45, 0),
+        zIndex: 1
+      }, {
+        origin: [0.5, 1],
+        size: [65, 16],
+        backgroundColor: '#282C38',
+        classes: ['logo', 'logo-brick', 'logo-top'],
+        translate: Transform.translate(0, -75, 0),
+        zIndex: 1
+      }]
     }
   };
 
   function _createLetterSurface(options) {
     return new Surface({
       size: [options.width, options.height],
+      classes: options.classes || [],
       properties: {
         backgroundColor: options.backgroundColor,
         zIndex: options.zIndex,
@@ -172,7 +199,7 @@ define(function(require, exports, module) {
   function LetterView(letter) {
     View.apply(this, arguments);
 
-    _createLetter.call(this, 'F');
+    _createLetter.call(this, letter);
 
     this.add(this.letter);
   }
