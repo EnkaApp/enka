@@ -43,7 +43,6 @@ define(function(require, exports, module) {
   function _createListeners() {
 
     function play(e) {
-      if (this._locked) return;
       
       // Tell downstream listeners that a user wants to play
       this._eventOutput.emit('level:play', {
@@ -56,7 +55,6 @@ define(function(require, exports, module) {
     }
     
     function select(e) {
-      if (this._locked) return;
 
       // Flip the card
       this.flipper.flip();
@@ -72,7 +70,6 @@ define(function(require, exports, module) {
     }
 
     function close(e) {
-      if (this._locked) return;
 
       // Flip the card
       this.flipper.flip();
@@ -87,9 +84,11 @@ define(function(require, exports, module) {
       });
     }
 
-    this.front.on('click', select.bind(this));
-    this.back.playButton.on('click', play.bind(this));
-    this.back.backing.on('click', close.bind(this));
+    if (!this._locked) {
+      this.front.on('click', select.bind(this));
+      this.back.playButton.on('click', play.bind(this));
+      this.back.backing.on('click', close.bind(this));
+    }
     
     this.front.pipe(this._eventOutput);
   }
@@ -218,6 +217,16 @@ define(function(require, exports, module) {
 
   function _setLFVListeners() {
     this.backing.pipe(this._eventOutput);
+
+    // For some very odd reason, we need to trigger a callback here
+    // so that when the level is unlocked it will respond to clicks
+    // again. The _eventOutput in the callback is not necessary, but
+    // added there for the hell of it.
+    //
+    // @TODO Figure out why this is needed
+    this.backing.on('click', function() {
+      this._eventOutput.emit('level:click');
+    }.bind(this));
   }
 
   function LevelFrontView() {

@@ -222,8 +222,6 @@ define(function(require, exports, module) {
     this.levels = cells;
 
     this.gridMod = new StateModifier({
-      // origin: [0.5, 1],
-      // align: [0.5, 1],
       transform: Transform.translate(0,40,0)
     });
 
