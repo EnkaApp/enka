@@ -132,14 +132,15 @@ define(function(require, exports, module) {
     level: 1,
     stage: 1,
     colors: 1,
-    start: [-W * 4, -H, 0]
+    start: [-W * 4, -H, 10]
   };
 
   LevelView.prototype.hide = function(transition) {
 
     var easeOut = {
       curve: 'easeOut',
-      duration: 300
+      // duration: 300
+      duration: 0
     };
 
     transition = transition !== undefined ? transition : spring;

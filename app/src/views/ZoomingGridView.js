@@ -82,14 +82,16 @@ define(function (require, exports, module) {
     closeEvent: 'cell:close',
   };
 
-  ZoomingGrid.prototype.showCells = function() {
+  ZoomingGrid.prototype.showCells = function(transition, delay, callback) {
     this.visible = false;
-    _animateCells.call(this);
+    this.gridMod.setTransform(Transform.translate(0, 0, 1));
+    _animateCells.call(this, transition, delay, callback);
   };
 
-  ZoomingGrid.prototype.hideCells = function() {
+  ZoomingGrid.prototype.hideCells = function(transition, delay, callback) {
     this.visible = true;
-    _animateCells.call(this);
+    this.gridMod.setTransform(Transform.translate(0, 0, -100));
+    _animateCells.call(this, transition, delay, callback);
   };
 
   ZoomingGrid.prototype.createGrid = function(cells) {
@@ -110,7 +112,7 @@ define(function (require, exports, module) {
     this.node.add(this.gridMod).add(this.grid);
   }
 
-  function _animateCells(transition, delay) {
+  function _animateCells(transition, delay, callback) {
     var cells = this.cells;
     
     var ease = {
@@ -118,8 +120,8 @@ define(function (require, exports, module) {
       curve: Easing.inOutQuad
     };
 
-    transition = typeof transition !== 'undefined' ? transition  : ease;
-    delay = typeof delay !== 'undefined' ? delay : 100;
+    transition = transition !== undefined ? transition : ease;
+    delay = delay || delay === 0 ? delay : 100;
 
     var animate = function() {
 
@@ -138,6 +140,12 @@ define(function (require, exports, module) {
       var cell = cells[i];
       Timer.setTimeout(animate.bind(cell), delay * i);
     }
+
+    // Execute callback when the animation has completed
+    Timer.setTimeout(function () {
+      if (callback) callback();
+    }, cells.length * delay);
+    
   }
 
   // ## Utility Functions

@@ -30,7 +30,7 @@ define(function(require, exports, module) {
   function _setListeners() {
 
     function levelSelect(data) {
-      console.log('level:select');
+      this._eventOutput.emit('level:select');
     }
 
     function play(data) {
@@ -77,6 +77,7 @@ define(function(require, exports, module) {
 
     this.rootMod = new StateModifier({
       size: [undefined, this.options.currentHeight],
+      transform: Transform.translate(0, 0, 50)
     });
 
     this.node = this.add(this.rootMod);
@@ -123,7 +124,6 @@ define(function(require, exports, module) {
   LevelsView.prototype.contract = function(callback) {
     this._active = false;
 
-    // remove class to background
     this.bg.removeClass('active');
 
     // shift the icon back
@@ -132,13 +132,15 @@ define(function(require, exports, module) {
       {curve: 'linear', duration: 300}
     );
 
-    _animateSize.call(this, {
-      start: this.options.expandedHeight,
-      end: this.options.height,
-      axis: 'y'
-    }, function () {
-      this.hideLevels();
-      if (callback) callback.call(this);
+    this.hideLevels(function() {
+      _animateSize.call(this, {
+        start: this.options.expandedHeight,
+        end: this.options.height,
+        duration: 500,
+        axis: 'y'
+      }, function () {
+        if (callback) callback.call(this);
+      }.bind(this));
     }.bind(this));
   };
 
@@ -146,8 +148,8 @@ define(function(require, exports, module) {
     this.grid.showCells();
   };
 
-  LevelsView.prototype.hideLevels = function() {
-    this.grid.hideCells();
+  LevelsView.prototype.hideLevels = function(callback) {
+    this.grid.hideCells(null, 50, callback);
   };
 
   function _createBackground() {
@@ -235,7 +237,7 @@ define(function(require, exports, module) {
    */
   function _animateSize(options, callback) {
     var transition = {
-      duration: 300,
+      duration: options.duration || 300,
       curve: Easing.inOutQuad
     };
 

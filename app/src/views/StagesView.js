@@ -42,9 +42,12 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this._eventInput.on('nav:loadGame', function(data) {
-      console.log(data);
       this._eventOutput.emit('nav:loadGame', data);
     }.bind(this));
+
+    this._eventInput.on('level:select', function(data) {
+      console.log('stages level:select');
+    });
   }
 
   function StagesView() {
@@ -269,11 +272,16 @@ define(function(require, exports, module) {
     // respond to level click events
     view.pipe(this.scrollView);
     view.on('stage:select', this.scrollToStage.bind(this));
+    view.on('level:select', _hideIcon.bind(this));
     view.on('nav:loadGame', function(data) {
       this._eventInput.emit('nav:loadGame', data);
     }.bind(this));
 
     return view;
+  }
+
+  function _hideIcon() {
+    console.log('hide icon');
   }
 
   function _createScrollView() {
@@ -358,7 +366,7 @@ define(function(require, exports, module) {
     offset = offset - this.options.headerHeight;
     offset = offset - offset % this.options.stageHeight;
     
-    return firstVisibileHeight + offset;
+    return firstVisibileHeight + offset + 10;
   }
 
   /**
@@ -382,7 +390,7 @@ define(function(require, exports, module) {
     // default transition
     if (!transition) {
       transition = {
-        duration: 200,
+        duration: 300,
         curve: 'linear'
       };
     }
