@@ -366,7 +366,7 @@ define(function(require, exports, module) {
     offset = offset - this.options.headerHeight;
     offset = offset - offset % this.options.stageHeight;
     
-    return firstVisibileHeight + offset + 10;
+    return firstVisibileHeight + offset;
   }
 
   /**

@@ -1794,6 +1794,12 @@ button {
   font-size: 0.9em;
   font-style: italic;
 }
+.logo.logo-bg {
+  background-color: rgba(45, 92, 129, 0.8);
+}
+.logo.logo-brick {
+  background-color: white;
+}
 .stage-level-front .level-number,
 .stage-level-front .fa-lock {
   position: absolute;
@@ -1949,6 +1955,18 @@ button {
 .stage-6.stage-level-current {
   font-weight: bold;
   text-decoration: underline;
+}
+.splash-backing {
+  background: #3f80b2 url('../images/splash-bg.png') 0 0 repeat;
+  background-size: 320px 128px;
+}
+.splash-pattern-1 {
+  background: transparent url('../images/splash-pattern1.png') 0 0 repeat;
+  background-size: 320px auto;
+}
+.splash-pattern-2 {
+  background: transparent url('../images/splash-pattern2.png') 0 0 repeat;
+  background-size: 320px auto;
 }
 .top-triangle {
   width: 0px;

@@ -17,6 +17,7 @@ define(function(require, exports, module) {
   var HomeView      = require('views/HomeView');
   var StagesView    = require('views/StagesView');
   var FpsMeterView  = require('views/FpsMeterView');
+  // var SplashView    = require('views/SplashView');
 
   // ## EventSyncs
   var GenericSync   = require('famous/inputs/GenericSync');
@@ -121,8 +122,8 @@ define(function(require, exports, module) {
     });
   };
 
-
   // ## View Constructors
+  
   function _createStagesView() {
     this.stagesView = new StagesView();
 

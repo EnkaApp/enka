@@ -9,7 +9,7 @@ define(function(require, exports, module) {
   var Modifier      = require('famous/core/Modifier');
   var Easing        = require('famous/transitions/Easing');
   var Transitionable = require('famous/transitions/Transitionable');
-  var EventHandler  = require('famous/core/EventHandler');
+  var ImageSurface  = require('famous/surfaces/ImageSurface');
 
   // var eventHandler = new EventHandler();
   var LetterView = require('views/LetterView');
@@ -19,15 +19,92 @@ define(function(require, exports, module) {
   // ## Shared
   var width = utils.getViewportWidth();
 
-  function _createLogoBg() {
-    this.bg = new Surface({
-      size: [0, this.options.height],
-      properties: {
-        pointerEvents: 'none'
+  function LogoView() {
+    View.apply(this, arguments);
+
+    _createLogoBg.call(this);
+    _createLogoBrand.call(this);
+    _createFamousIcon.call(this);
+  }
+
+  LogoView.prototype = Object.create(View.prototype);
+  LogoView.prototype.constructor = LogoView;
+
+  LogoView.DEFAULT_OPTIONS = {
+    width: width / 5 * 3, //192
+    height: width / 5 * 3, //192
+  };
+
+  LogoView.prototype.showLogo = function() {
+    this.showBackground(function() {
+      this.showBrand.call(this, function() {
+        this.showFamousIcon.call(this);
+      }.bind(this));
+    }.bind(this));
+  };
+
+  LogoView.prototype.showBackground = function(callback) {
+    _toggleBg.call(this, true, callback);
+  };
+
+  LogoView.prototype.showBrand = function(callback) {
+    this.brandView.show(callback);
+  };
+
+  LogoView.prototype.showFamousIcon = function() {
+    this.famousIcon._mod.setOpacity(0.999, {
+      curve: 'linear',
+      duration: 600
+    });
+  };
+
+  LogoView.prototype.hideBackground = function() {
+    _toggleBg.call(this, false);
+  };
+
+  LogoView.resetLogo = function() {
+
+  };
+
+  // ## Private Helpers
+
+  function _createFamousIcon() {
+    this.famousIcon = new ImageSurface({
+      size: [35, 35],
+      content: 'images/famous-logo.png',
+      classes: ['backfaceVisibility']
+    });
+
+    var initialTime = Date.now();
+    
+    var posMod = new StateModifier({
+      origin: [0.5, 0],
+      align: [0.5, 0],
+      opacity: 0.001,
+      transform: Transform.translate(0, 40, 50)
+    });
+
+    var centerSpinMod = new Modifier({
+      origin: [0.5, 0.5],
+      transform : function() {
+        return Transform.rotateY(0.002 * (Date.now() - initialTime));
       }
     });
 
-    this.bg.setClasses(['bg-logo']);
+    this.famousIcon._mod = posMod;
+
+    this.add(posMod).add(centerSpinMod).add(this.famousIcon);
+  }
+
+  function _createLogoBg() {
+    this.bg = new Surface({
+      size: [0, this.options.height],
+      classes: ['logo', 'logo-bg'],
+      properties: {
+        pointerEvents: 'none',
+        zIndex: 5
+      }
+    });
 
     this.bgModifier = new Modifier({
       origin: [0.5, 0],
@@ -78,43 +155,9 @@ define(function(require, exports, module) {
       origin: [0.5, 0.5]
     });
 
+    this.brandView = pyramid;
     this.add(mod).add(pyramid);
   }
-
-  function LogoView() {
-    View.apply(this, arguments);
-
-    _createLogoBg.call(this);
-    this.showLogo();
-  }
-
-  LogoView.prototype = Object.create(View.prototype);
-  LogoView.prototype.constructor = LogoView;
-
-  LogoView.DEFAULT_OPTIONS = {
-    width: width / 5 * 3, //192
-    height: width / 5 * 3, //192
-  };
-
-  LogoView.prototype.showLogo = function() {
-    this.showBackground(this.showBrand.bind(this));
-  };
-
-  LogoView.prototype.showBackground = function(callback) {
-    _toggleBg.call(this, true, callback);
-  };
-
-  LogoView.prototype.showBrand = function() {
-    _createLogoBrand.call(this);
-  };
-
-  LogoView.prototype.hideBackground = function() {
-    _toggleBg.call(this, false);
-  };
-
-  LogoView.resetLogo = function() {
-
-  };
 
   module.exports = LogoView;
 });

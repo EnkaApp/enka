@@ -19,19 +19,19 @@ define(function(require, exports, module) {
         size: [37, 125],
         backgroundColor: '#282C38',
         translate: Transform.translate(0, 0, 0),
-        zIndex: 1
+        zIndex: 15
       }, {
         origin: [0, 0],
         size: [80, 37],
         backgroundColor: '#FA1435',
         translate: Transform.translate(0, 0, 0),
-        zIndex: 2
+        zIndex: 10
       }, {
         origin: [0, 0],
         size: [80, 37],
         backgroundColor: '#18C5DC',
         translate: Transform.translate(0, 46, 0),
-        zIndex: 0
+        zIndex: 5
       }]
     },
 
@@ -40,24 +40,21 @@ define(function(require, exports, module) {
       surfaces:[{
         origin: [0.5, 1],
         size: [160, 40],
-        backgroundColor: '#18C5DC',
         classes: ['logo', 'logo-brick', 'logo-bottom'],
         translate: Transform.translate(0, 0, 0),
-        zIndex: 1
+        zIndex: 5
       }, {
         origin: [0.5, 1],
         size: [100, 25],
-        backgroundColor: '#FA1435',
         classes: ['logo', 'logo-brick', 'logo-middle'],
         translate: Transform.translate(0, -45, 0),
-        zIndex: 1
+        zIndex: 5
       }, {
         origin: [0.5, 1],
         size: [65, 16],
-        backgroundColor: '#282C38',
         classes: ['logo', 'logo-brick', 'logo-top'],
         translate: Transform.translate(0, -75, 0),
-        zIndex: 1
+        zIndex: 5
       }]
     }
   };
@@ -81,8 +78,8 @@ define(function(require, exports, module) {
     });
   }
 
-  function _animateLetterSurface(node, options) {
-    var dur = 250;
+  function _animateLetterSurface(node, options, duration) {
+    var dur = duration || duration === 0 ? duration : 250;
 
     Timer.setTimeout(function(i) {
       var transition = {duration: dur, curve: Easing.inOutQuad };
@@ -133,9 +130,10 @@ define(function(require, exports, module) {
       var surface = _createLetterSurface(options);
       var modifier = _createLetterModifier(options);
 
-      this.add(modifier).add(surface);
+      surface._options = options;
 
-      _animateLetterSurface(surface, options);
+      this._surfaces.push(surface);
+      this.add(modifier).add(surface);
     }
   }
 
@@ -199,6 +197,8 @@ define(function(require, exports, module) {
   function LetterView(letter) {
     View.apply(this, arguments);
 
+    this._surfaces = [];
+
     _createLetter.call(this, letter);
 
     this.add(this.letter);
@@ -206,6 +206,19 @@ define(function(require, exports, module) {
 
   LetterView.prototype = Object.create(View.prototype);
   LetterView.prototype.constructor = LetterView;
+
+  LetterView.prototype.show = function(callback) {
+    var dur = 250;
+
+    for (var i = 0; i < this._surfaces.length; i++) {
+      var surface = this._surfaces[i];
+      _animateLetterSurface(surface, surface._options, dur);
+    }
+
+    Timer.setTimeout(function() {
+      if (callback) callback();
+    }, dur * this._surfaces.length);
+  };
 
   module.exports = LetterView;
 });
