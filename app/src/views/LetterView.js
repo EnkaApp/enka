@@ -19,13 +19,13 @@ define(function(require, exports, module) {
         size: [37, 125],
         backgroundColor: '#282C38',
         translate: Transform.translate(0, 0, 0),
-        zIndex: 15
+        zIndex: 10
       }, {
         origin: [0, 0],
         size: [80, 37],
         backgroundColor: '#FA1435',
         translate: Transform.translate(0, 0, 0),
-        zIndex: 10
+        zIndex: 15
       }, {
         origin: [0, 0],
         size: [80, 37],
@@ -194,18 +194,22 @@ define(function(require, exports, module) {
   //   this.letter = canvas;
   // }
 
-  function LetterView(letter) {
+  function LetterView() {
     View.apply(this, arguments);
 
     this._surfaces = [];
 
-    _createLetter.call(this, letter);
+    _createLetter.call(this, this.options.letter);
 
-    this.add(this.letter);
+    // this.add(this.letter);
   }
 
   LetterView.prototype = Object.create(View.prototype);
   LetterView.prototype.constructor = LetterView;
+
+  LetterView.DEFAULT_OPTIONS = {
+    letter: 'pyramid'
+  };
 
   LetterView.prototype.show = function(callback) {
     var dur = 250;

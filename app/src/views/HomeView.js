@@ -11,54 +11,87 @@ define(function(require, exports, module) {
   var Modifier      = require('famous/core/Modifier');
   var Timer         = require('famous/utilities/Timer');
 
-  // ## Layouts
-  var HomeLayout = require('views/HomeLayout');
+  // ## App Dependencies
+  var utils         = require('utils');
 
   // ## Views
-  var HomeMenuView = require('views/HomeMenuView');
-  var LogoView = require('views/LogoView');
+  var BackgroundView  = require('views/BackgroundView');
+  var HomeMenuView    = require('views/HomeMenuView');
+  var LogoView        = require('views/LogoView');
 
-  function _createLayout() {
-    this.layout = new HomeLayout({
-      brandingTopMargin: window.innerHeight / 10,
-      menuSize: [190, 110],
-      menuBottomMargin: window.innerHeight / 10,
+  // ## Shared Variables
+  var W = utils.getViewportWidth();
+  var H = utils.getViewportHeight();
+
+  function HomeView() {
+    View.apply(this, arguments);
+
+    var rootModifier = new StateModifier({
+      origin: [0, 0],
+      align: [0, 0]
     });
 
-    var modifier = new StateModifier({
-      tranform: Transform.translate(0, 0, 0.1)
-    });
+    this.node = this.add(rootModifier);
 
-    this.add(this.layout);
+    _createBackground.call(this);
+    _createLogo.call(this);
+    _createMenu.call(this);
+
+    // Pipe button events to parent
+    _setListeners.call(this);
   }
 
-  function _createBackground() {
-    this.bg = new Surface({
-      properties: {
-        backgroundColor: '#FFFFFF'
-      }
+  HomeView.prototype = Object.create(View.prototype);
+  HomeView.prototype.constructor = HomeView;
+
+  HomeView.DEFAULT_OPTIONS = {};
+
+  HomeView.prototype.showLoading = function() {
+    this.logo.showLogo();
+  };
+
+  HomeView.prototype.showMenu = function() {
+
+    this.logo._mod.setTransform(Transform.translate(0, -100, 0), {
+      curve: 'easeOut',
+      duration: 300
     });
 
-    this.bg.setClasses(['bg-home']);
+    this.menuView.showButtons();
+  };
 
-    this.add(this.bg);
+  function _createBackground() {
+    this.bg = new BackgroundView();
+
+    this.node.add(this.bg);
+    
+    this.bg.show(null, 300, function() {
+      this.logo.showLogo();
+    }.bind(this));
   }
 
   function _createLogo() {
-    var logo = new LogoView();
+    this.logo = new LogoView();
+    
+    var mod = new StateModifier({
+      size: [W/5 * 3, W/5 * 3],
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5],
+    });
 
-    this.layout.branding.add(logo);
+    this.logo._mod = mod;
+
+    this.node.add(mod).add(this.logo);
   }
 
   function _createMenu() {
     this.menuView = new HomeMenuView();
 
-    this.layout.menu.add(this.menuView);
+    this.menuView.rootMod.setOrigin([0.5, 1]);
+    this.menuView.rootMod.setAlign([0.5, 1]);
+    this.menuView.rootMod.setTransform(Transform.translate(0, -60, 10));
 
-    // show the buttons
-    Timer.setTimeout(function() {
-      this.menuView.showButtons();
-    }.bind(this), 1000);
+    this.node.add(this.menuView);
   }
 
   function _setListeners() {
@@ -73,25 +106,6 @@ define(function(require, exports, module) {
     // Listen for event from AppView
     this.bg.pipe(this._eventOutput);
   }
-
-  function HomeView() {
-    View.apply(this, arguments);
-
-    _createBackground.call(this);
-    _createLayout.call(this);
-    _createLogo.call(this);
-    _createMenu.call(this);
-
-    // Pipe button events to parent
-    _setListeners.call(this);
-
-    this.add(this.layout);
-  }
-
-  HomeView.prototype = Object.create(View.prototype);
-  HomeView.prototype.constructor = HomeView;
-
-  HomeView.DEFAULT_OPTIONS = {};
 
   module.exports = HomeView;
 });

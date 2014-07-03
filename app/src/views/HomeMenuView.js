@@ -12,6 +12,13 @@ define(function(require, exports, module) {
 
   Transitionable.registerMethod('spring', SpringTransition);
 
+  // ## App Dependencies
+  var utils = require('utils');
+
+  // ## Shared Variables
+  var W = utils.getViewportWidth();
+  var H = utils.getViewportHeight();
+
   var TOP_MARGIN = 40; // button top margin
   var DELAY = 300; // milliseconds between button intro animations
 
@@ -24,49 +31,6 @@ define(function(require, exports, module) {
 
   // ## Views
   var HomeButtonView = require('views/HomeButtonView');
-
-  function _createResumeGameButton() {
-    this.btnResumeGame = new HomeButtonView({
-      content: 'Resume',
-      classes: ['btn-resume']
-    });
-
-    var mod = new StateModifier({
-      transform: Transform.translate(0, window.innerHeight / 2, 0)
-    });
-
-    this._modifiers.push(mod);
-    this.add(mod).add(this.btnResumeGame);
-
-  }
-
-  function _createPlayButton() {
-    this.btnPlay = new HomeButtonView({
-      content: 'Stages',
-      classes: ['btn-play']
-    });
-
-    var mod = new StateModifier({
-      transform: Transform.translate(0, window.innerHeight / 2, 0)
-    });
-    
-    this._modifiers.push(mod);
-    this.add(mod).add(this.btnPlay);
-  }
-
-  function _createAboutButton() {
-    this.btnAbout = new HomeButtonView({
-      content: 'About',
-      classes: ['btn-about']
-    });
-
-    var mod = new StateModifier({
-      transform: Transform.translate(0, window.innerHeight / 2, 0)
-    });
-
-    this._modifiers.push(mod);
-    this.add(mod).add(this.btnAbout);
-  }
 
   function _setListeners() {
     this.btnPlay.on('click', function() {
@@ -85,6 +49,15 @@ define(function(require, exports, module) {
   function HomeMenuView() {
     View.apply(this, arguments);
 
+    this.rootMod = new StateModifier({
+      size: [190, 110],
+      origin: [0.5, 0],
+      align: [0.5, 0],
+      transform: Transform.translate(0, 0, 0)
+    });
+
+    this.node = this.add(this.rootMod);
+
     // Array of button modifiers
     this._modifiers = [];
 
@@ -102,12 +75,6 @@ define(function(require, exports, module) {
   HomeMenuView.DEFAULT_OPTIONS = {};
 
   HomeMenuView.prototype.showButtons = function() {
-
-      // {
-      //   curve: Easing.inSine,
-      //   duration: 500
-      // }
-    
     function _callback(i) {
       this._modifiers[i].setTransform(Transform.translate(0, i*TOP_MARGIN, 0), spring);
     }
@@ -116,6 +83,51 @@ define(function(require, exports, module) {
       Timer.setTimeout(_callback.bind(this, i), (i+1) * DELAY);
     }
   };
+
+  // ## Private Helpers
+
+  function _createResumeGameButton() {
+    this.btnResumeGame = new HomeButtonView({
+      content: 'Resume',
+      classes: ['btn-resume']
+    });
+
+    var mod = new StateModifier({
+      transform: Transform.translate(0, H, 0)
+    });
+
+    this._modifiers.push(mod);
+    this.node.add(mod).add(this.btnResumeGame);
+
+  }
+
+  function _createPlayButton() {
+    this.btnPlay = new HomeButtonView({
+      content: 'Stages',
+      classes: ['btn-play']
+    });
+
+    var mod = new StateModifier({
+      transform: Transform.translate(0, H, 0)
+    });
+    
+    this._modifiers.push(mod);
+    this.node.add(mod).add(this.btnPlay);
+  }
+
+  function _createAboutButton() {
+    this.btnAbout = new HomeButtonView({
+      content: 'About',
+      classes: ['btn-about']
+    });
+
+    var mod = new StateModifier({
+      transform: Transform.translate(0, H, 0)
+    });
+
+    this._modifiers.push(mod);
+    this.node.add(mod).add(this.btnAbout);
+  }
 
   module.exports = HomeMenuView;
 });

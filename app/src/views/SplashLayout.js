@@ -1,4 +1,6 @@
-
+/*
+ * DEPRECATED - UNUSED
+ */
 
 define(function(require, exports, module) {
   var Entity = require('famous/core/Entity');

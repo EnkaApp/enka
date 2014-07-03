@@ -1,4 +1,6 @@
-
+/*
+ * DEPRECATED - Unused now
+ */
 
 define(function(require, exports, module) {
   var Entity = require('famous/core/Entity');
@@ -72,14 +74,14 @@ define(function(require, exports, module) {
       {
         origin: [0.5, 0],
         align: [0.5, 0],
-        transform: Transform.translate(0, brandingTopMargin, 0),
+        transform: Transform.translate(0, brandingTopMargin, 1),
         size: brandingSize,
         target: this.branding.render()
       },
       {
         origin: [0.5, 1],
         align: [0.5, 1],
-        transform: Transform.translate(0, -menuBottomMargin, 0),
+        transform: Transform.translate(0, -menuBottomMargin, 1),
         size: menuSize,
         target: this.menu.render()
       }

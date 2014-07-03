@@ -33,12 +33,15 @@ define(function(require, exports, module) {
   LogoView.DEFAULT_OPTIONS = {
     width: width / 5 * 3, //192
     height: width / 5 * 3, //192
+    brand: 'pyramid'
   };
 
   LogoView.prototype.showLogo = function() {
     this.showBackground(function() {
       this.showBrand.call(this, function() {
-        this.showFamousIcon.call(this);
+        if (this.famousIcon) {
+          this.showFamousIcon.call(this);
+        }
       }.bind(this));
     }.bind(this));
   };
@@ -149,14 +152,17 @@ define(function(require, exports, module) {
 
     // this.add(fModifier).add(letterF);
 
-    var pyramid = new LetterView('pyramid');
+    var brand = new LetterView({
+      letter: this.options.brand
+    });
+
     var mod = new StateModifier({
       size: [170, 125],
       origin: [0.5, 0.5]
     });
 
-    this.brandView = pyramid;
-    this.add(mod).add(pyramid);
+    this.brandView = brand;
+    this.add(mod).add(brand);
   }
 
   module.exports = LogoView;
