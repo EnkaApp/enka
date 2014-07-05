@@ -1895,7 +1895,7 @@ button {
 .stage-1.stage-bg.active {
   border-color: #ede6d2;
 }
-.stage-1.stage-levels-bg.level-open {
+.stage-1.stage-levels-bg--active {
   background-color: #f4f0e4;
 }
 .stage-1.stage-level-front {
@@ -1911,7 +1911,7 @@ button {
 .stage-2.stage-bg.active {
   border-color: #fca627;
 }
-.stage-2.stage-levels-bg.level-open {
+.stage-2.stage-levels-bg--active {
   background-color: #fcb040;
 }
 .stage-2.stage-level-front {
@@ -1930,7 +1930,7 @@ button {
 .stage-3.stage-bg.active {
   border-color: #f79f9b;
 }
-.stage-3.stage-levels-bg.level-open {
+.stage-3.stage-levels-bg--active {
   background-color: #f9b6b3;
 }
 .stage-3.stage-level-front {
@@ -1946,7 +1946,7 @@ button {
 .stage-4.stage-bg.active {
   border-color: #dc927d;
 }
-.stage-4.stage-levels-bg.level-open {
+.stage-4.stage-levels-bg--active {
   background-color: #e1a391;
 }
 .stage-4.stage-level-front {
@@ -1962,7 +1962,7 @@ button {
 .stage-5.stage-bg.active {
   border-color: #a5f2e2;
 }
-.stage-5.stage-levels-bg.level-open {
+.stage-5.stage-levels-bg--active {
   background-color: #bbf5e9;
 }
 .stage-5.stage-level-front {
@@ -1978,7 +1978,7 @@ button {
 .stage-6.stage-bg.active {
   border-color: #4ca8a6;
 }
-.stage-6.stage-levels-bg.level-open {
+.stage-6.stage-levels-bg--active {
   background-color: #5ab4b2;
 }
 .stage-6.stage-level-front {

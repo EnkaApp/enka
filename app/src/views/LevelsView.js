@@ -104,6 +104,7 @@ define(function(require, exports, module) {
   function LevelsView() {
     View.apply(this, arguments);
 
+    this._active = false;
     this.openLevel = null;
     this.config = new StageConfig(this.options.stage);
     this._gameController = new GameController();
@@ -138,6 +139,7 @@ define(function(require, exports, module) {
     this._active = true;
 
     this._backing._mod.setTransform(Transform.identity);
+    this._backing.addClass('stage-levels-bg--active');
     
     this.grid.showCells(transition, delay, function() {
       this.showCloseBtn();
@@ -148,6 +150,7 @@ define(function(require, exports, module) {
   LevelsView.prototype.hide = function(transition, delay, callback) {
 
     this._active = false;
+    this._backing.removeClass('stage-levels-bg--active');
 
     this.grid.hideCells(transition, delay, function() {
       this._backing._mod.setTransform(Transform.translate(0, 0, -100));
@@ -212,7 +215,7 @@ define(function(require, exports, module) {
       classes: [
         'stage-' + this.options.stage,
         'stage-levels',
-        'stage-levels-bg'
+        'stage-levels-bg',
       ]
     });
 

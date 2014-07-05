@@ -48,21 +48,17 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this._eventInput.on('nav:loadGame', function(data) {
-      this._eventOutput.emit('nav:loadGame', data);
+      this.showHeader(function() {
+        this._eventOutput.emit('nav:loadGame', data);
+      }.bind(this));
     }.bind(this));
 
     this._eventInput.on('level:select', function(data) {
-      this.layout.header._mod.setTransform(Transform.translate(0, -this.options.headerHeight, 0), {
-        curve: 'easeOut',
-        duration: 100
-      });
+      this.hideHeader();
     }.bind(this));
 
     this._eventInput.on('level:close', function(data) {
-      this.layout.header._mod.setTransform(Transform.translate(0, 0, 50), {
-        curve: 'linear',
-        duration: 300
-      });
+      this.showHeader();
     }.bind(this));
 
     this._eventInput.on('stage:select', function(data) {
@@ -162,6 +158,20 @@ define(function(require, exports, module) {
         levels.show();
       }, this.options.pageChangeDuration);
     }.bind(this));
+  };
+
+  StagesView.prototype.showHeader = function(callback) {
+    this.layout.header._mod.setTransform(Transform.translate(0, 0, 50), {
+      curve: 'linear',
+      duration: 300
+    }, callback);
+  };
+
+  StagesView.prototype.hideHeader = function() {
+    this.layout.header._mod.setTransform(Transform.translate(0, -this.options.headerHeight, 0), {
+      curve: 'easeOut',
+      duration: 100
+    });
   };
 
   // ## Private Helpers
