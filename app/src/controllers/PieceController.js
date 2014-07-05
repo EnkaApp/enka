@@ -7,15 +7,15 @@ define(function(require, exports, module) {
 
 
   // ## Import Views
-  var PieceView = require('./views/PieceView');
+  var PieceView = require('views/PieceView');
 
   var colorArray = ['blue', 'green', 'red'];
 
   // initializes this.colorQueue with 3 colors
-  function PieceGenerator(options) {
+  function PieceController(options) {
 
-    if(PieceGenerator._instance){
-      return PieceGenerator._instance;
+    if(PieceController._instance){
+      return PieceController._instance;
     }
 
     this._deletedPieces = [];
@@ -33,26 +33,26 @@ define(function(require, exports, module) {
       this.addColorToQueue();
     }
     
-    PieceGenerator._instance = this;
+    PieceController._instance = this;
   }
 
-  PieceGenerator._instance = null;
+  PieceController._instance = null;
 
-  PieceGenerator.DEFAULT_OPTIONS = {
+  PieceController.DEFAULT_OPTIONS = {
     rows: 7,
     columns: 5,
     colors: 3,
     pieceSize: [64, 64]
   };
 
-  PieceGenerator.prototype.setOptions = function(options) {
+  PieceController.prototype.setOptions = function(options) {
     this._optionsManager.patch(options);
   };
 
   /*
    * Should only be used when a new game is starting
    */
-  PieceGenerator.prototype.resetLastColor = function() {
+  PieceController.prototype.resetLastColor = function() {
     this._lastColor = '';
   };
 
@@ -137,7 +137,7 @@ define(function(require, exports, module) {
     return node;
   }
 
-  PieceGenerator.prototype.getPiece = function(direction, position) {
+  PieceController.prototype.getPiece = function(direction, position) {
     var node = null;
 
     // If this._deletedPieces.length === 0, create a new piece
@@ -153,19 +153,26 @@ define(function(require, exports, module) {
     return node;
   };
 
-  PieceGenerator.prototype.addDeletedPiece = function(node) {
+  PieceController.prototype.addDeletedPiece = function(node) {
     this._deletedPieces.push(node);
   };
 
-  PieceGenerator.prototype.getNextColorFromQueue = function(){
-    var color = this.colorQueue.shift();
+  PieceController.prototype.getNextColorFromQueue = function(shift){
+    var color;
 
-    this._eventOutput.emit('piece:colorRemoved');
+    shift = shift !== undefined ? shift : true;
+
+    if (shift) {
+      color = this.colorQueue.shift();
+      this._eventOutput.emit('piece:colorRemoved');
+    } else {
+      color = this.colorQueue[0];
+    }
 
     return color;
   };
 
-  PieceGenerator.prototype.addColorToQueue = function(){
+  PieceController.prototype.addColorToQueue = function(){
     var color = _getRandomColor(0, colorArray.length - 1);
     this.colorQueue.push(color);
 
@@ -179,5 +186,5 @@ define(function(require, exports, module) {
     return colorArray[num];
   }
 
-  module.exports = PieceGenerator;
+  module.exports = PieceController;
 });

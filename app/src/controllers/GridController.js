@@ -66,6 +66,15 @@ define(function(require, exports, module) {
     return [x, y];
   };
 
+  /*
+   * Same as getXYCoords but without the deprected pieceSize parameter
+   *
+   * @param {int} index Index form which to calculate the grid coordinates
+   */
+  GridController.prototype.getXYCoordsFromIndex = function(index) {
+    return this.getXYCoords(index);
+  };
+
   /**
    * @param {number} index
    * @param {number} pieceSize DEPRECATED

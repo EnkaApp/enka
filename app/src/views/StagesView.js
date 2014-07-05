@@ -487,8 +487,6 @@ define(function(require, exports, module) {
 
     var firstVisibileHeight = _getFirstVisibleHeight.call(this);
 
-    console.log('firstVisibileHeight', firstVisibileHeight);
-
     // If the clicked index is the one after the first visible just return the height
     if (index === firstIndex + 1) {
       return firstVisibileHeight + ADJUST;
@@ -496,8 +494,6 @@ define(function(require, exports, module) {
 
     // Otherwise we calculate offset and add it to the height of the first visible
     var offset = (index - firstIndex - 1) * this.options.stageHeight;
-
-    console.log('offset', offset, firstVisibileHeight + offset + ADJUST);
     
     return firstVisibileHeight + offset + ADJUST;
   }

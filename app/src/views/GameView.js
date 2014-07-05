@@ -224,7 +224,7 @@ define(function(require, exports, module) {
       size: [190, 50],
       origin: [0.5, 1],
       align: [0.5, 1],
-      transform: Transform.translate(0, -20, 0)
+      transform: Transform.translate(0, -20, 1)
     });
 
     node = node.add(nodeMod);
@@ -341,7 +341,7 @@ define(function(require, exports, module) {
     });
 
     // This transform moves origamiView to the middle of the view
-    transform = Transform.translate(centerX - width/2, centerY - height/2, 15);
+    transform = Transform.translate(centerX - width/2, centerY - height/2, 100);
     this.origamiMod.setTransform(transform, {
       curve: 'linear',
       duration: 500

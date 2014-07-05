@@ -1753,6 +1753,10 @@ button {
   background: #9ad4b9;
   border-color: #bee3d2;
 }
+.gameboard-board {
+  background: #ffffff url('../images/tile-patterns/tile-gray-bg.png') 0 0 repeat;
+  background-size: auto auto;
+}
 .gameboard-win .message {
   text-align: center;
   padding: 20px 0 0;

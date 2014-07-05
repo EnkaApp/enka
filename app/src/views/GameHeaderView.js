@@ -11,8 +11,8 @@ define(function(require, exports, module) {
   var Easing          = require('famous/transitions/Easing');
   var StateModifier   = require('famous/modifiers/StateModifier');
   
-  // ## App Dependencies
-  var PieceGenerator  = require('PieceGenerator');
+  // ## Controllers
+  var PieceController  = require('controllers/PieceController');
 
   // ## Views
   var BoardView = require('views/BoardView');
@@ -44,7 +44,7 @@ define(function(require, exports, module) {
       transform: Transform.translate(0, 0, 1)
     });
     
-    this.pieceGenerator = new PieceGenerator();
+    this.pieceGenerator = new PieceController();
 
     this.upcomingColors = [];
 
