@@ -198,6 +198,8 @@ define(function(require, exports, module) {
       inTransform: Transform.translate(0, 0, 0),
       showTransform: Transform.translate(0, 0, 0),
       outTransform: Transform.translate(0, 0, 0),
+      inTransition: {curve: 'easeOut', duration: PAGE_CHANGE_DURATION},
+      outTransition: {curve: 'easeOut', duration: PAGE_CHANGE_DURATION},
       inOpacity: 1,
       outOpacity: 1,
       overlap: true
@@ -206,10 +208,11 @@ define(function(require, exports, module) {
 
   AppView.prototype.showPage = function(page) {
     var view = this._pages[page];
-    this.lightbox.show(view, {
-      curve: 'linear',
-      duration: PAGE_CHANGE_DURATION
-    });
+    // this.lightbox.show(view, {
+    //   curve: 'linear',
+    //   duration: PAGE_CHANGE_DURATION
+    // });
+    this.lightbox.show(view);
 
      // save current page
     this._currentPage = page;

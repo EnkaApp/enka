@@ -42,10 +42,8 @@ define(function(require, exports, module) {
 
     function levelSelect(data) {
       this.openLevel = data.node;
-      this._closeButton._mod.setOpacity(0.001);
+      this.hideCloseBtn();
 
-      // Set the z translation to right above the header
-      this._backing._mod.setTransform(Transform.translate(0, 0, 51));
       this._backing.addClass('level-open');
 
       // Timer is being used to execute this after the animation has completed
@@ -56,32 +54,22 @@ define(function(require, exports, module) {
 
     function levelClose(data) {
       this.openLevel = null;
-      this._backing._mod.setTransform(Transform.identity);
-      this._backing.removeClass('level-open');
+      this.showCloseBtn();
 
       // Timer is being used to execute this after the animation has completed
       Timer.setTimeout(function() {
-        this._closeButton._mod.setOpacity(0.999, {
-          curve: 'linear',
-          duration: 300
-        });
-
+        this._backing.removeClass('level-open');
         this._eventOutput.emit('level:close', data);
       }.bind(this), LEVEL_CLOSE_DURATION - 200);
     }
 
     function play(data) {
-      this._backing._mod.setTransform(Transform.identity);
-      this._backing.removeClass('level-open');
       this.closeOpenedLevels();
+      this.showCloseBtn();
 
       // Timer is being used to execute this after the close levels animation has completed
       Timer.setTimeout(function() {
-        this._closeButton._mod.setOpacity(0.999, {
-          curve: 'linear',
-          duration: 300
-        });
-
+        this._backing.removeClass('level-open');
         this._eventOutput.emit('nav:loadGame', data);
       }.bind(this), LEVEL_CLOSE_DURATION - 200);
     }
@@ -152,10 +140,7 @@ define(function(require, exports, module) {
     this._backing._mod.setTransform(Transform.identity);
     
     this.grid.showCells(transition, delay, function() {
-      this._closeButton._mod.setOpacity(0.999, {
-        curve: 'linear',
-        duration: 300
-      });
+      this.showCloseBtn();
       if (callback) callback();
     }.bind(this));
   };
@@ -166,12 +151,39 @@ define(function(require, exports, module) {
 
     this.grid.hideCells(transition, delay, function() {
       this._backing._mod.setTransform(Transform.translate(0, 0, -100));
-      this._closeButton._mod.setOpacity(0.001, {
-        curve: 'linear',
-        duration: 300
-      });
+      this.hideCloseBtn();
       if (callback) callback();
     }.bind(this));
+  };
+
+  LevelsView.prototype.showCloseBtn = function() {
+    var dur = 300;
+    var transform = Transform.translate(0, 0, 1);
+
+    this._closeButton._mod.setOpacity(0.999, {
+      curve: 'easeOut',
+      duration: dur
+    });
+
+    this._closeButton._mod.setTransform(transform, {
+      curve: 'easeOut',
+      duration: dur
+    });
+  };
+
+  LevelsView.prototype.hideCloseBtn = function() {
+    var btnSize = this._closeButton.getSize();
+    var transform = Transform.translate(0, btnSize[1], 1);
+
+    this._closeButton._mod.setOpacity(0.001, {
+      curve: 'linear',
+      duration: 100
+    });
+
+    this._closeButton._mod.setTransform(transform, {
+      curve: 'linear',
+      duration: 100
+    });
   };
   
   LevelsView.prototype.closeOpenedLevels = function() {
@@ -231,7 +243,7 @@ define(function(require, exports, module) {
       size: [undefined, 50],
       origin: [0.5, 1],
       align: [0.5, 1],
-      transform: Transform.translate(0, 0, 1)
+      transform: Transform.translate(0, 50, 1)
     });
 
     this._closeButton._mod = mod;
@@ -292,7 +304,6 @@ define(function(require, exports, module) {
     if (scaleByWidth < scaleByHeight) scale = scaleByWidth;
     else scale = scaleByHeight;
     
-    console.log(h, gridHeight, scale);
     return [scale, scale, 1];
   }
 

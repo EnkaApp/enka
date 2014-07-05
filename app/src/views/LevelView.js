@@ -163,9 +163,10 @@ define(function(require, exports, module) {
     
     this.rootMod.setOpacity(0.999, transition);
 
-    // The 100 Z translation is needed to prevent flickering that occurs when the 
-    // flip transition is executed, and also to put it above the header
-    this.rootMod.setTransform(Transform.translate(0,0,100), transition);
+    // The Z translation is needed to prevent flickering that occurs when the 
+    // flip transition is executed, and also to put it above the header. To prevent
+    // the flickering the Z must be ~100 greater than its background surface
+    this.rootMod.setTransform(Transform.translate(0,0,150), transition);
   };
 
   LevelView.prototype.unlock = function() {

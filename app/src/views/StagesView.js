@@ -51,13 +51,23 @@ define(function(require, exports, module) {
       this._eventOutput.emit('nav:loadGame', data);
     }.bind(this));
 
-    // this._eventInput.on('level:select', function(data) {
+    this._eventInput.on('level:select', function(data) {
+      this.layout.header._mod.setTransform(Transform.translate(0, -this.options.headerHeight, 0), {
+        curve: 'easeOut',
+        duration: 100
+      });
+    }.bind(this));
 
-    // }.bind(this));
+    this._eventInput.on('level:close', function(data) {
+      this.layout.header._mod.setTransform(Transform.translate(0, 0, 50), {
+        curve: 'linear',
+        duration: 300
+      });
+    }.bind(this));
 
-    // this._eventInput.on('level:close', function(data) {
-
-    // }.bind(this));
+    this._eventInput.on('stage:select', function(data) {
+      this.scrollToStage(data);
+    }.bind(this));
 
     this._eventInput.on('stage:close', function(data) {
       this.closeExpanded();
@@ -150,7 +160,7 @@ define(function(require, exports, module) {
       // Timer ensures that levels are shown only after the page change animation completes
       Timer.setTimeout(function() {
         levels.show();
-      }, this.options.pageChangeDuration + 100);
+      }, this.options.pageChangeDuration);
     }.bind(this));
   };
 
@@ -321,7 +331,9 @@ define(function(require, exports, module) {
     // Pipe all view events to the scrollview so we can scroll and
     // respond to level click events
     view.pipe(this.scrollView);
-    view.on('stage:select', this.scrollToStage.bind(this));
+    view.on('stage:select', function(data) {
+      this._eventInput.emit('stage:select', data);
+    }.bind(this));
 
     return view;
   }
