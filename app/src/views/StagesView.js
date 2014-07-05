@@ -4,17 +4,22 @@
  * This is the stages selection menu view
  */
 define(function(require, exports, module) {
-  var Engine        = require('famous/core/Engine');
-  var View          = require('famous/core/View');
-  var Surface       = require('famous/core/Surface');
-  var Transform     = require('famous/core/Transform');
-  var Transitionable = require('famous/transitions/Transitionable');
-  var StateModifier = require('famous/modifiers/StateModifier');
-  var Easing        = require('famous/transitions/Easing');
-  var ContainerSurface = require('famous/surfaces/ContainerSurface');
-  var RenderNode    = require('famous/core/RenderNode');
-  var SpringTransition = require('famous/transitions/SpringTransition');
-  var SnapTransition = require('famous/transitions/SnapTransition');
+  var Engine            = require('famous/core/Engine');
+  var View              = require('famous/core/View');
+  var Surface           = require('famous/core/Surface');
+  var Transform         = require('famous/core/Transform');
+  var Transitionable    = require('famous/transitions/Transitionable');
+  var StateModifier     = require('famous/modifiers/StateModifier');
+  var Easing            = require('famous/transitions/Easing');
+  var ContainerSurface  = require('famous/surfaces/ContainerSurface');
+  var RenderNode        = require('famous/core/RenderNode');
+  var SpringTransition  = require('famous/transitions/SpringTransition');
+  var SnapTransition    = require('famous/transitions/SnapTransition');
+  var Lightbox          = require('famous/views/Lightbox');
+  var Timer             = require('famous/utilities/Timer');
+
+  // ## App Dependencies
+  var utils = require('utils');
 
   // ## Stage Configuration
   var StageConfig = require('StageConfig');
@@ -23,18 +28,19 @@ define(function(require, exports, module) {
   var Layout = require('famous/views/HeaderFooterLayout');
 
   // ## Views
-  var Scrollview = require('famous/views/Scrollview');
-  var LevelsView = require('views/LevelsView');
+  var Scrollview  = require('famous/views/Scrollview');
+  var LevelsView  = require('views/LevelsView');
+  var StageView   = require('views/StageView');
 
   // ## Controllers
   var LivesController = require('controllers/LivesController');
 
-  // ## Shared
-  var H = window.innerHeight;
+  // ## Shared Variables
+  var W = utils.getViewportWidth();
+  var H = utils.getViewportHeight();
 
   Transitionable.registerMethod('spring', SpringTransition);
   Transitionable.registerMethod('snap', SnapTransition);
-
 
   function _setListeners() {
     this.homeIcon.on('click', function() {
@@ -45,24 +51,37 @@ define(function(require, exports, module) {
       this._eventOutput.emit('nav:loadGame', data);
     }.bind(this));
 
-    this._eventInput.on('level:select', function(data) {
-      console.log('stages level:select');
-    });
+    // this._eventInput.on('level:select', function() {
+      
+    // }.bind(this));
+
+    // this._eventInput.on('level:close', function() {
+
+    // }.bind(this));
+
+    this._eventInput.on('stage:close', function(data) {
+      this.closeExpanded();
+    }.bind(this));
   }
 
   function StagesView() {
     View.apply(this, arguments);
 
-    _createLayout.call(this);
-    _createHeader.call(this);
-    _createContent.call(this);
-    
-    // Init Event Listeners
-    _setListeners.call(this);
+    // Array of level surfaces to be lightboxed in
+    this._stageLevels = [];
 
     // set initial active stage
     this.prevIndex = this.options.activeStage - 1;
     this.activeIndex = this.options.activeStage - 1;
+
+    _createLayout.call(this);
+    _createHeader.call(this);
+    _createContent.call(this);
+    _createLightbox.call(this);
+    
+    // Init Event Listeners
+    _setListeners.call(this);
+
     this.loadStage();
   }
 
@@ -72,8 +91,15 @@ define(function(require, exports, module) {
   StagesView.DEFAULT_OPTIONS = {
     headerHeight: 44,
     stageHeight: 100,
-    stageExpandedHeight: 500,
-    activeStage: 1
+
+    // stageExpandedHeight should be larger than actual scrollview container
+    // otherwise occassionally when _scrollActiveToTop is called you will be 
+    // able to see either a little of the previous or next view. I believe this
+    // is due to how the scrollview is being scrolled. For now, this is a pretty
+    // good fix
+    stageExpandedHeight: H,
+    activeStage: 1,
+    pageChangeDuration: 500
   };
 
   StagesView.prototype.scrollToStage = function(data) {
@@ -81,41 +107,75 @@ define(function(require, exports, module) {
     var index = data.stage - 1;
     var node = data.node;
 
-    // stop from executing if their is a second click on an already active node
-    if (this.activeIndex === index) return;
-
-    this.prevIndex = this.activeIndex;
     this.activeIndex = index;
 
-    var bgColor = data.backgroundColor;
-    var yOffset = _getYOffset.call(this, e.y);
+    // var bgColor = data.backgroundColor;
 
-    this.expandStage();
-    _scrollOrigin.call(this, yOffset, function() {
-      this.closeExpanded();
+    this.expandStage(function() {
+      _scrollActiveToTop.call(this, function() {
+        // animate in the levels
+        var levels = this._stageLevels[this.activeIndex];
+        this.lightbox.show(levels, null, function() {
+          levels.show();
+        });
+      }.bind(this));
     }.bind(this));
   };
 
   StagesView.prototype.closeExpanded = function(callback) {
-    var prevNode = _getNodeAtIndex.call(this, this.prevIndex);
-    var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
+    var activeNode = _getStageAtIndex.call(this, this.activeIndex);
 
-    // close the currently expanded node
-    if (this.prevIndex !== this.activeIndex) {
-      prevNode.contract(callback);
-    }
+    // close the expanded node
+    activeNode.contract(function() {
+      this.lightbox.hide();
+      if (callback) callback();
+    }.bind(this));
   };
 
-  StagesView.prototype.expandStage = function() {
-    var activeNode = _getNodeAtIndex.call(this, this.activeIndex);
-    
-    // open the new node
-    activeNode.expand();
+  StagesView.prototype.expandStage = function(callback) {
+    var activeNode = _getStageAtIndex.call(this, this.activeIndex);
+    activeNode.expand(callback);
   };
 
+  /*
+   * Only used when this class is first initialized
+   */
   StagesView.prototype.loadStage = function() {
     this.expandStage();
+
+    // animate in the levels
+    var levels = this._stageLevels[this.activeIndex];
+    this.lightbox.show(levels, null, function() {
+
+      // Timer ensures that levels are shown only after the page change animation completes
+      Timer.setTimeout(function() {
+        levels.show();
+      }, this.options.pageChangeDuration + 100);
+    }.bind(this));
   };
+
+  // ## Private Helpers
+
+  /*
+   * Lightbox is used to conserve memory, otherwise older phones such as the iPhone 4
+   * crash when attempting to load the stages + all stage levels
+   */
+  function _createLightbox() {
+    this.lightbox = new Lightbox({
+      inTransform: Transform.translate(0, 0, 0),
+      showTransform: Transform.translate(0, 0, 0),
+      outTransform: Transform.translate(0, 0, 0),
+      inOpacity: 1,
+      outOpacity: 1,
+    });
+
+    var mod = new StateModifier({
+      size: [undefined, this.options.stageExpandedHeight],
+      transform: Transform.translate(0, 0, 1)
+    });
+
+    this.add(mod).add(this.lightbox);
+  }
 
   // ## Create layout
 
@@ -141,19 +201,21 @@ define(function(require, exports, module) {
     livesController.remove();
 
     var headerMod = new StateModifier({
-      transform: Transform.translate(0,0,0.1)
+      transform: Transform.translate(0,0,50)
     });
 
     var node = this.layout.header.add(headerMod);
 
+    // Save the modifier for later reference
+    this.layout.header._mod = headerMod;
+
     // Setup the background
     var bg = new Surface({
       properties: {
-        backgroundColor: 'black'
+        backgroundColor: 'black',
+        classes: ['header', 'navbar']
       }
     });
-
-    bg.setClasses(['navbar']);
 
     var bgMod = new StateModifier({
       transform: Transform.behind
@@ -162,10 +224,8 @@ define(function(require, exports, module) {
     // Setup the home icone
     this.homeIcon = new Surface({
       size: [true, true],
+      classes: ['header', 'nav-item'],
       content: '<i class="fa fa-2x fa-angle-double-up"></i>',
-      properties: {
-        color: 'white'
-      }
     });
 
     var homeIconMod = new StateModifier({
@@ -177,10 +237,8 @@ define(function(require, exports, module) {
     // Setup lives display
     var livesIcon = new Surface({
       size: [true, true],
+      classes: ['header'],
       content: '<i class="fa fa-heart"></i>',
-      properties: {
-        color: 'white'
-      }
     });
 
     var livesIconMod = new StateModifier({
@@ -191,13 +249,9 @@ define(function(require, exports, module) {
 
     var livesCounter = new Surface({
       size: [true, true],
+      classes: ['header', 'lives-count'],
       content: livesController.get() || '0',
-      properties: {
-        color: 'white'
-      }
     });
-
-    livesCounter.setClasses(['header', 'lives-count']);
 
     var livesCounterMod = new StateModifier({
       align: [0, 0.5],
@@ -208,12 +262,8 @@ define(function(require, exports, module) {
     // Setup the lives timer
     var timer = new Surface({
       content: '',
-      properties: {
-        color: 'white'
-      }
+      classes: ['header', 'lives-timer'],
     });
-
-    timer.setClasses(['header', 'lives-timer']);
 
     var timerMod = new StateModifier({
       size: [50, 24],
@@ -260,8 +310,8 @@ define(function(require, exports, module) {
     this.layout.content.add(container);
   }
 
-  function _createScrollViewNode(options) {
-    var view = new LevelsView({
+  function _createStageView(options) {
+    var view = new StageView({
       stage: options.index + 1,
       height: options.height,
       currentHeight: options.currentHeight,
@@ -272,7 +322,31 @@ define(function(require, exports, module) {
     // respond to level click events
     view.pipe(this.scrollView);
     view.on('stage:select', this.scrollToStage.bind(this));
-    view.on('level:select', _hideIcon.bind(this));
+
+    return view;
+  }
+
+  function _createStageLevels(options) {
+    var view = new LevelsView({
+      stage: options.index + 1,
+      height: options.height,
+      currentHeight: options.currentHeight,
+      expandedHeight: options.expandedHeight
+    });
+
+    // Send view events to the scrollview so we can respond to level click events
+    view.on('stage:close', function(data) {
+      this._eventInput.emit('stage:close', data);
+    }.bind(this));
+
+    view.on('level:select', function() {
+      this._eventInput.emit('level:select');
+    }.bind(this));
+
+    view.on('level:close', function() {
+      this._eventInput.emit('level:close');
+    }.bind(this));
+
     view.on('nav:loadGame', function(data) {
       this._eventInput.emit('nav:loadGame', data);
     }.bind(this));
@@ -280,26 +354,31 @@ define(function(require, exports, module) {
     return view;
   }
 
-  function _hideIcon() {
-    console.log('hide icon');
-  }
-
   function _createScrollView() {
-    this.scrollViewNodes = [];
+    this._stages = [];
     this.scrollView = new Scrollview();
 
     for (var i = 0; i < StageConfig.getStagesCount(); i++) {
-      var node = _createScrollViewNode.call(this, {
+      var options = {
         index: i,
         height: this.options.stageHeight,
         currentHeight: this.options.stageHeight,
         expandedHeight: this.options.stageExpandedHeight,
-      });
+      };
 
-      this.scrollViewNodes.push(node);
+      if (this.activeIndex === i) {
+        options.currentHeight = this.options.stageExpandedHeight;
+        options.active = true;
+      }
+      
+      var stage = _createStageView.call(this, options);
+      var levels = _createStageLevels.call(this, options);
+
+      this._stageLevels.push(levels);
+      this._stages.push(stage);
     }
 
-    this.scrollView.sequenceFrom(this.scrollViewNodes);
+    this.scrollView.sequenceFrom(this._stages);
 
     this.scrollView._eventInput.on('end', function() {
 
@@ -313,6 +392,11 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this.scrollView.pipe(this._eventOutput);
+  }
+
+  function _scrollActiveToTop(transition, callback) {
+    var yOffset = _getYOffset.call(this, this.activeIndex);
+    _scrollOrigin.call(this, yOffset, transition, callback);
   }
 
   /**
@@ -332,48 +416,66 @@ define(function(require, exports, module) {
     sv._pageSpringPosition += amount;
     sv.setPosition(sv.getPosition() + amount);
     if (sv._springState === SpringStates.EDGE) {
-        sv.spring.setOptions({anchor: [sv._edgeSpringPosition, 0, 0]});
+      sv.spring.setOptions({anchor: [sv._edgeSpringPosition, 0, 0]});
     }
     else if (sv._springState === SpringStates.PAGE) {
-        sv.spring.setOptions({anchor: [sv._pageSpringPosition, 0, 0]});
+      sv.spring.setOptions({anchor: [sv._pageSpringPosition, 0, 0]});
     }
   }
 
-  /**
+  /*
    * Calculates the height of the first visible scrollview item
    */
   function _getFirstVisibleHeight() {
+    // svPos is the number of pixels of the first visible scrollview node that is hidden
     var svPos = this.scrollView.getPosition();
     var firstIndex = this.scrollView._scroller._node.index;
 
-    if (firstIndex === 0) return 0;
-
-    var firstVisibile = _getNodeAtIndex.call(this, firstIndex);
+    var firstVisibile = _getStageAtIndex.call(this, firstIndex);
     var firstHeight = firstVisibile.getSize()[1];
     var height = firstHeight - svPos;
 
     return height;
   }
 
-  /**
+  /*
    * Calculates how far up we need to scroll in order to have the
    * top of the item that was click line up with the top of the 
    * scrollview
+   *
+   * @param {float} the pixel coordinate of the Y click position
+   * @param {index} the scrollview index of the scroll node that was clicked on
    */
-  function _getYOffset(clickY) {
+  function _getYOffset(index) {
+    var ADJUST = 0; // arbitrary
+    var firstIndex = this.scrollView._scroller._node.index;
+
+    // If the first visible index is the clicked index then we are scrolling down
+    if (index === firstIndex) {
+      var svPos = this.scrollView.getPosition();
+      return -svPos;
+    }
+
     var firstVisibileHeight = _getFirstVisibleHeight.call(this);
-    var offset = clickY - firstVisibileHeight;
-    offset = offset - this.options.headerHeight;
-    offset = offset - offset % this.options.stageHeight;
+
+    // If the clicked index is the one after the first visible just return the height
+    if (index === firstIndex + 1) {
+      return firstVisibileHeight + ADJUST;
+    }
+
+    // Otherwise we calculate offset and add it to the height of the first visible
+    var offset = (index - firstIndex - 1) * this.options.stageHeight;
+
+    console.log(offset, firstVisibileHeight + offset + ADJUST);
     
-    return firstVisibileHeight + offset;
+    return firstVisibileHeight + offset + ADJUST;
   }
 
-  /**
+  /*
    * This calls _shiftOrigin
    *
    * @param {number} delta The number of pixels to shift the scrollview origin by. If this
-   * number is positive then it will be shift up by that many pixels. Vice versa if down.
+   * number is positive then it will be shifted up by that many pixels. Vice versa if down.
    *
    * @param {function} callback The callback function to execute when scrolling is done
    */
@@ -422,8 +524,8 @@ define(function(require, exports, module) {
     transitionable.set(delta, transition, complete);
   }
 
-  function _getNodeAtIndex(index) {
-    return this.scrollViewNodes[index];
+  function _getStageAtIndex(index) {
+    return this._stages[index];
   }
 
   module.exports = StagesView;

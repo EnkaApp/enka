@@ -41,19 +41,19 @@ define(function(require, exports, module) {
         origin: [0.5, 1],
         size: [160, 40],
         classes: ['logo', 'logo-brick', 'logo-bottom'],
-        translate: Transform.translate(0, 0, 0),
+        translate: Transform.translate(0, 0, 1),
         zIndex: 5
       }, {
         origin: [0.5, 1],
         size: [100, 25],
         classes: ['logo', 'logo-brick', 'logo-middle'],
-        translate: Transform.translate(0, -45, 0),
+        translate: Transform.translate(0, -45, 1),
         zIndex: 5
       }, {
         origin: [0.5, 1],
         size: [65, 16],
         classes: ['logo', 'logo-brick', 'logo-top'],
-        translate: Transform.translate(0, -75, 0),
+        translate: Transform.translate(0, -75, 1),
         zIndex: 5
       }]
     }

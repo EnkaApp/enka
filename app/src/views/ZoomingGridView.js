@@ -96,6 +96,11 @@ define(function (require, exports, module) {
 
   ZoomingGrid.prototype.createGrid = function(cells) {
     this.cells = cells || [];
+
+    for (var i = this.cells.length - 1; i >= 0; i--) {
+      this.cells[i].pipe(this._eventInput);
+    }
+
     _createGrid.call(this);
   };
 

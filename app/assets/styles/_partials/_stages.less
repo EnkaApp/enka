@@ -1,18 +1,40 @@
+.stage-levels {
+  
+  .btn {
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    background: darken(whitesmoke, 15%);
+    border-top: 5px solid darken(whitesmoke, 5%);
+    text-transform: uppercase;
+    font-weight: bold;
+    color: white;
+  }
+}
+
+
 .stage-bg.active {
   border-bottom: 10px solid white;
 }
 
 .stage-1 {
+  @bg-color: @cc1-baige;
+
   &.stage-bg {
-    background-color: @cc1-baige;
+    background-color: @bg-color;
 
     &.active {
-      border-color: darken(@cc1-baige, 5%);
+      border-color: darken(@bg-color, 5%);
     }
   }
 
+  &.stage-levels-bg.level-open {
+    background-color: @bg-color;
+  }
+
   &.stage-level-front {
-    background-color: darken(@cc1-baige, 10%);
+    background-color: darken(@bg-color, 10%);
   }
 
   &.stage-level-current {
@@ -36,16 +58,22 @@
 }
 
 .stage-2 {
+  @bg-color: @cc3-marigold;
+
   &.stage-bg {
-    background-color: @cc3-marigold;
+    background-color: @bg-color;
 
     &.active {
-      border-color: darken(@cc3-marigold, 5%);
+      border-color: darken(@bg-color, 5%);
     }
   }
 
+  &.stage-levels-bg.level-open {
+    background-color: @bg-color;
+  }
+
   &.stage-level-front {
-    background-color: darken(@cc3-marigold, 10%);
+    background-color: darken(@bg-color, 10%);
   }
 
   &.stage-level-current {
@@ -54,7 +82,7 @@
   }
 
   &.stage-level-incomplete {
-    background-color: darken(@cc3-marigold, 10%);
+    background-color: darken(@bg-color, 10%);
   }
 
   &.stage-level-complete {
@@ -73,16 +101,22 @@
 }
 
 .stage-3 {
+  @bg-color: @cc3-salmon;;
+
   &.stage-bg {
-    background-color: @cc3-salmon;
+    background-color: @bg-color;
 
     &.active {
-      border-color: darken(@cc3-salmon, 5%);
+      border-color: darken(@bg-color, 5%);
     }
   }
 
+  &.stage-levels-bg.level-open {
+    background-color: @bg-color;
+  }
+
   &.stage-level-front {
-    background-color: darken(@cc3-salmon, 10%);
+    background-color: darken(@bg-color, 10%);
   }
 
   &.stage-level-current {
@@ -106,16 +140,22 @@
 }
 
 .stage-4 {
+  @bg-color: @cc4-clay;
+
   &.stage-bg {
-    background-color: @cc4-clay;
+    background-color: @bg-color;
 
     &.active {
-      border-color: darken(@cc4-clay, 5%);
+      border-color: darken(@bg-color, 5%);
     }
   }
 
+  &.stage-levels-bg.level-open {
+    background-color: @bg-color;
+  }
+
   &.stage-level-front {
-    background-color: darken(@cc4-clay, 10%);
+    background-color: darken(@bg-color, 10%);
   }
 
   &.stage-level-current {
@@ -139,16 +179,22 @@
 }
 
 .stage-5 {
+  @bg-color: @cc2-light-mint;
+
   &.stage-bg {
-    background-color: @cc2-light-mint;
+    background-color: @bg-color;
 
     &.active {
-      border-color: darken(@cc2-light-mint, 5%);
+      border-color: darken(@bg-color, 5%);
     }
   }
 
+  &.stage-levels-bg.level-open {
+    background-color: @bg-color;
+  }
+
   &.stage-level-front {
-    background-color: darken(@cc2-light-mint, 10%);
+    background-color: darken(@bg-color, 10%);
   }
 
   &.stage-level-current {
@@ -172,16 +218,22 @@
 }
 
 .stage-6 {
+  @bg-color: @cc1-seagreen;
+
   &.stage-bg {
-    background-color: @cc1-seagreen;
+    background-color: @bg-color;
 
     &.active {
-      border-color: darken(@cc1-seagreen, 5%);
+      border-color: darken(@bg-color, 5%);
     }
   }
 
+  &.stage-levels-bg.level-open {
+    background-color: @bg-color;
+  }
+
   &.stage-level-front {
-    background-color: darken(@cc1-seagreen, 10%);
+    background-color: darken(@bg-color, 10%);
   }
 
   &.stage-level-current {

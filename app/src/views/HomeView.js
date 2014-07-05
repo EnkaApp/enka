@@ -51,7 +51,6 @@ define(function(require, exports, module) {
   };
 
   HomeView.prototype.showMenu = function() {
-
     this.logo._mod.setTransform(Transform.translate(0, -100, 0), {
       curve: 'easeOut',
       duration: 300

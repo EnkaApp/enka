@@ -17,10 +17,23 @@ define(function(require, exports, module) {
   var utils = require('utils');
 
   // ## Shared
-  var width = utils.getViewportWidth();
+  var W = utils.getViewportWidth();
+  var maxWidth = 480;
+  var maxHeight = 480;
 
   function LogoView() {
     View.apply(this, arguments);
+
+    this._width = this.options.width > maxWidth ?  maxWidth : this.options.width;
+    this._height = this.options.height > maxHeight ? maxHeight : this.options.height;
+
+    this.rootModifier = new StateModifier({
+      size: [this._width, this._height],
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5]
+    });
+
+    this.node = this.add(this.rootModifier);
 
     _createLogoBg.call(this);
     _createLogoBrand.call(this);
@@ -31,8 +44,8 @@ define(function(require, exports, module) {
   LogoView.prototype.constructor = LogoView;
 
   LogoView.DEFAULT_OPTIONS = {
-    width: width / 5 * 3, //192
-    height: width / 5 * 3, //192
+    width: W / 5 * 3, //192 on a 320 pixel viewport
+    height: W / 5 * 3, //192 on a 320 pixel viewport
     brand: 'pyramid'
   };
 
@@ -81,10 +94,11 @@ define(function(require, exports, module) {
     var initialTime = Date.now();
     
     var posMod = new StateModifier({
-      origin: [0.5, 0],
-      align: [0.5, 0],
+      size: [35, 35],
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5],
       opacity: 0.001,
-      transform: Transform.translate(0, 40, 50)
+      transform: Transform.translate(0, -55, 50)
     });
 
     var centerSpinMod = new Modifier({
@@ -96,12 +110,13 @@ define(function(require, exports, module) {
 
     this.famousIcon._mod = posMod;
 
-    this.add(posMod).add(centerSpinMod).add(this.famousIcon);
+    // this.add(posMod).add(centerSpinMod).add(this.famousIcon);
+    this.node.add(posMod).add(centerSpinMod).add(this.famousIcon);
   }
 
   function _createLogoBg() {
     this.bg = new Surface({
-      size: [0, this.options.height],
+      size: [0, this._height],
       classes: ['logo', 'logo-bg'],
       properties: {
         pointerEvents: 'none',
@@ -109,37 +124,13 @@ define(function(require, exports, module) {
       }
     });
 
-    this.bgModifier = new Modifier({
-      origin: [0.5, 0],
+    this.bgModifier = new StateModifier({
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5],
       transform: Transform.translate(0, 0, 0)
     });
 
     this.add(this.bgModifier).add(this.bg);
-  }
-
-  function _toggleBg(open, callback) {
-
-    var transition = {duration: 400, curve: Easing.inOutQuad };
-
-    var start = open ? 0 : this.options.width;
-    var end = open ? this.options.width : 0;
-
-    var transitionable = new Transitionable(start);
-
-    var prerender = function(){
-      this.bg.setOptions({
-        size: [transitionable.get(), this.options.height]
-      });
-    }.bind(this);
-
-    var complete = function(){
-      Engine.removeListener('prerender', prerender);
-      if (callback) callback();
-    };
-
-    Engine.on('prerender', prerender);
-
-    transitionable.set(end, transition, complete);
   }
 
   function _createLogoBrand() {
@@ -162,7 +153,34 @@ define(function(require, exports, module) {
     });
 
     this.brandView = brand;
-    this.add(mod).add(brand);
+    // this.add(mod).add(brand);
+    this.node.add(mod).add(brand);
+  }
+
+  // Animate the background open/close
+  function _toggleBg(open, callback) {
+
+    var transition = {duration: 400, curve: Easing.inOutQuad };
+
+    var start = open ? 0 : this._width;
+    var end = open ? this._width : 0;
+
+    var transitionable = new Transitionable(start);
+
+    var prerender = function(){
+      this.bg.setOptions({
+        size: [transitionable.get(), this._height]
+      });
+    }.bind(this);
+
+    var complete = function(){
+      Engine.removeListener('prerender', prerender);
+      if (callback) callback();
+    };
+
+    Engine.on('prerender', prerender);
+
+    transitionable.set(end, transition, complete);
   }
 
   module.exports = LogoView;

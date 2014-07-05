@@ -14,6 +14,9 @@ define(function(require, exports, module) {
   var Transitionable = require('famous/transitions/Transitionable');
   var SpringTransition = require('famous/transitions/SpringTransition');
 
+  // ## Utils
+  var utils = require('utils');
+
   // ## Configurations
   var StageConfig = require('StageConfig');
 
@@ -30,8 +33,8 @@ define(function(require, exports, module) {
 
   // ## Shared
   var user = new User();
-  var W = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-  var H = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  var W = utils.getViewportWidth();
+  var H = utils.getViewportHeight();
 
   // Button Intro Transition
   var spring = {
@@ -132,17 +135,13 @@ define(function(require, exports, module) {
     level: 1,
     stage: 1,
     colors: 1,
-    start: [-W * 4, -H, 10]
+    duration: 500,
+    start: [-W * 4, -H, 0]
   };
 
   LevelView.prototype.hide = function(transition) {
 
-    var easeOut = {
-      curve: 'easeOut',
-      // duration: 300
-      duration: 0
-    };
-
+    spring.period = this.options.duration;
     transition = transition !== undefined ? transition : spring;
 
     this.rootMod.setOpacity(0.001, transition, function() {
@@ -152,15 +151,14 @@ define(function(require, exports, module) {
 
   LevelView.prototype.show = function(transition) {
     
-    var easeOut = {
-      curve: 'easeOut',
-      duration: 500
-    };
-
+    spring.period = this.options.duration;
     transition = transition !== undefined ? transition : spring;
     
     this.rootMod.setOpacity(0.999, transition);
-    this.rootMod.setTransform(Transform.translate(0,0,1), transition);
+
+    // The 100 Z translation is needed to prevent flickering that occurs when the 
+    // flip transition is executed, and also to put it above the header
+    this.rootMod.setTransform(Transform.translate(0,0,100), transition);
   };
 
   LevelView.prototype.unlock = function() {
@@ -400,7 +398,7 @@ define(function(require, exports, module) {
       size: [this.options.width-50, 50],
       origin: [0.5, 1],
       align: [0.5, 1],
-      transform: Transform.translate(0, -50, 0)
+      transform: Transform.translate(0, -50, 1)
     });
 
     this.node.add(this.playButtonMod).add(this.playButton);

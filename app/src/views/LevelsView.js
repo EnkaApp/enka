@@ -11,6 +11,10 @@ define(function(require, exports, module) {
   var Transitionable  = require('famous/transitions/Transitionable');
   var Timer           = require('famous/utilities/Timer');
   var ImageSurface    = require('famous/surfaces/ImageSurface');
+  var RenderNode      = require('famous/core/RenderNode');
+
+  // ## Utils
+  var utils = require('utils');
 
   // ## Stage Configuration
   var StageConfig = require('StageConfig');
@@ -22,37 +26,71 @@ define(function(require, exports, module) {
   var GameController = require('controllers/GameController');
 
   // ## Views
-  var Lightbox = require('famous/views/Lightbox');
   var LevelView = require('views/LevelView');
   var ZoomingGridView = require('views/ZoomingGridView');
+
+  // ## Templates
+  var tplBtn = require('hbs!templates/btn');
+
+  // ## Shared
+  var W = utils.getViewportWidth();
+  var H = utils.getViewportHeight();
+  var LEVEL_CLOSE_DURATION = 700;
 
   // ## Event Handlers/Listeners    
   function _setListeners() {
 
     function levelSelect(data) {
-      this._eventOutput.emit('level:select');
+      this._closeButton._mod.setOpacity(0.001);
+
+      // Set the z translation to right above the header
+      this._backing._mod.setTransform(Transform.translate(0, 0, 51));
+      this._backing.addClass('level-open');
+
+      // Timer is being used to execute this after the animation has completed
+      Timer.setTimeout(function() {
+        this._eventOutput.emit('level:select');
+      }.bind(this), LEVEL_CLOSE_DURATION - 200);
+    }
+
+    function levelClose(data) {
+
+      this._backing._mod.setTransform(Transform.identity);
+      this._backing.removeClass('level-open');
+
+      // Timer is being used to execute this after the animation has completed
+      Timer.setTimeout(function() {
+        this._closeButton._mod.setOpacity(0.999, {
+          curve: 'linear',
+          duration: 300
+        });
+
+        this._eventOutput.emit('level:close');
+      }.bind(this), LEVEL_CLOSE_DURATION - 200);
     }
 
     function play(data) {
-      console.log('level:play', data);
       this._eventOutput.emit('nav:loadGame', data);
     }
 
-    function stageSelect(e) {
-      this._eventOutput.emit('stage:select', {
-        stage: this.options.stage,
-        node: this,
-        event: e
-      });
-    }
+    this._closeButton.on('click', function() {
 
-    this.bg.on('click', stageSelect.bind(this));
+      // Hide the levels
+      this.hide(null, 0, function() {
+
+        // Close the stage
+        this._eventOutput.emit('stage:close', {
+          stage: this.options.stage
+        });
+      }.bind(this));
+    }.bind(this));
+
     this._eventInput.on('level:select', levelSelect.bind(this));
+    this._eventInput.on('level:close', levelClose.bind(this));
     this._eventInput.on('level:play', play.bind(this));
 
     // Make sure that scroll/swipe events are passed downstream
     this.grid.pipe(this._eventInput);
-    this.bg.pipe(this._eventInput);
     this._eventInput.pipe(this._eventOutput);
 
     this._gameController._eventOutput.on('game:unlockNextLevel', function() {
@@ -62,13 +100,6 @@ define(function(require, exports, module) {
     }.bind(this));
   }
 
-  function _unlockNextLevel(stage, level) {
-    if (this.options.stage === stage) {
-      var levelView = this.levels[level-1];
-      levelView.unlock();
-    }
-  }
-
   function LevelsView() {
     View.apply(this, arguments);
 
@@ -76,15 +107,15 @@ define(function(require, exports, module) {
     this._gameController = new GameController();
 
     this.rootMod = new StateModifier({
-      size: [undefined, this.options.currentHeight],
-      transform: Transform.translate(0, 0, 50)
+      size: [undefined, this.options.expandedHeight],
+      transform: Transform.translate(0, 0, 1),
     });
 
     this.node = this.add(this.rootMod);
 
-    _createBackground.call(this);
-    _createStageIcon.call(this);
+    _createBacking.call(this);
     _createGrid.call(this);
+    _createCloseBtn.call(this);
 
     _setListeners.call(this);
   }
@@ -94,127 +125,111 @@ define(function(require, exports, module) {
 
   LevelsView.DEFAULT_OPTIONS = {
     stage: 1,
-    height: 100,
-    currentHeight: 100,
+    bgColor: '',
+    // height: 100,
+    // currentHeight: 100,
     expandedHeight: 600,
     grid: [5,5],
   };
 
-  LevelsView.prototype.expand = function(data) {
+  LevelsView.prototype.show = function(transition, delay, callback) {
     this._active = true;
 
-    // add class to background
-    this.bg.addClass('active');
-
-    // shift the icon up
-    this.iconMod.setTransform(
-      Transform.translate(0, -(this.options.expandedHeight/2 - 50), 0),
-      {curve: 'linear', duration: 300}
-    );
-
-    _animateSize.call(this, {
-      start: this.options.height,
-      end: this.options.expandedHeight,
-      axis: 'y'
-    }, function () {
-      this.showLevels();
+    this._backing._mod.setTransform(Transform.identity);
+    
+    this.grid.showCells(transition, delay, function() {
+      this._closeButton._mod.setOpacity(0.999, {
+        curve: 'linear',
+        duration: 300
+      });
+      if (callback) callback();
     }.bind(this));
   };
 
-  LevelsView.prototype.contract = function(callback) {
+  LevelsView.prototype.hide = function(transition, delay, callback) {
+
     this._active = false;
 
-    this.bg.removeClass('active');
-
-    // shift the icon back
-    this.iconMod.setTransform(
-      Transform.translate(0, 0, 0),
-      {curve: 'linear', duration: 300}
-    );
-
-    this.hideLevels(function() {
-      _animateSize.call(this, {
-        start: this.options.expandedHeight,
-        end: this.options.height,
-        duration: 500,
-        axis: 'y'
-      }, function () {
-        if (callback) callback.call(this);
-      }.bind(this));
+    this.grid.hideCells(transition, delay, function() {
+      this._backing._mod.setTransform(Transform.translate(0, 0, -100));
+      this._closeButton._mod.setOpacity(0.001, {
+        curve: 'linear',
+        duration: 300
+      });
+      if (callback) callback();
     }.bind(this));
   };
 
-  LevelsView.prototype.showLevels = function() {
-    this.grid.showCells();
-  };
+  // ## Private Helpers
 
-  LevelsView.prototype.hideLevels = function(callback) {
-    this.grid.hideCells(null, 50, callback);
-  };
-
-  function _createBackground() {
-    this.bg = new Surface({
-      size: [undefined, undefined],
-      content: this.options.content
-    });
-
-    this.bgMod = new StateModifier({
-      transform: Transform.translate(0, 0, 0)
-    });
-
-    this.bg.setClasses(['stage-bg', 'stage-'+this.options.stage]);
-
-    this.node.add(this.bgMod).add(this.bg);
-  }
-
-  function _createStageIcon() {
-    var icon = this.config.getIcon();
-
-    this.icon = new ImageSurface({
-      content: icon.url,
-      properties: {
-        pointerEvents: 'none'
-      }
-    });
-
-    this.iconMod = new StateModifier({
-      size: icon.size || [50, 50],
-      align: [0.5, 0.5],
-      origin: [0.5, 0.5],
-      opacity: 0.85
-    });
-
-    this.node.add(this.iconMod).add(this.icon);
-  }
-
-  function _createCells() {
-    var cells = [];
-    var cellCount = this.options.grid[0] * this.options.grid[1];
-
-    for (var i = 0; i < cellCount; i++) {
-      
-      var options = {
-        index: i,
-        level: i+1,
-        colors: 3,
-        stage: this.options.stage,
-      };
-
-      var cell = new LevelView(options);
-
-      cell.pipe(this.grid._eventInput);
-      cells.push(cell);
+  function _unlockNextLevel(stage, level) {
+    if (this.options.stage === stage) {
+      var levelView = this.levels[level-1];
+      levelView.unlock();
     }
+  }
 
-    return cells;
+  /*
+   * Backing will be used to prevent any event from getting to the scrollview
+   */
+  function _createBacking() {
+    this._backing = new Surface({
+      size: [undefined, undefined],
+      classes: [
+        'stage-' + this.options.stage,
+        'stage-levels',
+        'stage-levels-bg'
+      ]
+    });
+
+    var mod = new StateModifier({
+      size: [undefined, undefined],
+    });
+
+    this._backing._mod = mod;
+
+    this.node.add(mod).add(this._backing);
+  }
+
+  function _createCloseBtn() {
+    var content = tplBtn({
+      label: 'Browse Stages',
+      classes: 'btn-browse'
+    });
+
+    this._closeButton = new Surface({
+      content: content,
+      classes: [
+        'stage-levels',
+        'stage-' + this.options.stage,
+      ]
+    });
+
+    var mod = new StateModifier({
+      size: [undefined, 50],
+      origin: [0.5, 1],
+      align: [0.5, 1],
+      transform: Transform.translate(0, 0, 1)
+    });
+
+    this._closeButton._mod = mod;
+
+    this.node.add(mod).add(this._closeButton);
   }
 
   function _createGrid() {
+
+    var gridSize = [4,5];
+    var gutterSize = [20,20];
+    var cellSize = [250,250];
+
+    var scale = _getScale.call(this, gridSize, cellSize, gutterSize, 70, 44);
+
     this.grid = new ZoomingGridView({
-      grid: [4,5],
-      gutterSize: [20,20],
-      cellSize: [250,250],
-      scale: [0.3, 0.3, 1],
+      grid: gridSize,
+      gutterSize: gutterSize,
+      cellSize: cellSize,
+      scale: scale,
       openEvent: 'level:select',
       closeEvent: 'level:close'
     });
@@ -224,7 +239,9 @@ define(function(require, exports, module) {
     this.levels = cells;
 
     this.gridMod = new StateModifier({
-      transform: Transform.translate(0,40,0)
+      align: [0.5, 0],
+      origin: [0.5, 0],
+      transform: Transform.translate(0,0,1)
     });
 
     // Initialize the grid with the cells
@@ -232,96 +249,51 @@ define(function(require, exports, module) {
     this.node.add(this.gridMod).add(this.grid);
   }
 
-  /**
-   * Animates the size of the this view
+  /*
+   * Calculates scale based on the viewport height / width
+   *
+   * @param {number} buttonHeight - Height of the close button. Should also include any top or bottom margin.
    */
-  function _animateSize(options, callback) {
-    var transition = {
-      duration: options.duration || 300,
-      curve: Easing.inOutQuad
-    };
+  function _getScale(gridSize, cellSize, gutter, buttonHeight, headerHeight) {
+    var h = H - headerHeight - buttonHeight;
+    var cols = gridSize[0];
+    var rows = gridSize[1];
 
-    var start = options.start || 0;
-    var end = options.end || 0;
-    var axis = options.axis && options.axis.toLowerCase() || 'y';
+    // Calculate the scale based off the height
+    var gridHeight = rows * cellSize[1] + (rows + 2) * gutter[1];
+    var scaleByHeight = h/gridHeight;
 
-    var transitionable = new Transitionable(start);
+    // Calculate the scale based off the width
+    var gridWidth = cols *  cellSize[0] + (rows + 2) * gutter[0];
+    var scaleByWidth = W/gridWidth;
 
-    var prerender = function() {
-      var size = [];
-      var pixels = transitionable.get();
-
-      if (axis === 'x') {
-        size = [pixels, undefined];
-      } else if (axis === 'y') {
-        size = [undefined, pixels];
-      } else {
-        size = [pixels, pixels];
-      }
-
-      this.rootMod.setSize(size);
-    }.bind(this);
-
-    var complete = function(){
-      Engine.removeListener('prerender', prerender);
-      
-      // Update the currentHeight of the view
-      this.options.currentHeight = end;
-      
-      if (callback) callback();
-    }.bind(this);
-
-    Engine.on('prerender', prerender);
-
-    transitionable.set(end, transition, complete);
-  }
-
-
-  // ## Utility Functions
-
-  /**
-   * Calculates the grid [col, row] coordinates based from the
-   * index of the level
-   */
-  function _indexToGridCoord(index) {
-    var grid = this.options.grid;
-    var cols = grid[0];
-    var rows = grid[1];
-
-    var row = Math.floor(index / cols) + 1;
-    var col = index % cols + 1;
-
-    return [col, row];
-  }
-
-  /**
-   * Calculate the translation along the X axis that is needed
-   * to center the level view
-   */
-  function _getXTranslation(coord, grid) {
-    var cols = grid[0];
-    var width = this.options.cellSize[0];
-    var half = cols * width / 2;
-    var offset = (coord[0] - 1) * width;
+    if (scaleByWidth < scaleByHeight) scale = scaleByWidth;
+    else scale = scaleByHeight;
     
-    var x = half - offset - (width / 2);
-
-    return x;
+    console.log(h, gridHeight, scale);
+    return [scale, scale, 1];
   }
 
-  /**
-   * Calculate the translation along the Y axis that is needed
-   * to center the level view
-   */
-  function _getYTranslation(coord, grid) {
-    var rows = grid[1];
-    var height = this.options.cellSize[1];
-    var half = rows * height / 2;
-    var offset = (coord[1] - 1) * height;
-    
-    var y = half - offset - (height / 2);
+  function _createCells(grid) {
+    var cells = [];
+    var cellCount = this.options.grid[0] * this.options.grid[1];
 
-    return y;
+    for (var i = 0; i < cellCount; i++) {
+      
+      var options = {
+        index: i,
+        level: i+1,
+        colors: 3,
+        duration: LEVEL_CLOSE_DURATION,
+        stage: this.options.stage,
+      };
+
+      var cell = new LevelView(options);
+
+      cells.push(cell);
+    }
+
+    return cells;
   }
 
   module.exports = LevelsView;

@@ -32,6 +32,9 @@ define(function(require, exports, module) {
   var MouseSync     = require('famous/inputs/MouseSync');
   var TouchSync     = require('famous/inputs/TouchSync');
 
+  // ## Shared
+  var PAGE_CHANGE_DURATION = 500;
+
   // GenericSync.register({
   //   'mouse': MouseSync,
   //   'touch': TouchSync
@@ -50,7 +53,7 @@ define(function(require, exports, module) {
     this.stagesView.on('nav:loadGame', function(data) {
       _slideLeft.call(this);
       this.gameView._eventInput.emit('game:load', data);
-      this.showPage('stages');
+      this.showPage('game');
     }.bind(this));
 
     this.gameView.on('nav:loadStages', function() {
@@ -191,7 +194,7 @@ define(function(require, exports, module) {
     var view = this._pages[page];
     this.lightbox.show(view, {
       curve: 'linear',
-      duration: 500
+      duration: PAGE_CHANGE_DURATION
     });
 
      // save current page
@@ -227,7 +230,9 @@ define(function(require, exports, module) {
   }
 
   function _createStagesView() {
-    this.stagesView = new StagesView();
+    this.stagesView = new StagesView({
+      pageChangeDuration: PAGE_CHANGE_DURATION
+    });
     this._pages.stages = this.stagesView;
   }
 
@@ -238,7 +243,12 @@ define(function(require, exports, module) {
 
   function _createFPSView() {
     this.fpsView = new FpsMeterView();
-    this.node.add(this.fpsView);
+
+    var mod = new StateModifier({
+      transform: Transform.translate(0, 0, 1000)
+    });
+
+    this.node.add(mod).add(this.fpsView);
   }
 
   // ## Private Helpers
