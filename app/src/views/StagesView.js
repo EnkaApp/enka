@@ -449,13 +449,20 @@ define(function(require, exports, module) {
    * Calculates the height of the first visible scrollview item
    */
   function _getFirstVisibleHeight() {
+    var height;
+
     // svPos is the number of pixels of the first visible scrollview node that is hidden
     var svPos = this.scrollView.getPosition();
     var firstIndex = this.scrollView._scroller._node.index;
 
     var firstVisibile = _getStageAtIndex.call(this, firstIndex);
     var firstHeight = firstVisibile.getSize()[1];
-    var height = firstHeight - svPos;
+
+    // if exactly equal we are looking at a situation where the very first visible node
+    // is lined up exactly with the top of scrollview
+    if (firstHeight === svPos) return firstHeight;
+
+    height = firstHeight - svPos;
 
     return height;
   }
@@ -480,6 +487,8 @@ define(function(require, exports, module) {
 
     var firstVisibileHeight = _getFirstVisibleHeight.call(this);
 
+    console.log('firstVisibileHeight', firstVisibileHeight);
+
     // If the clicked index is the one after the first visible just return the height
     if (index === firstIndex + 1) {
       return firstVisibileHeight + ADJUST;
@@ -488,7 +497,7 @@ define(function(require, exports, module) {
     // Otherwise we calculate offset and add it to the height of the first visible
     var offset = (index - firstIndex - 1) * this.options.stageHeight;
 
-    console.log(offset, firstVisibileHeight + offset + ADJUST);
+    console.log('offset', offset, firstVisibileHeight + offset + ADJUST);
     
     return firstVisibileHeight + offset + ADJUST;
   }
