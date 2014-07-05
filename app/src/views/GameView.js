@@ -69,7 +69,13 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this.boardMenuView.on('game:quit', function() {
-      this._eventOutput.emit('nav:loadStages');
+
+      if (this._fromPage === 'stages') {
+        this._eventOutput.emit('nav:loadStages');
+      } else {
+        this._eventOutput.emit('nav:loadHome');
+      }
+      
       this.gameHeaderView._eventInput.emit('game:closeMenu');
 
       // Let the slide animation complete before closing the menu
@@ -80,6 +86,8 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this._eventInput.on('game:load', function(data) {
+
+      this._fromPage = data.fromPage;
 
       // check to see if the stage/level that is loading is the same
       // as the one that the user has been playing... if not, update
@@ -122,6 +130,8 @@ define(function(require, exports, module) {
 
   function GameView() {
     View.apply(this, arguments);
+
+    this._fromPage = 'home';
 
     this._controller = new GameController();
 

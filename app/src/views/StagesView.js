@@ -51,11 +51,11 @@ define(function(require, exports, module) {
       this._eventOutput.emit('nav:loadGame', data);
     }.bind(this));
 
-    // this._eventInput.on('level:select', function() {
-      
+    // this._eventInput.on('level:select', function(data) {
+
     // }.bind(this));
 
-    // this._eventInput.on('level:close', function() {
+    // this._eventInput.on('level:close', function(data) {
 
     // }.bind(this));
 
@@ -231,7 +231,7 @@ define(function(require, exports, module) {
     var homeIconMod = new StateModifier({
       align: [1, 0.5],
       origin: [1, 0.5],
-      transform: Transform.translate(-12,0,0)
+      transform: Transform.translate(-12,0,1)
     });
 
     // Setup lives display
@@ -244,7 +244,7 @@ define(function(require, exports, module) {
     var livesIconMod = new StateModifier({
       align: [0, 0.5],
       origin: [0, 0.5],
-      transform: Transform.translate(12,0,0)
+      transform: Transform.translate(12,0,1)
     });
 
     var livesCounter = new Surface({
@@ -256,7 +256,7 @@ define(function(require, exports, module) {
     var livesCounterMod = new StateModifier({
       align: [0, 0.5],
       origin: [0, 0.5],
-      transform: Transform.translate(30,0,0)
+      transform: Transform.translate(30,0,1)
     });
 
     // Setup the lives timer
@@ -269,7 +269,7 @@ define(function(require, exports, module) {
       size: [50, 24],
       align: [0, 0.5],
       origin: [0, 0.5],
-      transform: Transform.translate(43,0,0)
+      transform: Transform.translate(43,0,1)
     });
 
     // Setup event listeners
@@ -526,6 +526,10 @@ define(function(require, exports, module) {
 
   function _getStageAtIndex(index) {
     return this._stages[index];
+  }
+
+  function _getStageLevelsAtIndex(index) {
+    return this._stageLevels[index];
   }
 
   module.exports = StagesView;

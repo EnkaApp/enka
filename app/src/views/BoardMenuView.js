@@ -89,7 +89,7 @@ define(function(require, exports, module) {
       align: [0.5, 0],
       origin: [0.5, 0],
       size: [undefined, 30],
-      transform: Transform.translate(0, 20, 0)
+      transform: Transform.translate(0, 20, 1)
     });
 
     this.desc._mod = mod;
@@ -114,7 +114,7 @@ define(function(require, exports, module) {
       size: [undefined, buttons.length * 60],
       origin: [0.5, 1],
       align: [0.5, 1],
-      transform: Transform.translate(0, -20, 0)
+      transform: Transform.translate(0, -20, 1)
     });
 
     this.buttonsNode = this.node.add(mod);
@@ -153,7 +153,7 @@ define(function(require, exports, module) {
       align: [0.5, 0],
       origin: [0.5, 0],
       size: [200, height],
-      transform: Transform.translate(0, index * (height + 10), 0)
+      transform: Transform.translate(0, index * (height + 10), 1)
     });
 
     this[propLabel]._mod = mod;

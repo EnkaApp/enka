@@ -60,7 +60,7 @@ define(function(require, exports, module) {
     function select(e) {
 
       // Flip the card
-      this.flipper.flip();
+      this.flip();
 
       // Tell downstream listeners that a level was selected
       this._eventOutput.emit('level:select', {
@@ -75,7 +75,7 @@ define(function(require, exports, module) {
     function close(e) {
 
       // Flip the card
-      this.flipper.flip();
+      this.flip();
 
       // Tell downstream listeners that a level was closed
       this._eventOutput.emit('level:close', {
@@ -98,6 +98,8 @@ define(function(require, exports, module) {
 
   function LevelView() {
     View.apply(this, arguments);
+
+    this.isOpen = false;
 
     // set locked/unlocked status
     this._locked = !user.hasUnlockedLevel(this.options.stage, this.options.level);
@@ -137,6 +139,11 @@ define(function(require, exports, module) {
     colors: 1,
     duration: 500,
     start: [-W * 4, -H, 0]
+  };
+
+  LevelView.prototype.flip = function() {
+    this.flipper.flip();
+    this.isOpen = !this.isOpen;
   };
 
   LevelView.prototype.hide = function(transition) {

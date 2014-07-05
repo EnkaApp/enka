@@ -41,6 +41,7 @@ define(function(require, exports, module) {
   function _setListeners() {
 
     function levelSelect(data) {
+      this.openLevel = data.node;
       this._closeButton._mod.setOpacity(0.001);
 
       // Set the z translation to right above the header
@@ -49,12 +50,12 @@ define(function(require, exports, module) {
 
       // Timer is being used to execute this after the animation has completed
       Timer.setTimeout(function() {
-        this._eventOutput.emit('level:select');
+        this._eventOutput.emit('level:select', data);
       }.bind(this), LEVEL_CLOSE_DURATION - 200);
     }
 
     function levelClose(data) {
-
+      this.openLevel = null;
       this._backing._mod.setTransform(Transform.identity);
       this._backing.removeClass('level-open');
 
@@ -65,12 +66,24 @@ define(function(require, exports, module) {
           duration: 300
         });
 
-        this._eventOutput.emit('level:close');
+        this._eventOutput.emit('level:close', data);
       }.bind(this), LEVEL_CLOSE_DURATION - 200);
     }
 
     function play(data) {
-      this._eventOutput.emit('nav:loadGame', data);
+      this._backing._mod.setTransform(Transform.identity);
+      this._backing.removeClass('level-open');
+      this.closeOpenedLevels();
+
+      // Timer is being used to execute this after the close levels animation has completed
+      Timer.setTimeout(function() {
+        this._closeButton._mod.setOpacity(0.999, {
+          curve: 'linear',
+          duration: 300
+        });
+
+        this._eventOutput.emit('nav:loadGame', data);
+      }.bind(this), LEVEL_CLOSE_DURATION - 200);
     }
 
     this._closeButton.on('click', function() {
@@ -103,6 +116,7 @@ define(function(require, exports, module) {
   function LevelsView() {
     View.apply(this, arguments);
 
+    this.openLevel = null;
     this.config = new StageConfig(this.options.stage);
     this._gameController = new GameController();
 
@@ -158,6 +172,14 @@ define(function(require, exports, module) {
       });
       if (callback) callback();
     }.bind(this));
+  };
+  
+  LevelsView.prototype.closeOpenedLevels = function() {
+    if (this.openLevel) {
+      this.openLevel.flip();
+      this.grid.closeCell();
+      this.openLevel = null;
+    }
   };
 
   // ## Private Helpers

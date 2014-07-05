@@ -27,18 +27,11 @@ define(function (require, exports, module) {
 
   function _setListeners() {
     this._eventInput.on(this.options.openEvent, function(data) {
-
-      var coord = _indexToGridCoord.call(this, data.index, this.options.grid);
-      var x = _getXTranslation.call(this, coord, this.options.grid);
-      var y = _getYTranslation.call(this, coord, this.options.grid);
-
-      this.gridMod.setTransform(Transform.translate(x, y, 1), transition);
-      this.rootMod.setTransform(Transform.scale(1, 1, 1), transition);
+      this.openCell(data);
     }.bind(this));
 
-    this._eventInput.on(this.options.closeEvent, function(data) {
-      this.rootMod.setTransform(this._scale, transition);
-      this.gridMod.setTransform(Transform.translate(0, 0, 0), transition);
+    this._eventInput.on(this.options.closeEvent, function() {
+      this.closeCell();
     }.bind(this));
 
     // Pipe all events downstream
@@ -80,6 +73,20 @@ define(function (require, exports, module) {
     scale: [0.1, 0.1, 1],
     openEvent: 'cell:select',
     closeEvent: 'cell:close',
+  };
+
+  ZoomingGrid.prototype.openCell = function(data) {
+    var coord = _indexToGridCoord.call(this, data.index, this.options.grid);
+    var x = _getXTranslation.call(this, coord, this.options.grid);
+    var y = _getYTranslation.call(this, coord, this.options.grid);
+
+    this.gridMod.setTransform(Transform.translate(x, y, 1), transition);
+    this.rootMod.setTransform(Transform.scale(1, 1, 1), transition);
+  };
+
+  ZoomingGrid.prototype.closeCell = function() {
+    this.rootMod.setTransform(this._scale, transition);
+    this.gridMod.setTransform(Transform.translate(0, 0, 0), transition);
   };
 
   ZoomingGrid.prototype.showCells = function(transition, delay, callback) {

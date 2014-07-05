@@ -201,7 +201,7 @@ define(function(require, exports, module) {
 
     _init.call(this);
 
-    _createBackground.call(this);
+    _createBacking.call(this);
     _createOverlay.call(this);
 
     _setListeners.call(this);
@@ -555,7 +555,7 @@ define(function(require, exports, module) {
     this.add(this.dimmer).add(this.overlay);
   }
 
-  function _createBackground() {
+  function _createBacking() {
     this.backing = new Surface({
       properties: {
         classes: ['gameboard-backing'],
@@ -567,7 +567,8 @@ define(function(require, exports, module) {
       properties: {
         classes: ['gameboard'],
         backgroundColor: 'white',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        zIndex: 5
       }
     });
 

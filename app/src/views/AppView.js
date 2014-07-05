@@ -15,9 +15,10 @@ define(function(require, exports, module) {
   // ## App Dependencies
   var utils           = require('utils');
 
-  // ## Models
+  // ## Models and Controllers
   var UserModel       = require('models/UserModel');
   var GameModel       = require('models/GameModel');
+  var GameController  = require('controllers/GameController');
 
   // ## Views
   var BackgroundView  = require('views/BackgroundView');
@@ -51,6 +52,9 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this.stagesView.on('nav:loadGame', function(data) {
+      
+      data.fromPage = 'stages';
+      
       _slideLeft.call(this);
       this.gameView._eventInput.emit('game:load', data);
       this.showPage('game');
@@ -61,13 +65,23 @@ define(function(require, exports, module) {
       this.showPage('stages');
     }.bind(this));
 
+    this.gameView.on('nav:loadHome', function() {
+      _slideRight.call(this);
+      this.showPage('home');
+    }.bind(this));
+
     this.homeView.on('nav:loadStages', function(){
       _slideUp.call(this);
       this.showPage('stages');
     }.bind(this));
 
     this.homeView.on('nav:loadGame', function() {
+      var data = this.gameController.getOptions();
+
+      data.fromPage = 'home';
+
       _slideLeft.call(this);
+      this.gameView._eventInput.emit('game:load', data);
       this.showPage('game');
     }.bind(this));
   }
@@ -76,8 +90,8 @@ define(function(require, exports, module) {
     View.apply(this, arguments);
 
     // Initialize Models
-    var user = new UserModel();
-    var game = new GameModel();
+    this.userModel = new UserModel();
+    this.gameController = new GameController();
 
     this._currentPage = '';
     this._pages = {};
