@@ -162,8 +162,8 @@ define(function(require, exports, module) {
 
   StagesView.prototype.showHeader = function(callback) {
     this.layout.header._mod.setTransform(Transform.translate(0, 0, 50), {
-      curve: 'linear',
-      duration: 300
+      curve: 'easeIn',
+      duration: 600
     }, callback);
   };
 
@@ -244,7 +244,7 @@ define(function(require, exports, module) {
     // Setup the home icone
     this.homeIcon = new Surface({
       size: [true, true],
-      classes: ['header', 'nav-item'],
+      classes: ['header', 'navbar', 'nav-item'],
       content: '<i class="fa fa-2x fa-angle-double-up"></i>',
     });
 
@@ -476,7 +476,6 @@ define(function(require, exports, module) {
    * @param {index} the scrollview index of the scroll node that was clicked on
    */
   function _getYOffset(index) {
-    var ADJUST = 0; // arbitrary
     var firstIndex = this.scrollView._scroller._node.index;
 
     // If the first visible index is the clicked index then we are scrolling down
@@ -489,13 +488,13 @@ define(function(require, exports, module) {
 
     // If the clicked index is the one after the first visible just return the height
     if (index === firstIndex + 1) {
-      return firstVisibileHeight + ADJUST;
+      return firstVisibileHeight;
     }
 
     // Otherwise we calculate offset and add it to the height of the first visible
     var offset = (index - firstIndex - 1) * this.options.stageHeight;
     
-    return firstVisibileHeight + offset + ADJUST;
+    return firstVisibileHeight + offset;
   }
 
   /*
@@ -519,8 +518,8 @@ define(function(require, exports, module) {
     // default transition
     if (!transition) {
       transition = {
-        duration: 300,
-        curve: 'linear'
+        duration: 250,
+        curve: 'easeOut'
       };
     }
 

@@ -160,16 +160,16 @@ define(function(require, exports, module) {
   };
 
   LevelsView.prototype.showCloseBtn = function() {
-    var dur = 300;
+    var dur = 600;
     var transform = Transform.translate(0, 0, 1);
 
     this._closeButton._mod.setOpacity(0.999, {
-      curve: 'easeOut',
+      curve: 'easeIn',
       duration: dur
     });
 
     this._closeButton._mod.setTransform(transform, {
-      curve: 'easeOut',
+      curve: 'easeIn',
       duration: dur
     });
   };

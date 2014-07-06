@@ -62,7 +62,7 @@ define(function(require, exports, module) {
     this.options.active = true;
     this.bg.addClass('active');
 
-    var transition = {curve: 'linear', duration: 300};
+    var transition = {curve: 'easeOut', duration: 250};
     var iconYPos = -(this.options.expandedHeight/2 - 50);
 
      // shift the icon up
@@ -91,7 +91,7 @@ define(function(require, exports, module) {
     this.options.active = false;
     this.bg.removeClass('active');
 
-    var transition = {curve: 'linear', duration: 300};
+    var transition = {curve: 'easeOut', duration: 250};
     
     this.iconMod.setTransform(Transform.translate(0, 0, 0), transition, function() {
       // and show the icon
