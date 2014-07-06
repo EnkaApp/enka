@@ -34,7 +34,7 @@ define(function(require, exports, module) {
   var TouchSync     = require('famous/inputs/TouchSync');
 
   // ## Shared
-  var PAGE_CHANGE_DURATION = 500;
+  var PAGE_CHANGE_DURATION = 750;
 
   // GenericSync.register({
   //   'mouse': MouseSync,

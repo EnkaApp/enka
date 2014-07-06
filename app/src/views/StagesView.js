@@ -80,6 +80,10 @@ define(function(require, exports, module) {
     this.prevIndex = this.options.activeStage - 1;
     this.activeIndex = this.options.activeStage - 1;
 
+    // set the stage height
+    var stageHeight = _calculateStageHeight.call(this);
+    this.setOptions({stageHeight: stageHeight});
+
     _createLayout.call(this);
     _createHeader.call(this);
     _createContent.call(this);
@@ -563,6 +567,17 @@ define(function(require, exports, module) {
 
   function _getStageLevelsAtIndex(index) {
     return this._stageLevels[index];
+  }
+
+  /*
+   * Returns the stage height
+   * Minimum height of 100px. Otherwise sets the stage height so that 5 stages will fill the screen
+   */
+  function _calculateStageHeight() {
+    var svHeight = H - this.options.headerHeight;
+    var stageHeight = svHeight / 5 > 100 ? svHeight / 5 : 100;
+
+    return stageHeight;
   }
 
   module.exports = StagesView;

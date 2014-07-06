@@ -1933,8 +1933,8 @@ button {
   background-color: #f55638;
 }
 .stage-1.stage-level-front {
-  background-color: #f55638;
-  border: 10px solid #f55638;
+  background-color: #ee300c;
+  border: 10px solid #d62b0b;
 }
 .stage-1.stage-level-current {
   font-weight: bold;
@@ -1976,7 +1976,7 @@ button {
   font-weight: bold;
   text-decoration: underline;
 }
-.stage-2.stage-level-incomplete {
+.stage-2.stage-level-locked {
   background-color: #551f1c;
 }
 .stage-3.stage-bg {

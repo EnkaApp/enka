@@ -115,8 +115,11 @@ define(function(require, exports, module) {
     this.winBtn.on('click', function() {
       this._eventOutput.emit('nav:loadStages');
 
-      // reset the origami view (i.e win message)
-      _resetOrigamiView.call(this);
+      // reset the origami view (i.e win message) but allow the page
+      // change plenty of time to complete first
+      Timer.setTimeout(function() {
+        _resetOrigamiView.call(this);
+      }.bind(this), 1250);
     }.bind(this));
   }
 
