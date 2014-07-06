@@ -50,7 +50,7 @@ define(function(require, exports, module) {
     this._eventInput.on('nav:loadGame', function(data) {
       this.showHeader(function() {
         this._eventOutput.emit('nav:loadGame', data);
-      }.bind(this));
+      }.bind(this), 300);
     }.bind(this));
 
     this._eventInput.on('level:select', function(data) {
@@ -160,11 +160,18 @@ define(function(require, exports, module) {
     }.bind(this));
   };
 
-  StagesView.prototype.showHeader = function(callback) {
+  StagesView.prototype.showHeader = function(callback, delay) {
+    delay = delay || 600;
+
     this.layout.header._mod.setTransform(Transform.translate(0, 0, 50), {
       curve: 'easeIn',
       duration: 600
-    }, callback);
+    });
+
+    // This allows the callback to fire before the header has finished moving
+    if (callback) {
+      Timer.setTimeout(callback, delay);
+    }
   };
 
   StagesView.prototype.hideHeader = function() {

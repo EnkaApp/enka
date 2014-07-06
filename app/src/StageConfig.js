@@ -70,31 +70,26 @@ define(function(require, exports, module) {
         _getLevelDef(null, 'standard', 4),
         _getLevelDef(null, 'standard', 6),
         _getLevelDef(null, 'standard', 8),
+        
         _getLevelDef(GAMETYPE_SURVIVAL, 'standard', 8),
-
         _getLevelDef(null, 'tall', 6),
         _getLevelDef(null, 'tall', 6),
         _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 5),
+        
         _getLevelDef(GAMETYPE_SURVIVAL, null, 5),
         _getLevelDef(null, null, 30),
-
-        _getLevelDef(null, 'wide', 25),
-        _getLevelDef(null, 'large', 35),
+        _getLevelDef(null, 'wide', 10),
+        _getLevelDef(null, 'large', 15),
+        
         _getLevelDef(GAMETYPE_SURVIVAL, null, 15),
-        _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 15),
-        _getLevelDef(null, 'skinny', 20),
-
-        _getLevelDef(null, 'wide', 25),
-        _getLevelDef(GAMETYPE_SURVIVAL, null, 40),
-        _getLevelDef(null, null, 15),
-        _getLevelDef(GAMETYPE_SURVIVAL, 'tall', 35),
-        _getLevelDef(null, 'skinny', 20),
-
-        _getLevelDef(GAMETYPE_SURVIVAL, null, 25),
-        _getLevelDef(null, 'xlarge', 40),
-        _getLevelDef(GAMETYPE_SURVIVAL, 'small', 20),
-        _getLevelDef(null, 'tall', 15),
-        _getLevelDef(null, 'skinny', 20),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 10),
+        _getLevelDef(null, 'skinny', 10),
+        _getLevelDef(null, 'wide', 15),
+        
+        _getLevelDef(GAMETYPE_SURVIVAL, null, 10),
+        _getLevelDef(null, null, 10),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'tall', 15),
+        _getLevelDef(null, 'skinny', 10),
       ],
     },
 
@@ -108,12 +103,12 @@ define(function(require, exports, module) {
       grid: [4, 5],
 
       levels: [
-        {
-          gametype: GAMETYPE_SURVIVAL,
-          goal: 10,
-          grid: [2,8],
-          startCoord: [1,1]
-        }
+        _getLevelDef(GAMETYPE_SURVIVAL, null, 15),
+        _getLevelDef(null, 'xlarge', 10),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'small', 10),
+        _getLevelDef(null, 'tall', 10),
+        
+        _getLevelDef(null, 'skinny', 10),
       ],
     },
 

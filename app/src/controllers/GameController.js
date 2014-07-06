@@ -23,12 +23,21 @@ define(function(require, exports, module) {
   }
 
   function _init() {
+
+    // Get the models... both will have been initialized by now so we are retrieving
+    // an instance of them here
+    this._user = new UserModel();
+    this._model = new GameModel();
+
+    // Initialize with the latest saved game data
+    this.setOptions(this._model.getSaved());
+
+    // Do our setup
     var stage = new StageConfig(this.options.stage);
     
     this._stage = stage;
     this._config = stage.getLevelConfig(this.options.level);
-    this._model = new GameModel();
-    this._user = new UserModel();
+    
   }
 
   function GameController() {
@@ -65,6 +74,9 @@ define(function(require, exports, module) {
 
     this.setOptions(options);
 
+    // Save the new game to the database
+    this._model.save(options);
+
     _init.call(this);
   };
 
@@ -78,6 +90,13 @@ define(function(require, exports, module) {
 
   GameController.prototype.getLevelConfig = function() {
     return this._config;
+  };
+
+  GameController.prototype.getCurrentLevel = function() {
+    return {
+      stage: this.options.stage,
+      level: this.options.level
+    };
   };
 
   GameController.prototype.unlockNextLevel = function() {

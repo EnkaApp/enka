@@ -1730,6 +1730,12 @@ button {
   font-size: 14px;
   line-height: 24px;
 }
+.game-navbar {
+  background: black;
+}
+.game-navbar.game-navbar-button {
+  color: white;
+}
 .gamemenu.gamemenu-description {
   text-align: center;
 }
@@ -1806,6 +1812,15 @@ button {
 }
 .logo.logo-brick {
   background-color: white;
+}
+.stage-1.piece.color-1 {
+  background-color: #f55638;
+}
+.stage-1.piece.color-2 {
+  background-color: #5ab4b2;
+}
+.stage-1.piece.color-3 {
+  background-color: #ebaa4c;
 }
 .stage-level-front .level-number,
 .stage-level-front .fa-lock {

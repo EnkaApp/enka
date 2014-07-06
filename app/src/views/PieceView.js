@@ -11,11 +11,12 @@ define(function(require, exports, module) {
   var StateModifier = require('famous/modifiers/StateModifier');
   var Modifier      = require('famous/core/Modifier');
 
-  // Testing
+  // ## App Dependencies
   var Reflector = require('views/Reflector');
 
   // ## Constants
-
+  var BACK_CLASSES = ['piece', 'piece-back'];
+  var FRONT_CLASSES = ['piece', 'piece-front'];
   var DIRECTIONS = {
     right: Reflector.DIRECTION_RIGHT,
     left: Reflector.DIRECTION_LEFT,
@@ -23,7 +24,92 @@ define(function(require, exports, module) {
     down: Reflector.DIRECTION_DOWN,
   };
 
-  // ## Modifiers
+  function PieceView() {
+
+    View.apply(this, arguments);
+
+    this.back = _createBack.call(this);
+    this.front = _createFront.call(this);
+
+    this.reflector = new Reflector({
+      direction: DIRECTIONS[this.options.direction]
+    });
+  
+    this.reflector.setFront(this.front);
+    this.reflector.setBack(this.back);
+
+    _initReflectionModifier.call(this);
+    this.add(this.reflectionMod).add(this.reflector);
+  }
+
+  PieceView.prototype = Object.create(View.prototype);
+  PieceView.prototype.constructor = PieceView;
+
+  PieceView.DEFAULT_OPTIONS = {
+    width: 100,
+    height: 100,
+    frontBgColor: 'blue',
+    backBgColor: 'red',
+    direction: 'left',
+    obstacle: false,
+    level: 1,
+    stage: 1
+  };
+
+  PieceView.prototype.getOption = function(key) {
+    return this.options[key];
+  };
+
+  PieceView.prototype.updateOptions = function(options) {
+    this.reset();
+
+    // update the options
+    this.setOptions(options);
+
+    // reiniatialize the back, front, reflectionModifier, and reflector
+    this.back.setClasses(_getBackClasses.call(this));
+
+    this.front.setClasses(_getFrontClasses.call(this));
+
+    _initReflectionModifier.call(this);
+    
+    this.reflector.updateOptions({
+      direction: DIRECTIONS[this.options.direction]
+    });
+
+    this.reflector.setFront(this.front);
+    this.reflector.setBack(this.back);
+  };
+
+  PieceView.prototype.reset = function() {
+    this.reflector.reset();
+  };
+
+  PieceView.prototype.reflect = function() {
+    this.reflector.reflect({curve : 'linear', duration : 500}, function(){
+      this._eventOutput.emit('reflected');
+    }.bind(this));
+  };
+
+   // ## Private Helpers
+
+  function _getBackClasses() {
+    return BACK_CLASSES.concat(
+      this.options.backBgColor,
+      'stage-'+this.options.stage,
+      'level-'+this.options.level
+    );
+  }
+
+  function _getFrontClasses() {
+    return FRONT_CLASSES.concat(
+      this.options.frontBgColor,
+      'stage-'+this.options.stage,
+      'level-'+this.options.level
+    );
+  }
+
+   // ## Modifiers
 
   function _initReflectionModifier() {
 
@@ -58,19 +144,14 @@ define(function(require, exports, module) {
   function _createBack() {
     var back = new Surface({
       content: '',
-      // size: [this.options.width, this.options.height],
+      classes: _getBackClasses.call(this),
       origin: [0.5, 0.5],
       align: [0.5, 0.5],
       properties: {
-        backgroundColor: this.options.backBgColor,
         webkitBackfaceVisibility: 'visible',
         pointerEvents: 'none'
       }
     });
-
-    // @TODO add color label class
-    back.setClasses(['piece', 'piece-back', this.options.backBgColor]);
-
 
     return back;
   }
@@ -79,93 +160,17 @@ define(function(require, exports, module) {
     // console.log(size)
     var front = new Surface({
       content: '',
-      // size: [this.options.width, this.options.height],
+      classes: _getFrontClasses.call(this),
       origin: [0.5, 0.5],
       align: [0.5, 0.5],
       properties: {
-        backgroundColor: this.options.frontBgColor,
         webkitBackfaceVisibility: 'visible',
         pointerEvents: 'none'
       }
     });
 
-    // @TODO add color label class
-    front.setClasses(['piece', 'piece-front', this.options.frontBgColor]);
-
     return front;
   }
-
-  function PieceView() {
-
-    View.apply(this, arguments);
-
-    this.back = _createBack.call(this);
-    this.front = _createFront.call(this);
-
-    this.reflector = new Reflector({
-      direction: DIRECTIONS[this.options.direction]
-    });
-  
-    this.reflector.setFront(this.front);
-    this.reflector.setBack(this.back);
-
-    _initReflectionModifier.call(this);
-    this.add(this.reflectionMod).add(this.reflector);
-  }
-
-  PieceView.prototype = Object.create(View.prototype);
-  PieceView.prototype.constructor = PieceView;
-
-  PieceView.DEFAULT_OPTIONS = {
-    width: 100,
-    height: 100,
-    frontBgColor: 'blue',
-    backBgColor: 'red',
-    direction: 'left',
-    obstacle: false
-  };
-
-  PieceView.prototype.getOption = function(key) {
-    return this.options[key];
-  };
-
-  PieceView.prototype.updateOptions = function(options) {
-    this.reset();
-
-    // update the options
-    this.setOptions(options);
-
-    // reiniatialize the back, front, reflectionModifier, and reflector
-    //
-    // @TODO when changin to classes for colors we will need to 
-    // update this because we won't be using backgroundColor
-    this.back.setProperties({
-      backgroundColor: this.options.backBgColor
-    });
-
-    this.front.setProperties({
-      backgroundColor: this.options.frontBgColor
-    });
-
-    _initReflectionModifier.call(this);
-    
-    this.reflector.updateOptions({
-      direction: DIRECTIONS[this.options.direction]
-    });
-
-    this.reflector.setFront(this.front);
-    this.reflector.setBack(this.back);
-  };
-
-  PieceView.prototype.reset = function() {
-    this.reflector.reset();
-  };
-
-  PieceView.prototype.reflect = function() {
-    this.reflector.reflect({curve : 'linear', duration : 500}, function(){
-      this._eventOutput.emit('reflected');
-    }.bind(this));
-  };
 
   module.exports = PieceView;
 });

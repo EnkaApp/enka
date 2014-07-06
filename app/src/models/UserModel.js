@@ -149,7 +149,7 @@ define(function(require, exports, module) {
 
   UserModel.prototype.setLatestLevel = function(stage, level) {
 
-    // Something is firing this with no info... so stop
+    // Something is firing this with no info... so stop if there is no info
     // @TODO track down why
     if (!stage || !level) return;
 
@@ -157,8 +157,6 @@ define(function(require, exports, module) {
       latestStage: stage,
       latestLevel: level
     };
-
-    console.log(options);
     
     // update options
     this.setOptions(options);
@@ -171,8 +169,6 @@ define(function(require, exports, module) {
     var level = this.options.latestLevel;
     var stage = this.options.latestStage;
     var stageConfig = new StageConfig(this.options.latestStage);
-
-    console.log(level, stage);
 
     // If we are on the final level of the stage... unlock the next stage
     if (this.options.latestLevel === stageConfig.getLevelCount()) {

@@ -4,8 +4,7 @@
  */
 
  define(function(require, exports, module) {
-  var EventHandler = require('famous/core/EventHandler');
-  var OptionsManager = require('famous/core/OptionsManager');
+  var Engine = require('famous/core/Engine');
 
   // ## Dependencies
   var Model = require('models/Model');
@@ -17,10 +16,14 @@
   // @TODO
   function _init() {
     db.ready().then(function() {
-      db.getItem('currentGame').then(function(currentGame) {
-        // if (currentGame)
-      });
-    });
+      db.getItem('savedGame').then(function(savedGame) {
+        
+        console.info('Loading Saved Game');
+        this.setOptions(savedGame);
+        Engine.emit('game:loaded', savedGame);
+
+      }.bind(this));
+    }.bind(this));
   }
 
   function _setListeners() {
@@ -39,9 +42,11 @@
       return GameModel._instance;
     }
 
+
     Model.apply(this, arguments);
 
     _setListeners.call(this);
+    _init.call(this);
 
     GameModel._instance = this;
   }
@@ -52,30 +57,11 @@
   GameModel._instance = null;
 
   GameModel.DEFAULT_OPTIONS = {
-    currentLevel: 1,
-    currentStage: 1,
+    level: 1,
+    stage: 1,
     turns: 0,
     destroyed: 0,
     state: null
-  };
-
-  // ## Database Operations
-
-  GameModel.prototype.save = function(data) {
-    db.ready().then(function() {
-      db.setItem('currentGame', data, function() {
-        console.info('Saved current game data');
-      });
-    }.bind(this));
-  };
-
-
-  GameModel.prototype.delete = function() {
-    db.ready().then(function() {
-      db.removeItem('currentGame', function() {
-        console.info('Deleted current game data');
-      });
-    });
   };
 
   /*
@@ -86,6 +72,32 @@
    */
   GameModel.prototype.setOptions = function(options) {
     this._optionsManager.patch(options);
+  };
+
+  GameModel.prototype.getSaved = function() {
+    return this.getOptions();
+  };
+
+  // ## Database Operations
+
+  GameModel.prototype.save = function(data) {
+    
+    this.setOptions(data);
+
+    db.ready().then(function() {
+      db.setItem('savedGame', data, function() {
+        console.info('Saved current game data');
+      });
+    }.bind(this));
+  };
+
+
+  GameModel.prototype.delete = function() {
+    db.ready().then(function() {
+      db.removeItem('savedGame', function() {
+        console.info('Deleted saved game data');
+      });
+    });
   };
 
   GameModel.prototype.getDescription = function() {

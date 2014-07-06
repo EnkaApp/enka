@@ -44,6 +44,9 @@ define(function(require, exports, module) {
   // ## Shared Variables
   var W = utils.getViewportWidth();
   var H = utils.getViewportHeight();
+  var userIsLoaded = false;
+  var gameIsLoaded = false;
+  var gameIsSetup = false;
 
   function _setListeners() {
     this.stagesView.on('nav:loadHome', function() {
@@ -90,8 +93,11 @@ define(function(require, exports, module) {
     View.apply(this, arguments);
 
     // Initialize Models
+    this.gameModel = new GameModel();
     this.userModel = new UserModel();
-    this.gameController = new GameController();
+
+    // For testing
+    // this.userModel.setLatestLevel(1,20);
 
     this._currentPage = '';
     this._pages = {};
@@ -113,15 +119,19 @@ define(function(require, exports, module) {
 
     this.showHomePage();
 
-    // Setup the rest of the application
-    // _handleSwipe.call(this);
-    Engine.on('user:loaded', function() {
-      _setupGame.call(this);
-      
-      Timer.setTimeout(function() {
-        this.homeView.showMenu();
-      }.bind(this), 2000);
+    // Setup the rest of the application once both game and user have loaded
+
+    Engine.on('game:loaded', function(savedGame) {
+      gameIsLoaded = true;
+      if (userIsLoaded) _setupGame.call(this);
     }.bind(this));
+
+    Engine.on('user:loaded', function() {
+      userIsLoaded = true;
+      if (gameIsLoaded) _setupGame.call(this);
+    }.bind(this));
+
+    // _handleSwipe.call(this);
   }
 
   AppView.prototype = Object.create(View.prototype);
@@ -208,10 +218,7 @@ define(function(require, exports, module) {
 
   AppView.prototype.showPage = function(page) {
     var view = this._pages[page];
-    // this.lightbox.show(view, {
-    //   curve: 'linear',
-    //   duration: PAGE_CHANGE_DURATION
-    // });
+
     this.lightbox.show(view);
 
      // save current page
@@ -231,9 +238,24 @@ define(function(require, exports, module) {
   // ## View Constructors
 
   function _setupGame() {
+
+    if (gameIsSetup) return;
+
+    // Initialize Controllers
+    this.gameController = new GameController();
+
+    console.log(this.gameController.getOptions());
+
     _createStagesView.call(this);
     _createGameView.call(this);
     _setListeners.call(this);
+
+    // Show the menu
+    Timer.setTimeout(function() {
+      this.homeView.showMenu();
+    }.bind(this), 2000);
+
+    gameIsSetup = true;
   }
 
   function _createLightbox() {

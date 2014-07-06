@@ -43,7 +43,7 @@ define(function(require, exports, methods) {
    * @return {Object} associated object
    */
   Model.prototype.getOptions = function getOptions() {
-      return this._optionsManager.value();
+    return this._optionsManager.value();
   };
 
   Model.prototype.getOption = function(key) {

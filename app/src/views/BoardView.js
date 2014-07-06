@@ -561,10 +561,17 @@ define(function(require, exports, module) {
         var moveIndex = moves[i];
         var surface = this._highlights[i];
         var xy = this._gridController.getXYCoordsFromIndex(moveIndex);
+        var level = this._controller.getCurrentLevel();
 
-        surface.setClasses(['gameboard', 'gameboard-possible-move', colorClass]);
+        surface.setClasses([
+          'gameboard-possible-move',
+          'piece',
+          'stage-' + level.stage,
+          'level-' + level.level,
+          colorClass
+        ]);
         
-        surface.setProperties({backgroundColor: colorClass}); // TEMP... REMOVE
+        // surface.setProperties({backgroundColor: colorClass}); // TEMP... REMOVE
 
         surface._mod.setTransform(Transform.translate(xy[0], xy[1], 1));
         surface._scaleMod.setTransform(Transform.scale(1, 1, 1), {duration: 300});

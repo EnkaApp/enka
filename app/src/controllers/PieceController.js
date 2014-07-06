@@ -1,12 +1,11 @@
 define(function(require, exports, module) {
-  // var OptionsManager  = require('famous/core/OptionsManager');
   var StateModifier   = require('famous/modifiers/StateModifier');
   var Transform       = require('famous/core/Transform');
-  // var EventHandler    = require('famous/core/EventHandler');
   var RenderNode      = require('famous/core/RenderNode');
 
-  // ## Controller Base
+  // ## Controllers
   var Controller = require('controllers/Controller');
+  var GameController = require('controllers/GameController');
 
   // ## Import Views
   var PieceView = require('views/PieceView');
@@ -24,6 +23,7 @@ define(function(require, exports, module) {
     this.colorQueue = [];
     this._deletedPieces = [];
     this._lastColor = '';
+    this._gameController = new GameController();
 
     // initializes this.colorQueue with 3 colors
     for(var i = 0; i < 3; i++){
@@ -60,9 +60,10 @@ define(function(require, exports, module) {
     var node = this._deletedPieces.pop();
     var piece = node._piece;
     var mod = node._mod;
+    var level = this._gameController.getCurrentLevel();
     var backColor = this.getNextColorFromQueue();
 
-    console.info('Using Existing Piece');
+    // console.info('Using Existing Piece');
 
     // The only time this._lastColor is falsy is when we are
     // placeing the first piece on the board
@@ -72,7 +73,9 @@ define(function(require, exports, module) {
     piece.updateOptions({
       direction: direction,
       frontBgColor: this._lastColor,
-      backBgColor: backColor
+      backBgColor: backColor,
+      level: level.level,
+      stage: level.stage
     });
 
     // Update the opacity and piece size
@@ -90,10 +93,11 @@ define(function(require, exports, module) {
 
 	function _createNewPiece(direction) {
 
-    // console.info('Creating New Piece');
+    var level = this._gameController.getCurrentLevel();
 
     if(!direction) direction = 'left';
 
+    // Default to left for no particular reason
     var node = new RenderNode();
 
     // Create the modifier
@@ -119,7 +123,9 @@ define(function(require, exports, module) {
       height: this.options.pieceSize[1],
       frontBgColor: this._lastColor,
       backBgColor: backColor,
-      direction: direction
+      direction: direction,
+      level: level.level,
+      stage: level.stage
     };
 
     piece = new PieceView(options);
@@ -173,8 +179,8 @@ define(function(require, exports, module) {
   };
 
   PieceController.prototype.addColorToQueue = function(){
-    var color = _getRandomColor(0, colorArray.length - 1);
-    this.colorQueue.push(color);
+    var colorNum = _getRandomIntInRange(1, this.options.colors);
+    this.colorQueue.push('color-' + colorNum);
 
     this._eventOutput.emit('piece:colorsUpdated');
     this._eventOutput.emit('piece:colorAdded');
@@ -184,6 +190,11 @@ define(function(require, exports, module) {
   function _getRandomColor (min, max){
     var num = Math.floor(Math.random() * (max - min + 1)) + min;
     return colorArray[num];
+  }
+
+  function _getRandomIntInRange(min, max) {
+    var num = Math.floor(Math.random() * (max - min + 1)) + min;
+    return num;
   }
 
   module.exports = PieceController;

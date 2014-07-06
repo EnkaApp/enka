@@ -13,6 +13,7 @@ define(function(require, exports, module) {
   
   // ## Controllers
   var PieceController  = require('controllers/PieceController');
+  var GameController   = require('controllers/GameController');
 
   // ## Views
   var BoardView = require('views/BoardView');
@@ -21,7 +22,7 @@ define(function(require, exports, module) {
   var open = true;
 
   function _setListeners() {
-    this.pieceGenerator._eventOutput.on('piece:colorsUpdated', function() {
+    this._pieceController._eventOutput.on('piece:colorsUpdated', function() {
       this.updateColors();
     }.bind(this));
 
@@ -44,7 +45,8 @@ define(function(require, exports, module) {
       transform: Transform.translate(0, 0, 1)
     });
     
-    this.pieceGenerator = new PieceController();
+    this._pieceController = new PieceController();
+    this._gameController = new GameController();
 
     this.upcomingColors = [];
 
@@ -61,6 +63,7 @@ define(function(require, exports, module) {
 
   GameHeaderView.prototype.updateColors = function() {
 
+    var level = this._gameController.getCurrentLevel();
     var pw = this.options.pieceSize[0];
 
     var transition = {
@@ -76,9 +79,7 @@ define(function(require, exports, module) {
     var fourth = this.upcomingColors[3];
 
     // set the color of the last piece to the latest color
-    fourth.setProperties({
-      backgroundColor: this.pieceGenerator.colorQueue[2]
-    });
+    fourth.setClasses(_getClasses.call(this, 2, level.stage, level.level));
 
     // start transitioning
     first._modifier.setOpacity(0.001, transition);
@@ -101,11 +102,7 @@ define(function(require, exports, module) {
       }
     }
 
-    // change the color of the first piece... add it to the end
-    first.setProperties({
-      backgroundColor: 'none'
-    });
-
+    // Move the first piece to the end
     first = this.upcomingColors.shift();
     this.upcomingColors.push(first);
   };
@@ -117,37 +114,35 @@ define(function(require, exports, module) {
   function _createBacking() {
 
     this.backing = new Surface({
-      properties: {
-        classes: ['navbar'],
-        backgroundColor: 'black'
-      }
+      classes: ['header', 'navbar', 'game-navbar'],
     });
 
      var backingMod = new StateModifier({
       transform: Transform.behind
     });
 
-     this.node.add(backingMod).add(this.backing);
+    this.node.add(backingMod).add(this.backing);
   }
 
   function _createMenuButton() {
     this.menuButton = new Surface({
-      properties: {
-        backgroundColor: 'white'
-      }
+      size: [true, true],
+      classes: ['header', 'navbar', 'game-navbar', 'game-navbar-button'],
+      content: '<i class="fa fa-2x fa-angle-double-up"></i>',
     });
 
     var mod = new StateModifier({
-      size: [20, 20],
       origin: [1, 0.5],
       align: [1, 0.5],
-      transform: Transform.translate(-10, 0, 0)
+      transform: Transform.translate(-10, 0, 1)
     });
 
     this.node.add(mod).add(this.menuButton);
   }
 
   function _initPieces() {
+
+    var level = this._gameController.getCurrentLevel();
 
     var mod = new StateModifier({
       size: [70, 20],
@@ -173,12 +168,14 @@ define(function(require, exports, module) {
       // the fourth piece will be used to make the animation look better
       // so it does not need a color
       if (i < 3) {
-        properties.backgroundColor = this.pieceGenerator.colorQueue[i];
+        // properties.backgroundColor = this._pieceController.colorQueue[i];
+        classes = _getClasses.call(this, i, level.stage, level.level);
       }
 
       var surface = new Surface({
         size: this.options.pieceSize,
-        properties: properties
+        properties: properties,
+        classes: classes
       });
 
       surface._modifier = modifier;
@@ -187,6 +184,15 @@ define(function(require, exports, module) {
 
       node.add(modifier).add(surface);
     }
+  }
+
+  function _getClasses(index, stage, level) {
+    return [
+      'piece',
+      'stage-' + stage,
+      'level-' + level,
+      this._pieceController.colorQueue[index]
+    ];
   }
 
   module.exports = GameHeaderView;
