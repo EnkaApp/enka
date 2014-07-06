@@ -1,40 +1,40 @@
 define(function(require, exports, module) {
-  var OptionsManager  = require('famous/core/OptionsManager');
+  // var OptionsManager  = require('famous/core/OptionsManager');
   var StateModifier   = require('famous/modifiers/StateModifier');
   var Transform       = require('famous/core/Transform');
-  var EventHandler    = require('famous/core/EventHandler');
+  // var EventHandler    = require('famous/core/EventHandler');
   var RenderNode      = require('famous/core/RenderNode');
 
+  // ## Controller Base
+  var Controller = require('controllers/Controller');
 
   // ## Import Views
   var PieceView = require('views/PieceView');
 
   var colorArray = ['blue', 'green', 'red'];
 
-  // initializes this.colorQueue with 3 colors
   function PieceController(options) {
 
     if(PieceController._instance){
       return PieceController._instance;
     }
 
-    this._deletedPieces = [];
-    this._eventOutput = new EventHandler();
-    this._eventInput = new EventHandler();
+    Controller.apply(this, arguments);
 
-    this._lastColor = '';
-    this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
-    this._optionsManager = new OptionsManager(this.options);
     this.colorQueue = [];
+    this._deletedPieces = [];
+    this._lastColor = '';
 
-    if (options) this.setOptions(options);
-
+    // initializes this.colorQueue with 3 colors
     for(var i = 0; i < 3; i++){
       this.addColorToQueue();
     }
     
     PieceController._instance = this;
   }
+
+  PieceController.prototype = Object.create(Controller.prototype);
+  PieceController.prototype.constructor = PieceController;
 
   PieceController._instance = null;
 
