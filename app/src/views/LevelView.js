@@ -267,6 +267,7 @@ define(function(require, exports, module) {
     });
 
     this.backing.removeClass('locked');
+    this.backing.addClass('unlocked');
   };
 
   function _getLFVContent() {
@@ -296,6 +297,8 @@ define(function(require, exports, module) {
 
     if (this.options.locked) {
       this.backing.addClass('locked');
+    } else {
+      this.backing.addClass('unlocked');
     }
 
     this.node.add(this.backing);

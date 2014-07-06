@@ -1,5 +1,4 @@
 .stage-levels {
-  
   .btn {
     display: block;
     height: 100%;
@@ -19,7 +18,7 @@
 }
 
 .stage-1 {
-  @bg-color: @cc1-baige;
+  @bg-color: @cc1-bg;
 
   &.stage-bg {
     background-color: @bg-color;
@@ -34,7 +33,8 @@
   }
 
   &.stage-level-front {
-    background-color: darken(@bg-color, 10%);
+    background-color: @bg-color;
+    border: 10px solid @bg-color;
   }
 
   &.stage-level-current {
@@ -42,23 +42,34 @@
     text-decoration: underline;
   }
 
-  &.stage-level-complete {
-    &.stage-level--color1 {
+  &.unlocked {
+    color: @cc1-color4;
 
+    &.stage-level--color1 {
+      background-color: @cc1-color1;
+      border-color: darken(@cc1-color1, 10%);
     }
 
     &.stage-level--color2 {
-      
+      background-color: @cc1-color2;
+      border-color: darken(@cc1-color2, 10%);
     }
 
     &.stage-level--color3 {
-      
+      background-color: @cc1-color3;
+      border-color: darken(@cc1-color3, 10%);
     }
+  }
+
+  .btn {
+    background-color: darken(@cc1-bg, 20%);
+    color: @cc1-color4;
+    border-color: darken(@cc1-bg, 30%);
   }
 }
 
 .stage-2 {
-  @bg-color: @cc3-marigold;
+  @bg-color: @cc2-bg;
 
   &.stage-bg {
     background-color: @bg-color;
@@ -85,7 +96,7 @@
     background-color: darken(@bg-color, 10%);
   }
 
-  &.stage-level-complete {
+  &.unlocked {
     &.stage-level--color1 {
 
     }
@@ -101,7 +112,7 @@
 }
 
 .stage-3 {
-  @bg-color: @cc3-salmon;;
+  @bg-color: @cc3-bg;
 
   &.stage-bg {
     background-color: @bg-color;
@@ -124,7 +135,7 @@
     text-decoration: underline;
   }
 
-  &.stage-level-complete {
+  &.unlocked {
     &.stage-level--color1 {
 
     }
@@ -140,7 +151,7 @@
 }
 
 .stage-4 {
-  @bg-color: @cc4-clay;
+  @bg-color: @cc4-bg;
 
   &.stage-bg {
     background-color: @bg-color;
@@ -163,7 +174,7 @@
     text-decoration: underline;
   }
 
-  &.stage-level-complete {
+  &.unlocked {
     &.stage-level--color1 {
 
     }
@@ -179,7 +190,7 @@
 }
 
 .stage-5 {
-  @bg-color: @cc2-light-mint;
+  @bg-color: @cc5-bg;
 
   &.stage-bg {
     background-color: @bg-color;
@@ -202,9 +213,9 @@
     text-decoration: underline;
   }
 
-  &.stage-level-complete {
+  &.unlocked {
     &.stage-level--color1 {
-
+    
     }
 
     &.stage-level--color2 {
@@ -218,7 +229,7 @@
 }
 
 .stage-6 {
-  @bg-color: @cc1-seagreen;
+  @bg-color: @cc6-bg;
 
   &.stage-bg {
     background-color: @bg-color;
@@ -241,7 +252,7 @@
     text-decoration: underline;
   }
 
-  &.stage-level-complete {
+  &.unlocked {
     &.stage-level--color1 {
 
     }

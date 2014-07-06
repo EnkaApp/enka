@@ -1756,8 +1756,8 @@ button {
 .gamemenu-buttons .btn-continue,
 .gameboard-buttons .btn-resume,
 .gamemenu-buttons .btn-resume {
-  background: #9ad4b9;
-  border-color: #bee3d2;
+  background: #265e54;
+  border-color: #348375;
 }
 .gameboard-board {
   background: #ffffff url('../images/tile-patterns/tile-gray-bg.png') 0 0 repeat;
@@ -1814,13 +1814,28 @@ button {
   background-color: white;
 }
 .stage-1.piece.color-1 {
-  background-color: #f55638;
+  background-color: #5ab4b2;
 }
 .stage-1.piece.color-2 {
-  background-color: #5ab4b2;
+  background-color: #b30313;
 }
 .stage-1.piece.color-3 {
   background-color: #ebaa4c;
+}
+.stage-1.piece.color-4 {
+  background-color: #f4f0e4;
+}
+.stage-2.piece.color-1 {
+  background-color: #429291;
+}
+.stage-2.piece.color-2 {
+  background-color: #71486a;
+}
+.stage-2.piece.color-3 {
+  background-color: #e99b39;
+}
+.stage-2.piece.color-4 {
+  background-color: #eb422b;
 }
 .stage-level-front .level-number,
 .stage-level-front .fa-lock {
@@ -1852,34 +1867,34 @@ button {
 }
 .stage-level-front.stage-1 .level-number,
 .stage-level-front.stage-1 .fa-lock {
-  color: #d6c89c;
+  color: #f4f0e4;
 }
 .stage-level-front.stage-2 .level-number,
 .stage-level-front.stage-2 .fa-lock {
-  color: #d37f03;
+  color: #7c2d28;
 }
 .stage-level-front.stage-3 .level-number,
 .stage-level-front.stage-3 .fa-lock {
-  color: #f25b54;
+  color: #95d6d2;
 }
 .stage-level-front.stage-4 .level-number,
 .stage-level-front.stage-4 .fa-lock {
-  color: #cb6041;
+  color: #9b8ab8;
 }
 .stage-level-front.stage-5 .level-number,
 .stage-level-front.stage-5 .fa-lock {
-  color: #62e8cc;
+  color: #798184;
 }
 .stage-level-front.stage-6 .level-number,
 .stage-level-front.stage-6 .fa-lock {
-  color: #357472;
+  color: #0093d9;
 }
 .stage-level-back.stage-level-backing {
   box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
 }
 .stage-level-back .description {
   text-align: center;
-  color: #d6c89c;
+  color: #bd260a;
   padding: 50px 25px 0;
 }
 .stage-level-back .btn-play {
@@ -1887,9 +1902,9 @@ button {
   height: 100%;
   width: 100%;
   text-align: center;
-  background: #bee3d2;
+  background: #348375;
   color: white;
-  border: 5px solid #d0ebde;
+  border: 5px solid #3b9585;
   text-transform: uppercase;
   font-weight: bold;
   border-radius: 99em;
@@ -1909,99 +1924,120 @@ button {
   border-bottom: 10px solid white;
 }
 .stage-1.stage-bg {
-  background-color: #f4f0e4;
+  background-color: #f55638;
 }
 .stage-1.stage-bg.active {
-  border-color: #ede6d2;
+  border-color: #f44120;
 }
 .stage-1.stage-levels-bg--active {
-  background-color: #f4f0e4;
+  background-color: #f55638;
 }
 .stage-1.stage-level-front {
-  background-color: #e5dcc0;
+  background-color: #f55638;
+  border: 10px solid #f55638;
 }
 .stage-1.stage-level-current {
   font-weight: bold;
   text-decoration: underline;
 }
+.stage-1.unlocked {
+  color: #f4f0e4;
+}
+.stage-1.unlocked.stage-level--color1 {
+  background-color: #5ab4b2;
+  border-color: #449795;
+}
+.stage-1.unlocked.stage-level--color2 {
+  background-color: #b30313;
+  border-color: #81020e;
+}
+.stage-1.unlocked.stage-level--color3 {
+  background-color: #ebaa4c;
+  border-color: #e6941e;
+}
+.stage-1 .btn {
+  background-color: #bd260a;
+  color: #f4f0e4;
+  border-color: #8d1c07;
+}
 .stage-2.stage-bg {
-  background-color: #fcb040;
+  background-color: #7c2d28;
 }
 .stage-2.stage-bg.active {
-  border-color: #fca627;
+  border-color: #692622;
 }
 .stage-2.stage-levels-bg--active {
-  background-color: #fcb040;
+  background-color: #7c2d28;
 }
 .stage-2.stage-level-front {
-  background-color: #fb9b0e;
+  background-color: #551f1c;
 }
 .stage-2.stage-level-current {
   font-weight: bold;
   text-decoration: underline;
 }
 .stage-2.stage-level-incomplete {
-  background-color: #fb9b0e;
+  background-color: #551f1c;
 }
 .stage-3.stage-bg {
-  background-color: #f9b6b3;
+  background-color: #95d6d2;
 }
 .stage-3.stage-bg.active {
-  border-color: #f79f9b;
+  border-color: #83cfca;
 }
 .stage-3.stage-levels-bg--active {
-  background-color: #f9b6b3;
+  background-color: #95d6d2;
 }
 .stage-3.stage-level-front {
-  background-color: #f58984;
+  background-color: #70c8c2;
 }
 .stage-3.stage-level-current {
   font-weight: bold;
   text-decoration: underline;
 }
 .stage-4.stage-bg {
-  background-color: #e1a391;
+  background-color: #9b8ab8;
 }
 .stage-4.stage-bg.active {
-  border-color: #dc927d;
+  border-color: #8d7aae;
 }
 .stage-4.stage-levels-bg--active {
-  background-color: #e1a391;
+  background-color: #9b8ab8;
 }
 .stage-4.stage-level-front {
-  background-color: #d68169;
+  background-color: #806aa5;
 }
 .stage-4.stage-level-current {
   font-weight: bold;
   text-decoration: underline;
 }
 .stage-5.stage-bg {
-  background-color: #bbf5e9;
+  background-color: #798184;
 }
 .stage-5.stage-bg.active {
-  border-color: #a5f2e2;
+  border-color: #6d7477;
 }
 .stage-5.stage-levels-bg--active {
-  background-color: #bbf5e9;
+  background-color: #798184;
 }
 .stage-5.stage-level-front {
-  background-color: #8feedb;
+  background-color: #616769;
 }
 .stage-5.stage-level-current {
   font-weight: bold;
   text-decoration: underline;
 }
 .stage-6.stage-bg {
-  background-color: #5ab4b2;
+  background-color: #0093d9;
 }
 .stage-6.stage-bg.active {
-  border-color: #4ca8a6;
+  border-color: #0082c0;
 }
 .stage-6.stage-levels-bg--active {
-  background-color: #5ab4b2;
+  background-color: #0093d9;
 }
 .stage-6.stage-level-front {
-  background-color: #449795;
+  background-color: #0070a6;
 }
 .stage-6.stage-level-current {
   font-weight: bold;
