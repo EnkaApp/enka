@@ -90,13 +90,11 @@ define(function (require, exports, module) {
   };
 
   ZoomingGrid.prototype.showCells = function(transition, delay, callback) {
-    this.visible = false;
     this.gridMod.setTransform(Transform.translate(0, 0, 1));
     _animateCells.call(this, transition, delay, callback);
   };
 
   ZoomingGrid.prototype.hideCells = function(transition, delay, callback) {
-    this.visible = true;
     this.gridMod.setTransform(Transform.translate(0, 0, -100));
     _animateCells.call(this, transition, delay, callback);
   };

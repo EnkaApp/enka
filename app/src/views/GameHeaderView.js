@@ -189,6 +189,7 @@ define(function(require, exports, module) {
   function _getClasses(index, stage, level) {
     return [
       'piece',
+      'piece-mini',
       'stage-' + stage,
       'level-' + level,
       this._pieceController.colorQueue[index]

@@ -2,20 +2,26 @@
   background-color: @bgHome;  
 }
 
-.bg-logo {
-  background-color: @bgLogo;
+.logo.logo-bg {
+  background-color: fade(@bgLogo, 70%);
+}
+
+.logo.logo-brick {
+  background-color: white;
 }
 
 .btn-play.btn-wrapper,
 .btn-about.btn-wrapper,
 .btn-resume.btn-wrapper {
-  background-color: black;
+
+  button {
+    background-color: fade(@home-btnBg, 70%);
+    border: 3px solid @home-btnBg;
+  }
 
   .btn-label {
     color: white;
-    text-align: center;
     text-transform: uppercase;
-    font-style: italic;
     line-height: 30px;
   }
 }

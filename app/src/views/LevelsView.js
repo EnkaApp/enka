@@ -139,6 +139,7 @@ define(function(require, exports, module) {
     this._active = true;
 
     this._backing._mod.setTransform(Transform.identity);
+    this._backing._mod.setOpacity(0.999, {duration: 300});
     this._backing.addClass('stage-levels-bg--active');
     
     this.grid.showCells(transition, delay, function() {
@@ -151,6 +152,7 @@ define(function(require, exports, module) {
 
     this._active = false;
     this._backing.removeClass('stage-levels-bg--active');
+    this._backing._mod.setOpacity(0.001, {duration: 300});
 
     this.grid.hideCells(transition, delay, function() {
       this._backing._mod.setTransform(Transform.translate(0, 0, -100));
@@ -221,6 +223,7 @@ define(function(require, exports, module) {
 
     var mod = new StateModifier({
       size: [undefined, undefined],
+      opacity: 0.001
     });
 
     this._backing._mod = mod;

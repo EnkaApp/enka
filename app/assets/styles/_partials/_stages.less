@@ -1,3 +1,8 @@
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+// Stage Levels
+
 .stage-levels {
   .btn {
     display: block;
@@ -9,6 +14,84 @@
     text-transform: uppercase;
     font-weight: bold;
     color: white;
+    border-radius: 0px;
+  }
+}
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+// Stage Front
+
+.stage-level-front {
+  
+  &.stage-level-backing {
+    // border-radius: 99em;
+  }
+
+  .level-number, .fa-lock {
+    position: absolute;
+    display: block;
+    width: 100%;
+    line-height: 1;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .level-number {
+    height: 60px;
+    font-size: 60px;
+    top: 50%;
+    margin-top: -30px;
+  }
+
+  .fa-lock {
+    display: none;
+  }
+
+  &.locked {
+    .level-number {
+      display: none;
+    }
+
+    .fa-lock {
+      display: block;
+      height: 100px;
+      font-size: 100px;
+      top: 50%;
+      margin-top: -50px;
+    }
+  }
+}
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+// Stage Back
+
+.stage-level-back {
+
+  &.stage-level-backing {
+    box-shadow: 2px 2px 7px rgba(0,0,0,0.2);
+  }
+
+  .description {
+    text-align: center;
+    color: darken(@cc1-bg, 20%);
+    padding: 50px 25px 0;
+  }
+
+  .btn-play {
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    background: @btnSuccess;
+    color: white;
+    border: 5px solid lighten(@btnSuccess, 5%);
+    text-transform: uppercase;
+    font-weight: bold;
+    border-radius: 0;
   }
 }
 
@@ -16,6 +99,11 @@
 .stage-bg.active {
   border-bottom: 10px solid white;
 }
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+// Stage Specific
 
 .stage-1 {
   @bg-color: @cc1-bg;
@@ -29,21 +117,24 @@
   }
 
   &.stage-levels-bg--active {
-    background-color: @bg-color;
+    background-color: @cc1-activeBg;
   }
 
-  &.stage-level-front {
-    background-color: darken(@bg-color, 10%);
-    border: 10px solid darken(@bg-color, 15%);
+  &.stage-level-front.stage-level-backing {
+    background: darken(@cc1-activeBg, 5%);
+    border: 10px solid darken(@cc1-activeBg, 10%);
   }
 
-  &.stage-level-current {
-    font-weight: bold;
-    text-decoration: underline;
+  &.stage-level-back.stage-level-backing {}
+
+  &.locked {
+    .fa-lock {
+      color: @cc1-bg;
+    }
   }
 
   &.unlocked {
-    color: @cc1-color4;
+    color: @cc1-textColor;
 
     &.stage-level--color1 {
       background-color: @cc1-color1;
@@ -62,9 +153,9 @@
   }
 
   .btn {
-    background-color: darken(@cc1-bg, 20%);
-    color: @cc1-color4;
-    border-color: darken(@cc1-bg, 30%);
+    background-color: @cc1-btnBg;
+    color: @cc1-textColor;
+    border-color: darken(@cc1-btnBg, 10%);
   }
 }
 
@@ -80,34 +171,45 @@
   }
 
   &.stage-levels-bg--active {
-    background-color: @bg-color;
+    background-color: @cc2-activeBg;
   }
 
-  &.stage-level-front {
-    background-color: darken(@bg-color, 10%);
+  &.stage-level-front.stage-level-backing {
+    background: darken(@cc2-activeBg, 5%);
+    border: 10px solid darken(@cc2-activeBg, 10%);
   }
 
-  &.stage-level-current {
-    font-weight: bold;
-    text-decoration: underline;
-  }
+  &.stage-level-back.stage-level-backing {}
 
-  &.stage-level-locked {
-    background-color: darken(@bg-color, 10%);
+  &.locked {
+    .fa-lock {
+      color: lighten(@bg-color, 10%);
+    }
   }
 
   &.unlocked {
-    &.stage-level--color1 {
+    color: @cc2-textColor;
 
+    &.stage-level--color1 {
+      background-color: @cc2-color1;
+      border-color: darken(@cc2-color1, 10%);
     }
 
     &.stage-level--color2 {
-      
+      background-color: @cc2-color2;
+      border-color: darken(@cc2-color2, 10%); 
     }
 
     &.stage-level--color3 {
-      
+      background-color: @cc2-color3;
+      border-color: darken(@cc2-color3, 10%);
     }
+  }
+
+  .btn {
+    background-color: @cc2-btnBg;
+    color: @cc2-textColor;
+    border-color: darken(@cc2-btnBg, 10%);
   }
 }
 
@@ -123,30 +225,44 @@
   }
 
   &.stage-levels-bg--active {
-    background-color: @bg-color;
+    background-color: @cc3-activeBg;
   }
 
-  &.stage-level-front {
-    background-color: darken(@bg-color, 10%);
+  &.stage-level-front.stage-level-backing {
+    background: darken(@cc3-activeBg, 5%);
+    border: 10px solid darken(@cc3-activeBg, 10%);
   }
 
-  &.stage-level-current {
-    font-weight: bold;
-    text-decoration: underline;
+  &.stage-level-back.stage-level-backing {}
+  &.locked {
+    .fa-lock {
+      color: @cc3-bg;
+    }
   }
 
   &.unlocked {
-    &.stage-level--color1 {
+    color: @cc3-textColor;
 
+    &.stage-level--color1 {
+      background-color: @cc3-color1;
+      border-color: darken(@cc3-color1, 10%);
     }
 
     &.stage-level--color2 {
-      
+      background-color: @cc3-color2;
+      border-color: darken(@cc3-color2, 10%);
     }
 
     &.stage-level--color3 {
-      
+      background-color: @cc3-color3;
+      border-color: darken(@cc3-color3, 10%);
     }
+  }
+
+  .btn {
+    background-color: @cc3-btnBg;
+    color: @cc3-textColor;
+    border-color: darken(@cc3-btnBg, 10%);
   }
 }
 
@@ -162,19 +278,25 @@
   }
 
   &.stage-levels-bg--active {
-    background-color: @bg-color;
+    background-color: @cc4-activeBg;
   }
 
-  &.stage-level-front {
-    background-color: darken(@bg-color, 10%);
+  &.stage-level-front.stage-level-backing {
+    background: darken(@cc4-activeBg, 5%);
+    border: 10px solid darken(@cc4-activeBg, 10%);
   }
 
-  &.stage-level-current {
-    font-weight: bold;
-    text-decoration: underline;
+  &.stage-level-back.stage-level-backing {}
+
+  &.locked {
+    .fa-lock {
+      color: @cc4-bg;
+    }
   }
 
   &.unlocked {
+    color: @cc4-textColor;
+
     &.stage-level--color1 {
 
     }
@@ -186,6 +308,12 @@
     &.stage-level--color3 {
       
     }
+  }
+
+  .btn {
+    background-color: @cc4-btnBg;
+    color: @cc4-textColor;
+    border-color: darken(@cc4-btnBg, 10%);
   }
 }
 
@@ -201,19 +329,25 @@
   }
 
   &.stage-levels-bg--active {
-    background-color: @bg-color;
+    background-color: @cc5-activeBg;
   }
 
-  &.stage-level-front {
-    background-color: darken(@bg-color, 10%);
+  &.stage-level-front.stage-level-backing {
+    background: darken(@cc5-activeBg, 5%);
+    border: 10px solid darken(@cc5-activeBg, 10%);
   }
 
-  &.stage-level-current {
-    font-weight: bold;
-    text-decoration: underline;
+  &.stage-level-back.stage-level-backing {}
+
+  &.locked {
+    .fa-lock {
+      color: @cc5-bg;
+    }
   }
 
   &.unlocked {
+    color: @cc5-textColor;
+
     &.stage-level--color1 {
     
     }
@@ -225,6 +359,12 @@
     &.stage-level--color3 {
       
     }
+  }
+
+  .btn {
+    background-color: @cc5-btnBg;
+    color: @cc5-textColor;
+    border-color: darken(@cc5-btnBg, 10%);
   }
 }
 
@@ -240,19 +380,25 @@
   }
 
   &.stage-levels-bg--active {
-    background-color: @bg-color;
+    background-color: @cc6-activeBg;
   }
 
-  &.stage-level-front {
-    background-color: darken(@bg-color, 10%);
+  &.stage-level-front.stage-level-backing {
+    background: darken(@cc6-activeBg, 5%);
+    border: 10px solid darken(@cc6-activeBg, 10%);
   }
 
-  &.stage-level-current {
-    font-weight: bold;
-    text-decoration: underline;
+  &.stage-level-back.stage-level-backing {}
+
+  &.locked {
+    .fa-lock {
+      color: @cc6-bg;
+    }
   }
 
   &.unlocked {
+    color: @cc6-textColor;
+
     &.stage-level--color1 {
 
     }
@@ -264,5 +410,11 @@
     &.stage-level--color3 {
       
     }
+  }
+
+  .btn {
+    background-color: @cc6-btnBg;
+    color: @cc6-textColor;
+    border-color: darken(@cc6-btnBg, 10%);
   }
 }

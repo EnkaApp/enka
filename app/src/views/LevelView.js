@@ -287,6 +287,7 @@ define(function(require, exports, module) {
 
     this.backing.setClasses([
       'stage-level-front',
+      'stage-level-backing',
       'stage-'+this.options.stage,
       'stage-level--color'+this.options.color
     ]);

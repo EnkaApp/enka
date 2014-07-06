@@ -504,7 +504,7 @@ define(function(require, exports, module) {
    * These are to be reused after each piece is placed.
    */
   function _createPositionHighlights(size) {
-    var surfaces;
+    var surface, surfaces;
 
     if (this._highlights && this._highlights.length) surfaces = this._highlights;
     else surfaces = [];
@@ -512,7 +512,12 @@ define(function(require, exports, module) {
     // create surfaces if they have not been created yet
     if (!surfaces.length) {
       for (var i = 4; i >= 1; i--) {
-        var surface = new Surface();
+        surface = new Surface({
+          properties: {
+            pointerEvents: 'none'
+          }
+        });
+
         var mod = new StateModifier({
           origin: [0, 0],
           align: [0, 0],
@@ -534,8 +539,8 @@ define(function(require, exports, module) {
       }
     }
     
-    for (var i = surfaces.length - 1; i >= 0; i--) {
-      var surface = surfaces[i];
+    for (var j = surfaces.length - 1; j >= 0; j--) {
+      surface = surfaces[j];
       surface._mod.setSize(size);
       surface._scaleMod.setSize(size);
     }
@@ -600,33 +605,6 @@ define(function(require, exports, module) {
    * Checks to see if the user is trapped
    */
   function _checkIfTrapped(index) {
-    // var trueFlag = 0;
-    // var canMove = [];
-
-    // var directions = {
-    //   left: this.isInBounds('left'),
-    //   right: this.isInBounds('right'),
-    //   up: this.isInBounds('up'),
-    //   down: this.isInBounds('down')
-    // };
-
-    // for(var direction in directions){
-    //   var indexToCheck = _getNewIndex.call(this, index, direction);
-    //   if(directions[direction]){
-    //     canMove.push(this._state[indexToCheck] === null);
-    //   }
-    // }
-
-    // for(var i = 0; i < canMove.length; i++){
-    //   if(canMove[i]){
-    //     trueFlag++;
-    //   }
-    // }
-
-    // if(!trueFlag){
-    //   this._controller.gameOver();
-    // }
-
     var moves = _getPossibleMoves.call(this, index);
 
     if (moves.length === 0) this._controller.gameOver();

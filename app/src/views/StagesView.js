@@ -119,8 +119,6 @@ define(function(require, exports, module) {
 
     this.activeIndex = index;
 
-    // var bgColor = data.backgroundColor;
-
     this.expandStage(function() {
       _scrollActiveToTop.call(this, function() {
         // animate in the levels
@@ -193,11 +191,11 @@ define(function(require, exports, module) {
    */
   function _createLightbox() {
     this.lightbox = new Lightbox({
-      inTransform: Transform.translate(0, 0, 0),
-      showTransform: Transform.translate(0, 0, 0),
-      outTransform: Transform.translate(0, 0, 0),
+      inTransform: Transform.translate(0, 0, 1),
+      showTransform: Transform.translate(0, 0, 1),
+      outTransform: Transform.translate(0, 0, -100),
       inOpacity: 1,
-      outOpacity: 1,
+      outOpacity: 0,
     });
 
     var mod = new StateModifier({

@@ -48,8 +48,8 @@ define(function(require, exports, module) {
   PieceView.DEFAULT_OPTIONS = {
     width: 100,
     height: 100,
-    frontBgColor: 'blue',
-    backBgColor: 'red',
+    frontBgColor: 'color-1',
+    backBgColor: 'color-2',
     direction: 'left',
     obstacle: false,
     level: 1,

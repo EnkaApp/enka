@@ -1,56 +1,86 @@
 // Colors
 
-@baige: #F1E7C3;
-@brick: #9B2840;
-@lightTeal: #DDF6E8;
-@orange: #F67933;
-@lightBlue: #65C6D4;
-@skyBlue: #53A7D5;
-@navy: #313541;
-@red: #F80A41;
-@teal: #348375;
-@forest: #284141;
-@magenta: #FF3C63;
+@baige: #F4F0E4;
+@brick: #7C2D28;
+@orange: #F67E26;
+@bloodOrange: #F55638;
+@coral: #FA4E64;
+@green: #77C4A1;
+@navy: #202833;
 
-// Color Combinations
-@cc1-bg: #F55638; // orange
+// Color Combination 1
 @cc1-color1: #5AB4B2; // seagreen
 @cc1-color2: #B30313; // red
 @cc1-color3: #EBAA4C; // yellow
-@cc1-color4: #F4F0E4; // baige
+@cc1-color4: @bloodOrange;
 
+@cc1-bg: @cc1-color4;
+@cc1-activeBg: @baige;
+@cc1-textColor: @baige; // baige
+@cc1-btnBg: @cc1-bg;
 
-@cc2-bg: #7C2D28; // brick
+// Color Combination 2
 @cc2-color1: #429291; // teal
 @cc2-color2: #71486A; // purple
 @cc2-color3: #E99B39; // marigold
 @cc2-color4: #EB422B; // orange
 
-@cc3-bg: #95D6D2; // mint
-@cc3-color1: #BEE3D2; // green
+@cc2-bg: @cc2-color3; 
+@cc2-activeBg: @baige;
+@cc2-textColor: @baige;
+@cc2-btnBg: @cc2-bg;
+
+// Color Combination 3
+@cc3-color1: #77C4A1; // green
 @cc3-color2: #FCB040; // marigold
 @cc3-color3: #F9B6B3; // salmon
 @cc3-color4: #D9D3D3; // gray
+@cc3-color5: #95D6D2; // mint
 
-@cc4-bg: #9B8AB8; // purple
+@cc3-bg: @cc3-color5;
+@cc3-activeBg: @baige;
+@cc3-textColor: @baige;
+@cc3-btnBg: @cc3-bg;
+
+// Color Combination 4
 @cc4-color1: #FFDDB2; // yellow
-@cc4-color2: #CBE1FD; // blue
+@cc4-color2: #23C0ED; // light blue
 @cc4-color3: #E1A391; // clay
 @cc4-color4: #E0D2C3; // baige
+@cc4-color5: @orange; // orange
 
-@cc5-bg: #798184; // navy
+@cc4-bg: @cc4-color2;
+@cc4-activeBg: @baige;
+@cc4-textColor: @baige;
+@cc4-btnBg: @cc4-bg;
+
+// Color Combination 5
 @cc5-color1: #1C7691; // teal
-@cc5-color2: #23C0ED; // light blue
+@cc5-color2: #0093D9; // blue
 @cc5-color3: #202833; // navy
 @cc5-color4: #FA4E64; // coral
+@cc5-color5: #798184; // gray
 
-@cc6-bg: #0093D9; // light blue
+@cc5-bg: @cc5-color2;
+@cc5-activeBg: @baige;
+@cc5-textColor: @baige;
+@cc5-btnBg: @cc5-bg;
+
+// Color Combination 6
 @cc6-color1: #0F4A7D; // dark blue
 @cc6-color2: #F01920; // red
-@cc6-color3: #F67E26; // orange
-@cc6-color4: #D1A5B1; // salmon
+@cc6-color3: #9B8AB8; // purple
+@cc6-color4: #D1A5B1; // pink
+@cc6-color5: #CBE1FD; // sky blue
+
+
+@cc6-bg: @cc6-color3;
+@cc6-activeBg: @baige;
+@cc6-textColor: @baige;
+@cc6-btnBg: @cc6-bg;
 
 // Color Assignments
 @bgHome: #FFFFFF;
-@bgLogo: @lightTeal;
-@btnSuccess: @teal;
+@home-btnBg: @navy;
+@bgLogo: @navy;
+@btnSuccess: @green;
