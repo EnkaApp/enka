@@ -167,13 +167,13 @@ define(function(require, exports, module) {
 
     var transitionable = new Transitionable(start);
 
-    var prerender = function(){
+    var prerender = function() {
       this.bg.setOptions({
         size: [transitionable.get(), this._height]
       });
     }.bind(this);
 
-    var complete = function(){
+    var complete = function() {
       Engine.removeListener('prerender', prerender);
       if (callback) callback();
     };

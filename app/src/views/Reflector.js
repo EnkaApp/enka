@@ -189,14 +189,14 @@ define(function(require, exports, module) {
         }
 
         var result = [];
-        if (this.frontNode){
+        if (this.frontNode) {
             result.push({
                 transform: frontTransform,
                 target: this.frontNode.render()
             });
         }
 
-        if (this.backNode){
+        if (this.backNode) {
             result.push({
                 transform: Transform.moveThen([0, 0, -0.1], backTransform),
                 target: this.backNode.render()

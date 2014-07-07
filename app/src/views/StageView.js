@@ -71,7 +71,7 @@ define(function(require, exports, module) {
       this.iconMod.setOpacity(0.001, transition);
     }.bind(this));
 
-    // No need to animate if we are already at the expanded height. 
+    // No need to animate if we are already at the expanded height.
     // @NOTE This will only happen when the stages are first initialized
     if (this.options.currentHeight === this.options.expandedHeight) {
       if (callback) callback();
@@ -88,11 +88,11 @@ define(function(require, exports, module) {
   };
 
   StageView.prototype.contract = function(callback) {
+    var transition = {curve: 'easeOut', duration: 250};
+
     this.options.active = false;
     this.bg.removeClass('active');
 
-    var transition = {curve: 'easeOut', duration: 250};
-    
     this.iconMod.setTransform(Transform.translate(0, 0, 0), transition, function() {
       // and show the icon
       this.iconMod.setOpacity(0.999, transition);
@@ -103,7 +103,7 @@ define(function(require, exports, module) {
       end: this.options.height,
       duration: 500,
       axis: 'y'
-    }, function () {
+    }, function() {
       if (callback) callback();
     });
   };
@@ -174,12 +174,12 @@ define(function(require, exports, module) {
       this.rootMod.setSize(size);
     }.bind(this);
 
-    var complete = function(){
+    var complete = function() {
       Engine.removeListener('prerender', prerender);
-      
+
       // Update the currentHeight of the view
       this.options.currentHeight = end;
-      
+
       if (callback) callback();
     }.bind(this);
 

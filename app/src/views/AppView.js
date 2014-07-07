@@ -73,7 +73,7 @@ define(function(require, exports, module) {
       this.showPage('home');
     }.bind(this));
 
-    this.homeView.on('nav:loadStages', function(){
+    this.homeView.on('nav:loadStages', function() {
       _slideUp.call(this);
       this.showPage('stages');
     }.bind(this));

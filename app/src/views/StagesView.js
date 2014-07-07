@@ -91,7 +91,7 @@ define(function(require, exports, module) {
     _createHeader.call(this);
     _createContent.call(this);
     _createLightbox.call(this);
-    
+
     // Init Event Listeners
     _setListeners.call(this);
 
@@ -106,7 +106,7 @@ define(function(require, exports, module) {
     stageHeight: 100,
 
     // stageExpandedHeight should be larger than actual scrollview container
-    // otherwise occassionally when _scrollActiveToTop is called you will be 
+    // otherwise occassionally when _scrollActiveToTop is called you will be
     // able to see either a little of the previous or next view. I believe this
     // is due to how the scrollview is being scrolled. For now, this is a pretty
     // good fix
@@ -382,11 +382,15 @@ define(function(require, exports, module) {
   }
 
   function _createScrollView() {
+    var options;
+    var stage;
+    var levels;
+
     this._stages = [];
     this.scrollView = new Scrollview();
 
     for (var i = 0; i < StageConfig.getStagesCount(); i++) {
-      var options = {
+      options = {
         index: i,
         height: this.options.stageHeight,
         currentHeight: this.options.stageHeight,
@@ -397,9 +401,9 @@ define(function(require, exports, module) {
         options.currentHeight = this.options.stageExpandedHeight;
         options.active = true;
       }
-      
-      var stage = _createStageView.call(this, options);
-      var levels = _createStageLevels.call(this, options);
+
+      stage = _createStageView.call(this, options);
+      levels = _createStageLevels.call(this, options);
 
       this._stageLevels.push(levels);
       this._stages.push(stage);
@@ -409,7 +413,7 @@ define(function(require, exports, module) {
 
     this.scrollView._eventInput.on('end', function() {
 
-      // if we are not at the top edge tell AppView to stop responding 
+      // if we are not at the top edge tell AppView to stop responding
       // to Touch/Scroll Events
       if (this.scrollView._scroller.onEdge() !== -1) {
         this._eventOutput.emit('stagesView:scrollViewInContent');
@@ -474,22 +478,23 @@ define(function(require, exports, module) {
 
   /*
    * Calculates how far up we need to scroll in order to have the
-   * top of the item that was click line up with the top of the 
+   * top of the item that was click line up with the top of the
    * scrollview
    *
    * @param {float} the pixel coordinate of the Y click position
    * @param {index} the scrollview index of the scroll node that was clicked on
    */
   function _getYOffset(index) {
+    var firstVisibileHeight;
+    var offset;
     var firstIndex = this.scrollView._scroller._node.index;
 
     // If the first visible index is the clicked index then we are scrolling down
     if (index === firstIndex) {
-      var svPos = this.scrollView.getPosition();
-      return -svPos;
+      return -this.scrollView.getPosition();
     }
 
-    var firstVisibileHeight = _getFirstVisibleHeight.call(this);
+    firstVisibileHeight = _getFirstVisibleHeight.call(this);
 
     // If the clicked index is the one after the first visible just return the height
     if (index === firstIndex + 1) {
@@ -497,8 +502,7 @@ define(function(require, exports, module) {
     }
 
     // Otherwise we calculate offset and add it to the height of the first visible
-    var offset = (index - firstIndex - 1) * this.options.stageHeight;
-    
+    offset = (index - firstIndex - 1) * this.options.stageHeight;
     return firstVisibileHeight + offset;
   }
 
@@ -531,8 +535,8 @@ define(function(require, exports, module) {
     // @NOTE
     // This is hacky... but it works. Unlike with a standard transform where the
     // transformation is calculated from the initial position everytime, _shiftOrigin
-    // saves its position on each invocation so we are keeping track of previous moved 
-    // moved amount in order to adjust what we pass into _shiftOrigin so that the 
+    // saves its position on each invocation so we are keeping track of previous moved
+    // moved amount in order to adjust what we pass into _shiftOrigin so that the
     // move amount doesn't end up accumulating on itself
     var prevMove = 0;
 
@@ -551,7 +555,6 @@ define(function(require, exports, module) {
     }.bind(this);
 
     Engine.on('prerender', prerender);
-    
     transitionable.set(delta, transition, complete);
   }
 

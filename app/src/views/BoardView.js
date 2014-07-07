@@ -83,7 +83,7 @@ define(function(require, exports, module) {
       yStart = data.clientY;
     });
 
-    sync.on('end', function(data){
+    sync.on('end', function(data) {
       xEnd = data.clientX;
       yEnd = data.clientY;
       
@@ -108,7 +108,7 @@ define(function(require, exports, module) {
           piece._piece.reflect();
 
           // delete all legal matches. if no matches, check if we are trapped
-          var onReflected = function(){
+          var onReflected = function() {
 
             // We need to check if the piece is trapped after deleteMatches has
             // executed otherwise it will mistakingly check pieces that are in queue
@@ -271,7 +271,7 @@ define(function(require, exports, module) {
     lastPiece = piece;
   };
 
-  BoardView.prototype.deleteMatches = function(index, callback){
+  BoardView.prototype.deleteMatches = function(index, callback) {
     var matched = [];
     var connections = 0;
     var initialIndex = index;
@@ -283,11 +283,11 @@ define(function(require, exports, module) {
       var matches = this.checkIfAnyNeighborHasMatch(index);
       // console.log('The following indices have matches: ', matches);
 
-      for(var i = 0; i < matches.length; i++){
+      for(var i = 0; i < matches.length; i++) {
         // matches has matches of all neighbors
-        if (matches[i]){
+        if (matches[i]) {
           var newIndexToCheck = matches[i][0];
-          if (matches[i][1] === true && !matched[newIndexToCheck]){
+          if (matches[i][1] === true && !matched[newIndexToCheck]) {
             matched[newIndexToCheck] = true;
             connections++;
             seekAndDestroy.call(this, newIndexToCheck);
@@ -296,10 +296,10 @@ define(function(require, exports, module) {
       }
     }
 
-    if (connections > 1){
+    if (connections > 1) {
       var pieces = [];
-      for(var i = 0; i < matched.length; i++){
-        if (matched[i] && i !== initialIndex){
+      for(var i = 0; i < matched.length; i++) {
+        if (matched[i] && i !== initialIndex) {
           pieces.push(i);
         }
       }
@@ -322,9 +322,9 @@ define(function(require, exports, module) {
       down: this.checkIfDirectionHasMatch(index, 'down')
     };
 
-    for(var direction in directions){
+    for(var direction in directions) {
       // starts with 4 checks to see if the neighbor position is in bounds
-      if (this.isInBounds(direction)){
+      if (this.isInBounds(direction)) {
         if (directions[direction])
           matches.push(directions[direction]);
       }
@@ -333,7 +333,7 @@ define(function(require, exports, module) {
     return matches;
   };
 
-  BoardView.prototype.checkIfDirectionHasMatch = function(index, direction){
+  BoardView.prototype.checkIfDirectionHasMatch = function(index, direction) {
     var isMatchAtIndex = [];
     var matchColor = this.getColorFromIndex(index); // color to match to
     var neighborIndex = _getNewIndex.call(this, index, direction);
@@ -357,7 +357,7 @@ define(function(require, exports, module) {
   };
 
   BoardView.prototype.getColorFromIndex = function(index) {
-    if (this._state[index]){
+    if (this._state[index]) {
       var color = _getPieceAtIndex.call(this, index).getOption('backBgColor');
       return color;
     }
@@ -379,19 +379,19 @@ define(function(require, exports, module) {
     var newXPosition = newIndexCoords[0] + pieceSize[0];
     var newYPosition = newIndexCoords[1] + pieceSize[1];
 
-    if (direction === 'left' && newIndexCoords[0] === 0){
+    if (direction === 'left' && newIndexCoords[0] === 0) {
       res = false;
     }
 
-    if (direction === 'right' && newXPosition === boardWidth){
+    if (direction === 'right' && newXPosition === boardWidth) {
       res = false;
     }
 
-    if (direction === 'up' && newIndexCoords[1] === 0){
+    if (direction === 'up' && newIndexCoords[1] === 0) {
       res = false;
     }
 
-    if (direction === 'down' && newYPosition === boardHeight){
+    if (direction === 'down' && newYPosition === boardHeight) {
       res = false;
     }
 
@@ -669,16 +669,16 @@ define(function(require, exports, module) {
    * Calculates the index of the neighbor position relative to the current index
    */
   function _getNewIndex(index, direction) {
-    if (direction === 'left'){
+    if (direction === 'left') {
       return index - 1;
     }
-    if (direction === 'right'){
+    if (direction === 'right') {
       return index + 1;
     }
-    if (direction === 'up'){
+    if (direction === 'up') {
       return index - this.options.columns;
     }
-    if (direction === 'down'){
+    if (direction === 'down') {
       return index + this.options.columns;
     }
   }
@@ -690,19 +690,19 @@ define(function(require, exports, module) {
     var direction = '';
 
     // swipe right
-    if (xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)){
+    if (xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)) {
       direction = 'right';
     }
     // swipe left
-    if (xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd) ){
+    if (xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd) ) {
       direction = 'left';
     }
     // swipe down
-    if (yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)){
+    if (yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)) {
       direction = 'down';
     }
     // swipe up
-    if (yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ){
+    if (yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ) {
       direction = 'up';
     }
 

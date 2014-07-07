@@ -89,7 +89,7 @@ define(function(require, exports, module) {
 
       var transitionable = new Transitionable(start);
 
-      var prerender = function(){
+      var prerender = function() {
         var width = options.width || transitionable.get();
         var height = options.height || transitionable.get();
 
@@ -98,7 +98,7 @@ define(function(require, exports, module) {
         });
       };
 
-      var complete = function(){
+      var complete = function() {
         Engine.removeListener('prerender', prerender);
       };
 
@@ -180,7 +180,7 @@ define(function(require, exports, module) {
 
   //   Engine.on('prerender', _render);
 
-  //   var complete = function(){
+  //   var complete = function() {
   //     Engine.removeListener('prerender', _render);
   //     // this.letter = canvas;
   //     // if (callback) callback();

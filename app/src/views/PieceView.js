@@ -86,7 +86,7 @@ define(function(require, exports, module) {
   };
 
   PieceView.prototype.reflect = function() {
-    this.reflector.reflect({curve : 'linear', duration : 500}, function(){
+    this.reflector.reflect({curve : 'linear', duration : 500}, function() {
       this._eventOutput.emit('reflected');
     }.bind(this));
   };

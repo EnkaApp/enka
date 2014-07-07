@@ -14,7 +14,7 @@ define(function(require, exports, module) {
 
   function PieceController(options) {
 
-    if (PieceController._instance){
+    if (PieceController._instance) {
       return PieceController._instance;
     }
 
@@ -26,7 +26,7 @@ define(function(require, exports, module) {
     this._gameController = new GameController();
 
     // initializes this.colorQueue with 3 colors
-    for(var i = 0; i < 3; i++){
+    for(var i = 0; i < 3; i++) {
       this.addColorToQueue();
     }
     
@@ -147,7 +147,7 @@ define(function(require, exports, module) {
     var node = null;
 
     // If this._deletedPieces.length === 0, create a new piece
-    if (this._deletedPieces.length === 0){
+    if (this._deletedPieces.length === 0) {
       node = _createNewPiece.call(this, direction);
     }
 
@@ -163,7 +163,7 @@ define(function(require, exports, module) {
     this._deletedPieces.push(node);
   };
 
-  PieceController.prototype.getNextColorFromQueue = function(shift){
+  PieceController.prototype.getNextColorFromQueue = function(shift) {
     var color;
 
     shift = shift !== undefined ? shift : true;
@@ -178,7 +178,7 @@ define(function(require, exports, module) {
     return color;
   };
 
-  PieceController.prototype.addColorToQueue = function(){
+  PieceController.prototype.addColorToQueue = function() {
     var colorNum = _getRandomIntInRange(1, this.options.colors);
     this.colorQueue.push('color-' + colorNum);
 
@@ -187,7 +187,7 @@ define(function(require, exports, module) {
   };
 
   // ## Utility Functions
-  function _getRandomColor (min, max){
+  function _getRandomColor (min, max) {
     var num = Math.floor(Math.random() * (max - min + 1)) + min;
     return colorArray[num];
   }

@@ -1,4 +1,4 @@
-define(function (require, exports, module) {
+define(function(require, exports, module) {
   var Engine        = require('famous/core/Engine');
   var View          = require('famous/core/View');
   var Surface       = require('famous/core/Surface');
@@ -38,7 +38,7 @@ define(function (require, exports, module) {
     this._eventInput.pipe(this._eventOutput);
   }
 
-  var ZoomingGrid = function () {
+  var ZoomingGrid = function() {
     View.apply(this, arguments);
 
     this._scale = Transform.scale(
@@ -67,7 +67,7 @@ define(function (require, exports, module) {
   ZoomingGrid.prototype.constructor = ZoomingGrid;
 
   ZoomingGrid.DEFAULT_OPTIONS = {
-    cellSize: [300 ,400],
+    cellSize: [300, 400],
     grid: [4, 7],
     gutterSize: [0, 0],
     scale: [0.1, 0.1, 1],
@@ -124,7 +124,6 @@ define(function (require, exports, module) {
 
   function _animateCells(transition, delay, callback) {
     var cells = this.cells;
-    
     var ease = {
       duration: 300,
       curve: Easing.inOutQuad
@@ -152,10 +151,9 @@ define(function (require, exports, module) {
     }
 
     // Execute callback when the animation has completed
-    Timer.setTimeout(function () {
+    Timer.setTimeout(function() {
       if (callback) callback();
     }, cells.length * delay);
-    
   }
 
   // ## Utility Functions
@@ -164,7 +162,6 @@ define(function (require, exports, module) {
     var grid = this.options.grid;
     var cols = grid[0];
     var rows = grid[1];
-
     var row = Math.floor(index / cols) + 1;
     var col = index % cols + 1;
 
@@ -176,7 +173,6 @@ define(function (require, exports, module) {
     var width = this.options.cellSize[0];
     var half = cols * width / 2;
     var offset = (coord[0] - 1) * width;
-    
     var x = half - offset - (width / 2);
 
     return x;
@@ -187,7 +183,6 @@ define(function (require, exports, module) {
     var height = this.options.cellSize[1];
     var half = rows * height / 2;
     var offset = (coord[1] - 1) * height;
-    
     var y = half - offset - (height / 2);
 
     return y;
