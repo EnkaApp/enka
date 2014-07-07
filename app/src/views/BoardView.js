@@ -54,34 +54,23 @@ define(function(require, exports, module) {
 
     // Win Event
     this._controller.on('game:won', function() {
-      console.log('you win');
-
-      // Delete all pieces except the winner
-      var pieces = [];
-      var lastPieceIndex;
-
-      for (var i = 0; i < this._state.length; i++) {
-        var piece = this._state[i];
-        if (piece && piece !== lastPiece) {
-          pieces.push(i);
-        } else if (piece === lastPiece) {
-          lastPieceIndex = i;
-        }
-      }
-
-      this.deletePieces(pieces, true, function() {
+      _clearBoard.call(this, false, false, function() {
         this._eventOutput.emit('game:won', {
-          piece: lastPiece,
-          index: lastPieceIndex
+          piece: lastPiece
         });
       }.bind(this));
-
     }.bind(this));
 
     // Lose Event
     this._controller.on('game:lost', function() {
-      console.log('you lose');
-    });
+      this._eventOutput.emit('game:lost', {
+        piece: lastPiece,
+      });
+    }.bind(this));
+
+    this._controller.on('game:reset', function() {
+      _clearBoard.call(this, true, true);
+    }.bind(this));
 
     // Pipe PieceController events out
     this._pieceGenerator._eventOutput.pipe(this._eventOutput);
@@ -559,6 +548,34 @@ define(function(require, exports, module) {
 
   // ## Private Helpers
 
+  function _clearBoard(removeLastPiece, initialize, callback) {
+
+    removeLastPiece = removeLastPiece || false;
+    initialize = initialize || false;
+
+    // Delete all pieces except the winner
+    var pieces = [];
+    var lastPieceIndex;
+
+    for (var i = 0; i < this._state.length; i++) {
+      var piece = this._state[i];
+      
+      if (piece && piece === lastPiece) {
+        lastPieceIndex = i;
+        if(!removeLastPiece) continue;
+      }
+
+      if (piece) pieces.push(i);
+    }
+
+    this.deletePieces(pieces, true, function() {
+      _hidePossibleMoves.call(this);
+
+      if (initialize) _init.call(this);
+      if (callback) callback();
+    }.bind(this));
+  }
+
   /*
    * Highlights the parts of the board where a move can be made
    *
@@ -606,7 +623,9 @@ define(function(require, exports, module) {
       });
     }
 
-    Timer.setTimeout(callback, dur);
+    if (callback) {
+      Timer.setTimeout(callback, dur);
+    }
    }
 
   /*

@@ -12,29 +12,13 @@
   }
 }
 
-.gameboard-buttons,
 .gamemenu-buttons {
-  .btn {
-    display: block;
-    height: 100%;
-    width: 100%;
-    text-align: center;
-    background: darken(whitesmoke, 15%);
-    border: 5px solid darken(whitesmoke, 5%);
-    text-transform: uppercase;
-    font-weight: bold;
-    border-radius: 99em;
-    color: white;
-  }
-
-  .btn-continue,
   .btn-resume {
     background: darken(@btnSuccess, 10%);
     border-color: lighten(@btnSuccess, 0%);
   }
 
-  .btn-quit {
-  }
+  .btn-quit {}
 }
 
 .gameboard-backing {
@@ -50,5 +34,41 @@
   .message {
     text-align: center;
     padding: 20px 0 0;
+  }
+}
+
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+// Game Level Done
+
+.game.level-done {
+
+  &.message {
+    &.content {
+      font-size: 18px;
+      text-align: center;
+      line-height: 30px;
+    }
+
+    &.backing {
+
+    }
+  }
+
+  &.btn {
+    .btn-next {
+      background: darken(@btnSuccess, 10%);
+      border-color: lighten(@btnSuccess, 0%);
+    }
+    
+    .btn-replay {}
+
+    .btn-quit {
+      background: darken(@btnSuccess, 10%);
+      border-color: lighten(@btnSuccess, 0%);
+    }
+
+    .btn-restart {}
   }
 }

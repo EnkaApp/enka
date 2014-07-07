@@ -13,21 +13,63 @@
 // Stage Specific
 
 .stage-1 {
-  &.piece.color-1 {
-    background-color: @cc1-color1;
+
+  &.level-done {
+    background-color: white !important;
+    border-width: 30px;
   }
 
-  &.piece.color-2 {
-    background-color: @cc1-color2;
+  &.color-1 {
+    &.piece {
+      background-color: @cc1-color1;
+    }
+
+    &.level-done {
+      border-color: @cc1-color1;
+    }
   }
 
-  &.piece.color-3 {
-    background-color: @cc1-color3;
+  &.color-2 {
+    &.piece {
+      background-color: @cc1-color2;
+    }
+
+    &.level-done {
+      border-color: @cc1-color2;
+    }
   }
 
-  &.piece.color-4 {
-    background-color: @cc1-color4;
+  &.color-3 {
+    &.piece {
+      background-color: @cc1-color3;
+    }
+
+    &.level-done {
+      border-color: @cc1-color3;
+    }
   }
+
+  &.color-4 {
+    &.piece {
+      background-color: @cc1-color4;
+    }
+
+    &.level-done {
+      border-color: @cc1-color4;
+    }
+  }
+
+  // &.piece.color-2 {
+  //   background-color: @cc1-color2;
+  // }
+
+  // &.piece.color-3 {
+  //   background-color: @cc1-color3;
+  // }
+
+  // &.piece.color-4 {
+  //   background-color: @cc1-color4;
+  // }
 }
 
 .stage-2 {

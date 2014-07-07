@@ -1692,6 +1692,7 @@ a img {
 }
 html {
   background: #fff;
+  color: #444;
   font-family: "Helvetica-Neue", Arial, sans-serif;
 }
 h1,
@@ -1711,16 +1712,17 @@ i {
 }
 button {
   box-sizing: border-box;
-  border: none;
-  border-radius: 99em;
-  background: black;
-  padding: 0px;
-  width: 100%;
-  display: block;
   font-size: 14px;
-  font-weight: 300;
-  text-transform: uppercase;
+  display: block;
+  height: 100%;
+  width: 100%;
   text-align: center;
+  background: #cfcfcf;
+  border: 5px solid #e8e8e8;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 99em;
+  color: white;
 }
 .backfaceVisibility {
   -webkit-backface-visibility: visible;
@@ -1742,22 +1744,6 @@ button {
 .gamemenu.gamemenu-description {
   text-align: center;
 }
-.gameboard-buttons .btn,
-.gamemenu-buttons .btn {
-  display: block;
-  height: 100%;
-  width: 100%;
-  text-align: center;
-  background: #cfcfcf;
-  border: 5px solid #e8e8e8;
-  text-transform: uppercase;
-  font-weight: bold;
-  border-radius: 99em;
-  color: white;
-}
-.gameboard-buttons .btn-continue,
-.gamemenu-buttons .btn-continue,
-.gameboard-buttons .btn-resume,
 .gamemenu-buttons .btn-resume {
   background: #53b588;
   border-color: #77c4a1;
@@ -1772,6 +1758,19 @@ button {
 .gameboard-win .message {
   text-align: center;
   padding: 20px 0 0;
+}
+.game.level-done.message.content {
+  font-size: 18px;
+  text-align: center;
+  line-height: 30px;
+}
+.game.level-done.btn .btn-next {
+  background: #53b588;
+  border-color: #77c4a1;
+}
+.game.level-done.btn .btn-quit {
+  background: #53b588;
+  border-color: #77c4a1;
 }
 .header {
   color: white;
@@ -1816,17 +1815,33 @@ button {
 .piece-mini {
   border: none;
 }
-.stage-1.piece.color-1 {
+.stage-1.level-done {
+  background-color: white !important;
+  border-width: 30px;
+}
+.stage-1.color-1.piece {
   background-color: #5ab4b2;
 }
-.stage-1.piece.color-2 {
+.stage-1.color-1.level-done {
+  border-color: #5ab4b2;
+}
+.stage-1.color-2.piece {
   background-color: #b30313;
 }
-.stage-1.piece.color-3 {
+.stage-1.color-2.level-done {
+  border-color: #b30313;
+}
+.stage-1.color-3.piece {
   background-color: #ebaa4c;
 }
-.stage-1.piece.color-4 {
+.stage-1.color-3.level-done {
+  border-color: #ebaa4c;
+}
+.stage-1.color-4.piece {
   background-color: #f55638;
+}
+.stage-1.color-4.level-done {
+  border-color: #f55638;
 }
 .stage-2.piece.color-1 {
   background-color: #429291;
@@ -1841,16 +1856,11 @@ button {
   background-color: #eb422b;
 }
 .stage-levels .btn {
-  display: block;
-  height: 100%;
-  width: 100%;
-  text-align: center;
-  background: #cfcfcf;
-  border-top: 5px solid #e8e8e8;
-  text-transform: uppercase;
-  font-weight: bold;
-  color: white;
+  border: none;
   border-radius: 0px;
+}
+.stage-level-front.stage-level-backing {
+  border-radius: 1em;
 }
 .stage-level-front .level-number,
 .stage-level-front .fa-lock {
@@ -1881,6 +1891,7 @@ button {
   margin-top: -50px;
 }
 .stage-level-back.stage-level-backing {
+  border-radius: 1em;
   box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.2);
 }
 .stage-level-back .description {

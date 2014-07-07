@@ -80,6 +80,13 @@ define(function(require, exports, module) {
     _init.call(this);
   };
 
+  GameController.prototype.resetGame = function() {
+    var options = this.getCurrentLevel();
+    this.newGame(options);
+
+    this._eventOutput.emit('game:reset');
+  };
+
   GameController.prototype.gameOver = function() {
     this.lost();
   };

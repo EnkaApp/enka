@@ -3,6 +3,7 @@
  * GameView contains all the gameplay views, i.e. GameHeaderView and BoardView
  */
 define(function(require, exports, module) {
+  var Engine              = require('famous/core/Engine');
   var View                = require('famous/core/View');
   var Surface             = require('famous/core/Surface');
   var Transform           = require('famous/core/Transform');
@@ -11,6 +12,7 @@ define(function(require, exports, module) {
   var Timer               = require('famous/utilities/Timer');
   var ContainerSurface    = require('famous/surfaces/ContainerSurface');
   var RenderNode          = require('famous/core/RenderNode');
+  var Transitionable      = require('famous/transitions/Transitionable');
 
   // ## Utils
   var utils = require('utils');
@@ -28,7 +30,21 @@ define(function(require, exports, module) {
   var tplMsg = require('hbs!templates/msg');
   var tplBtn = require('hbs!templates/btn');
 
+  // ## Shared
+  var W = utils.getViewportWidth();
+  var H = utils.getViewportHeight();
   var MENU_HEIGHT = 220;
+  
+  var MESSAGES = {
+    won: [
+      'Level Completed',
+      'Nothin but net'
+    ],
+    lost: [
+      'Better luck next time',
+      'My grandmother plays better than you'
+    ]
+  };
 
   function _setListeners() {
 
@@ -93,9 +109,7 @@ define(function(require, exports, module) {
       // as the one that the user has been playing... if not, update
       // the game controller with the new game data
       if (!this._controller.isSameGame(data)) {
-
-        console.info('Loading new game :: stage:', data.stage, ', level:', data.level);
-
+        
         // update the game controller with the new stage/level info
         this._controller.newGame({
           level: data.level,
@@ -108,18 +122,28 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this.boardView._eventOutput.on('game:won', function(data) {
-      _doWinAnimation.call(this, data);
+      _doDoneAnimation.call(this, 'won', data);
       this._controller.unlockNextLevel();
     }.bind(this));
 
-    this.winBtn.on('click', function() {
-      this._eventOutput.emit('nav:loadStages');
+    this.boardView._eventOutput.on('game:lost', function(data) {
+      _doDoneAnimation.call(this, 'lost', data);
+    }.bind(this));
 
-      // reset the origami view (i.e win message) but allow the page
-      // change plenty of time to complete first
-      Timer.setTimeout(function() {
-        _resetOrigamiView.call(this);
-      }.bind(this), 1250);
+    this._eventInput.on('game:doneBtnClicked', function(data) {
+      var action = data.action;
+      
+      if (action === 'next' || action === 'quit') {
+        
+        _resetDoneNode.call(this, 300, function() {
+          this._controller.resetGame();
+          this._eventOutput.emit('nav:loadStages');
+        }.bind(this));
+
+      } else if (action === 'replay' || action === 'restart') {
+        this._controller.resetGame();
+        _resetDoneNode.call(this);
+      }
     }.bind(this));
   }
 
@@ -142,7 +166,7 @@ define(function(require, exports, module) {
 
     _createBoardView.call(this);
     _createBoardMenuView.call(this);
-    _createOrigamiView.call(this);
+    _createLevelDoneNode.call(this);
 
     // Call this after layout views have been created
     _createLayout.call(this);
@@ -194,112 +218,180 @@ define(function(require, exports, module) {
     this.add(this.boardMenuView);
   }
 
-  function _createWinNode() {
+  /*
+   * Creates the node that displays the won/lost message
+   */
+  function _createLevelDoneNode() {
     var node = new RenderNode();
 
-    var msg = tplMsg({
-      message: 'Level Completed'
+    // create the message node
+    var message = _createMessageNode.call(this);
+
+    var backing = new Surface({
+      classes: ['piece', 'level-done', 'level-done-backing'],
+      properties: {
+        borderRadius: '999em'
+      }
     });
 
-    var message = new Surface({
-      content: msg,
-      classes: ['gameboard', 'gameboard-win']
+    var posMod = new StateModifier({
+      size: [true, true],
+      origin: [0, 0],
+      align: [0, 0],
     });
 
-    var btn = tplBtn({
-      label: 'Continue',
-      classes: ['btn-continue']
-    });
-
-    this.winBtn = new Surface({
-      content: btn,
-      classes: ['gameboard', 'gameboard-buttons', 'gameboard-win']
-    });
-
-    var nodeMod = new StateModifier({
-      size: [190, 150],
+    var backingMod = new StateModifier({
+      size: [5, 5],
       origin: [0.5, 0.5],
       align: [0.5, 0.5],
-      transform: Transform.translate(0, 0, 1)
+      transform: Transform.translate(0, 0, -1),
+      opacity: 0.001
     });
 
-    var winBtnMod = new StateModifier({
-      size: [190, 50],
-      origin: [0.5, 1],
-      align: [0.5, 1],
-      transform: Transform.translate(0, -20, 1)
+    node = node.add(posMod);
+    node.add(backingMod).add(backing);
+
+    this._doneNode = node;
+    this._doneNode.msg = message;
+    this._doneNode._backing = backing;
+    this._doneNode._posMod = posMod;
+    this._doneNode._backingMod = backingMod;
+
+    this.add(this._doneNode);
+    this.add(message);
+  }
+
+  function _createMessageNode() {
+    var node = new RenderNode();
+
+    // create the buttons
+    var buttons = _createButtons.call(this, 2);
+
+    var backing = new Surface();
+    var message = new Surface();
+    
+    var rootMod = new StateModifier({
+      size: [250, 150],
+      origin: [0.5, 0.5],
+      align: [0.5, 0.5],
     });
 
-    node = node.add(nodeMod);
-    node.add(message);
-    node.add(winBtnMod).add(this.winBtn);
+    var backingMod = new StateModifier();
+    var messageMod = new StateModifier({
+      size: [190, 30],
+      origin: [0.5, 0],
+      align: [0.5, 0]
+    });
 
-    this.winMessage = node;
-    node._rootModifier = nodeMod;
-    node._winBtnModifer = winBtnMod;
+    node = node.add(rootMod);
+
+    node._mod = rootMod;
+    node._surface = message;
+    node._backing = backing;
+    node.buttons = buttons;
+
+    backing._mod = backingMod;
+    message._mod = messageMod;
+
+    node.add(backingMod).add(backing);
+    node.add(messageMod).add(message);
+
+    // add the buttons
+    for (var i = 0; i < buttons.length; i++) {
+      node.add(buttons[i]);
+    }
 
     return node;
   }
 
-  function _resetOrigamiView() {
-    this.overlayMod.setTransform(Transform.translate(0, 0, -100));
-    this.overlayMod.setOpacity(0.001);
-    this.origamiMod.setTransform(Transform.translate(0, 0, -100));
-    // this.winMessage._rootModifier.setTransform(Transform.translate(0, 0, -100));
-    this.origamiView.reset();
-  }
-
-  function _createOrigamiView() {
-
-    this.overlay = new Surface({
-      classes: ['game-overlay', 'game-win'],
-      properties: {
-        backgroundColor: '#303030'
-      }
-    });
-
-    this.overlayMod = new StateModifier({
-      origin: [0, 0],
-      align: [0, 0],
-      transform: Transform.translate(0, 0, -100),
-      opacity: 0.001
-    });
+  function _createButtons(count) {
     
-    this.origamiMod = new StateModifier({
-      origin: [0, 0],
-      align: [0, 0],
-      size: [64, 64],
-      transform: Transform.translate(0, 0, -100),
-    });
+    count = count || count === 0 ? count : 2;
 
-    var node = _createWinNode.call(this);
-    this.origamiView = new OrigamiView({
-      content: node
-    });
+    var height = 50;
+    var margin = 10;
+    var buttonNodes = [];
+    var wrapperClasses = ['game', 'level-done', 'btn'];
 
-    // Create the view but make not visible
-    this.add(this.overlayMod).add(this.overlay);
-    this.add(this.origamiMod).add(this.origamiView);
+    function eventHandler(node) {
+      this._eventInput.emit('game:doneBtnClicked', node);
+    }
+
+    for (var i = 0; i < count; i++) {
+      
+      var node = new RenderNode();
+      
+      var surface = new Surface({
+        classes: wrapperClasses
+      });
+
+      var mod = new StateModifier({
+        size: [190, height],
+        origin: [0.5, 1],
+        align: [0.5, 1],
+        transform: Transform.translate(0, -i * (height + margin), 1)
+      });
+
+      node._mod = mod;
+      node._surface = surface;
+
+      node.add(mod).add(surface);
+
+      buttonNodes.push(node);
+
+      // add event listener
+      node._surface.on('click', eventHandler.bind(this, node));
+    }
+
+    return buttonNodes;
   }
 
-  function _doWinAnimation(data) {
+  function _resetDoneNode(duration, callback) {
+    var dur = duration || 1000;
+
+    _hideMessageNode.call(this, dur);
+    this._doneNode._backingMod.setSize([5, 5], {duration: dur});
+    this._doneNode._backingMod.setOpacity(0.001, {duration: dur}, function() {
+      this._doneNode._backingMod.setTransform(Transform.translate(0, 0, -1));
+      if (callback) callback();
+    }.bind(this));
+  }
+
+  function _doDoneAnimation(type, data) {
+    console.log(data);
     var piece = data.piece;
-    var lastPieceIndex = data.index;
     var backColor = piece._piece.getOption('backBgColor');
+    var level = this._controller.getCurrentLevel();
+    var vector = _getPieceTranslation.call(this, piece);
+    var height = piece._piece.getOption('height');
+
+    // Place the win node on top of the piece
+    var posTransform = Transform.thenMove(
+      Transform.translate(0,0,500),
+      vector
+    );
+
+    this._doneNode._posMod.setTransform(posTransform);
+
+    this._doneNode._backing.addClass('stage-'+level.stage);
+    this._doneNode._backing.addClass(backColor);
+
+    var dur = 1000;
+    var backingMod = this._doneNode._backingMod;
+
+    backingMod.setOpacity(0.8, {duration: dur/2});
+    backingMod.setSize([H*1.25, H*1.25], {duration: dur}, function() {
+      _showMessageNode.call(this, type, 300);
+    }.bind(this));
+  }
+
+  function _getPieceTranslation(piece) {
     var width = piece._piece.getOption('width');
     var height = piece._piece.getOption('height');
     var reflectionOrigin = piece._piece.reflectionMod.getOrigin();
-    var centerX = utils.getViewportWidth() / 2;
-    var centerY = utils.getViewportHeight() / 2;
-
-    // Configure the origami view so that it starts at the same size as the piece
-    this.origamiView.setOptions({
-      startDimen: width
-    });
-
-    // HACKY
     var transform = piece._piece.reflector.backNode._matrix;
 
+    // Adjust for the reflector
     if (reflectionOrigin[0] == 0.5) {
 
       // Adjust for 'Up' Reflection
@@ -325,32 +417,109 @@ define(function(require, exports, module) {
       }
     }
 
-    // Place the origami view on top of the winning move
-    this.origamiMod.setSize([width, height]);
+    // Adjust for the done node backing modifier
+    transform = Transform.thenMove(transform, [width/2,height/2,1]);
 
-    // This transform calculates the position of the piece and put origamiView on top of it
-    var vector = Transform.getTranslate(transform);
-    transform = Transform.moveThen(vector, Transform.translate(0, 0, 185));
-    this.origamiMod.setTransform(transform);
+    return Transform.getTranslate(transform);
+  }
+  
+  function _showMessageNode(type, duration) {
+    duration = duration || duration === 0 ? duration : 300;
 
-    // Remove the last piece now that we have its position
-    this.boardView.deletePiece(lastPieceIndex);
 
-    // Fade the overlay in
-    this.overlayMod.setTransform(Transform.translate(0, 0, 200));
-    this.overlayMod.setOpacity(0.999, {
-      curve: 'linear',
-      duration: 1500
-    });
+    // configure the message and buttons
+    var content = utils.getRandomArrayItem(MESSAGES[type]);
 
-    // This transform moves origamiView to the middle of the view
-    transform = Transform.translate(centerX - width/2, centerY - height/2, 210);
-    this.origamiMod.setTransform(transform, {
-      curve: 'linear',
-      duration: 500
-    }, function() {
-      this.origamiView.open();
+    _setMessage.call(this, content, [type]);
+    _setButtons.call(this, type);
+
+    // show the message
+    var msg = this._doneNode.msg;
+    msg._mod.setOpacity(0.999, {duration: duration});
+    msg._mod.setTransform(Transform.translate(0,0,750));
+
+    // show the button
+    for (var i = 0; i < msg.buttons.length; i++) {
+      var btn = msg.buttons[i];
+
+      btn._mod.setOpacity(0.999, {duration: duration});
+    }
+  }
+
+  function _hideMessageNode(duration) {
+    var msg = this._doneNode.msg;
+
+    msg._mod.setOpacity(0.001, {duration: duration}, function() {
+      msg._mod.setTransform(Transform.translate(0,0,-1));
     }.bind(this));
+
+    // hide the buttons
+    for (var i = 0; i < msg.buttons.length; i++) {
+      var btn = msg.buttons[i];
+
+      btn._mod.setOpacity(0.001, {duration: duration});
+    }
+  }
+
+  function _setMessage(content, classes) {
+    var contentClasses, backingClasses;
+    var msg = this._doneNode.msg;
+    var defaultBackingClasses = ['game', 'level-done', 'message', 'backing'];
+    var defaultContentClasses = ['game', 'level-done', 'message', 'content'];
+    
+    if (classes) {
+      contentClasses = defaultContentClasses.concat(classes);
+      backingClasses = defaultBackingClasses.concat(classes);
+    } else {
+      contentClasses = defaultContentClasses;
+      backingClasses = defaultBackingClasses;
+    }
+
+    msg._surface.setContent(content);
+    msg._surface.setClasses(contentClasses);
+    msg._backing.setClasses(backingClasses);
+  }
+
+  function _setButtons(type) {
+    var buttons;
+    var buttonNodes = this._doneNode.msg.buttons;
+
+    if (type === 'won') {
+      buttons = [
+        {
+          label: 'replay',
+          classes: ['btn-replay']
+        },
+        {
+          label: 'next',
+          classes: ['btn-next']
+        }
+      ];
+    } else {
+      buttons = [
+        {
+          label: 'restart',
+          classes: ['btn-restart']
+        },
+        {
+          label: 'quit',
+          classes: ['btn-quit']
+        }
+      ];
+    }
+
+    for (var i = 0; i < buttonNodes.length; i++) {
+      var node = buttonNodes[i];
+      var surface = node._surface;
+      var btn = buttons[i];
+      var content = tplBtn({
+        label: btn.label,
+        classes: btn.classes
+      });
+
+      surface.setContent(content);
+      node.action = btn.label;
+    }
   }
 
   module.exports = GameView;
