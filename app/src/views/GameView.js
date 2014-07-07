@@ -21,7 +21,6 @@ define(function(require, exports, module) {
   var BoardView = require('views/BoardView');
   var BoardMenuView = require('views/BoardMenuView');
   var GameHeaderView = require('views/GameHeaderView');
-  var OrigamiView = require('views/OrigamiView');
 
   // ## Controllers
   var GameController = require('controllers/GameController');
