@@ -131,7 +131,8 @@ define(function(require, exports, module) {
         origin: origin,
         align: align
       });
-    } else {
+    }
+    else {
       this.reflectionMod.setOrigin(origin);
       this.reflectionMod.setAlign(align);
     }

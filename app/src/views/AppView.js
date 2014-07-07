@@ -119,12 +119,16 @@ define(function(require, exports, module) {
 
     Engine.on('game:loaded', function() {
       gameIsLoaded = true;
-      if (userIsLoaded) _setupGame.call(this);
+      if (userIsLoaded) {
+        _setupGame.call(this);
+      }
     }.bind(this));
 
     Engine.on('user:loaded', function() {
       userIsLoaded = true;
-      if (gameIsLoaded) _setupGame.call(this);
+      if (gameIsLoaded) {
+        _setupGame.call(this);
+      }
     }.bind(this));
 
     // _handleSwipe.call(this);
@@ -188,7 +192,8 @@ define(function(require, exports, module) {
   //         if (position < H - this.options.posThreshold) {
   //           this.slideDown();
   //           this.showingHome = true;
-  //         } else {
+  //         }
+  //         else {
   //           this.slideUp();
   //         }
   //       }
@@ -232,7 +237,10 @@ define(function(require, exports, module) {
 
   function _setupGame() {
 
-    if (gameIsSetup) return;
+    // Prevent setup from running twice
+    if (gameIsSetup) {
+      return;
+    }
 
     // Initialize Controllers
     this.gameController = new GameController();

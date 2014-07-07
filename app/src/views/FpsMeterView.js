@@ -18,14 +18,19 @@ define(function(require, exports, module) {
 
   var __extends = function(child, parent) {
     for (var key in parent) {
-      if (__hasProp.call(parent, key)) child[key] = parent[key];
+      if (__hasProp.call(parent, key)) {
+        child[key] = parent[key];
+      }
     }
 
-    function ctor() {
+    function Ctor() {
       this.constructor = child;
     }
 
-    ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child;
+    Ctor.prototype = parent.prototype; child.prototype = new Ctor();
+    child.__super__ = parent.prototype;
+
+    return child;
   };
 
   var FpsMeter = (function(_super) {
@@ -89,7 +94,8 @@ define(function(require, exports, module) {
     FpsMeter.prototype.toggleState = function() {
       if (this.state) {
         this.stop();
-      } else {
+      }
+      else {
         this.start();
       }
       return this.state = !this.state;

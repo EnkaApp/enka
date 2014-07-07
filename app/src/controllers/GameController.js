@@ -130,7 +130,9 @@ define(function(require, exports, module) {
     this.options.turns++;
 
     // check win condition
-    if (_hasWon.call(this)) this.won();
+    if (_hasWon.call(this)) {
+      this.won();
+    }
 
     // send 'turn++' event to model
     this._eventOutput.emit('game:turn++');
@@ -144,7 +146,9 @@ define(function(require, exports, module) {
   };
 
   GameController.prototype.doWinCheck = function() {
-    if (_hasWon.call(this)) this.won();
+    if (_hasWon.call(this)) {
+      this.won();
+    }
   };
 
   GameController.prototype.won = function() {
@@ -190,9 +194,14 @@ define(function(require, exports, module) {
     var goal = this._config.goal;
 
     if (gametype === StageConfig.GAMETYPE_SURVIVAL) {
-      if (this.options.turns >= goal) won = true;
-    } else if (gametype === StageConfig.GAMETYPE_DESTROY) {
-      if (this.options.destroyed >= goal) won = true;
+      if (this.options.turns >= goal) {
+        won = true;
+      }
+    }
+    else if (gametype === StageConfig.GAMETYPE_DESTROY) {
+      if (this.options.destroyed >= goal) {
+        won = true;
+      }
     }
 
     return won;

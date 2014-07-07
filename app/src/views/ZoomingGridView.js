@@ -123,7 +123,8 @@ define(function(require, exports, module) {
       if (this.visible) {
         this.rootMod.halt();
         this.hide();
-      } else {
+      }
+      else {
         this.rootMod.halt();
         this.show();
       }
@@ -138,7 +139,9 @@ define(function(require, exports, module) {
 
     // Execute callback when the animation has completed
     Timer.setTimeout(function() {
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }, cells.length * delay);
   }
 

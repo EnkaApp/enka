@@ -162,7 +162,9 @@ define(function(require, exports, module) {
 
     function complete() {
       Engine.removeListener('prerender', prerender.bind(this));
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }
 
     Engine.on('prerender', prerender.bind(this));

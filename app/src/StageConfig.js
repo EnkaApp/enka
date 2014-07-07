@@ -35,9 +35,11 @@ define(function(require, exports, module) {
 
     if (grid && typeof grid === 'string') {
       grid = GRID_TYPES[grid];
-    } else if (Array.isArray(grid)) {
+    }
+    else if (Array.isArray(grid)) {
       grid = grid;
-    } else {
+    }
+    else {
       grid = GRID_TYPES.standard;
     }
 

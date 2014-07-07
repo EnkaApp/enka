@@ -3,7 +3,6 @@ define(function(require, exports, module) {
   var Engine        = require('famous/core/Engine');
   var View          = require('famous/core/View');
   var Surface       = require('famous/core/Surface');
-  // var CanvasSurface = require('famous/surfaces/CanvasSurface');
   var Transform     = require('famous/core/Transform');
   var Modifier      = require('famous/core/Modifier');
   var Transitionable = require('famous/transitions/Transitionable');
@@ -120,7 +119,8 @@ define(function(require, exports, module) {
       if (letter.animationChain[i] === 'width') {
         options.height = options.size[1];
         options.width = 0;
-      } else {
+      }
+      else {
         options.height = 0;
         options.width = options.size[0];
       }
@@ -134,61 +134,6 @@ define(function(require, exports, module) {
       this.add(modifier).add(surface);
     }
   }
-
-  // @NOTE Keep this canvas code here as an example...
-  // @TODO Figure out why canvas animations tied into the 'prerender'
-  // event don't actually appear on the screen
-
-  // function _createLetter(letter) {
-
-  //   var options = {
-  //     x: 0,
-  //     y: 0,
-  //     width: 100,
-  //     height: 100,
-  //     fill: '#000000'
-  //   };
-
-  //   var canvas = new CanvasSurface({
-  //     canvasSize: [190, 190]
-  //   });
-
-  //   var context = canvas.getContext('2d');
-
-  //   // Height Transitionable
-  //   var transition = {duration: 400, curve: 'linear' };
-  //   var start = 0;
-  //   var end = options.height;
-  //   var transitionable = new Transitionable(start);
-
-  //   function _render() {
-  //     // clear the canvas
-  //     context.clearRect(0, 0, canvas.width, canvas.height);
-
-  //     var height = transitionable.get();
-
-  //     // draw the letter
-  //     context.beginPath();
-  //     context.rect(options.x, options.y, height, height);
-  //     context.fillStyle = options.fill;
-  //     context.fill();
-  //   }
-
-  //   Engine.on('prerender', _render);
-
-  //   var complete = function() {
-  //     Engine.removeListener('prerender', _render);
-  //     // this.letter = canvas;
-  //     // if (callback) callback();
-  //   };
-
-  //   // start the drawing process
-  //   // _render();
-
-  //   transitionable.set(end, transition, complete);
-
-  //   this.letter = canvas;
-  // }
 
   function LetterView() {
     View.apply(this, arguments);
@@ -214,7 +159,9 @@ define(function(require, exports, module) {
     }
 
     Timer.setTimeout(function() {
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }, dur * this._surfaces.length);
   };
 

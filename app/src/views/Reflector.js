@@ -32,7 +32,9 @@ define(function(require, exports, module) {
     this.options = Object.create(Reflector.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
 
-    if (options) this.setOptions(options);
+    if (options) {
+      this.setOptions(options);
+    }
 
     if (this.options.direction === Reflector.DIRECTION_UP ||
         this.options.direction === Reflector.DIRECTION_DOWN) {
@@ -105,8 +107,14 @@ define(function(require, exports, module) {
    * @param {Function} [callback] Callback
    */
   Reflector.prototype.setAngle = function setAngle(angle, transition, callback) {
-    if (transition === undefined) transition = this.options.transition;
-    if (this.angle.isActive()) this.angle.halt();
+    if (transition === undefined) {
+      transition = this.options.transition;
+    }
+
+    if (this.angle.isActive()) {
+      this.angle.halt();
+    }
+
     this.angle.set(angle, transition, callback);
   };
 

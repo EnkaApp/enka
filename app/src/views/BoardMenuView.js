@@ -129,7 +129,8 @@ define(function(require, exports, module) {
 
     if (Array.isArray(options.classes)) {
       classes = options.classes.join(' ');
-    } else {
+    }
+    else {
       classes = options.classes;
     }
 

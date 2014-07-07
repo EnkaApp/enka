@@ -133,7 +133,9 @@ define(function(require, exports, module) {
 
     this.grid.showCells(transition, delay, function() {
       this.showCloseBtn();
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }.bind(this));
   };
 
@@ -146,7 +148,9 @@ define(function(require, exports, module) {
     this.grid.hideCells(transition, delay, function() {
       this._backing._mod.setTransform(Transform.translate(0, 0, -100));
       this.hideCloseBtn();
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }.bind(this));
   };
 
@@ -296,8 +300,12 @@ define(function(require, exports, module) {
     var gridWidth = cols *  cellSize[0] + (rows + 2) * gutter[0];
     var scaleByWidth = W/gridWidth;
 
-    if (scaleByWidth < scaleByHeight) scale = scaleByWidth;
-    else scale = scaleByHeight;
+    if (scaleByWidth < scaleByHeight) {
+      scale = scaleByWidth;
+    }
+    else {
+      scale = scaleByHeight;
+    }
 
     return [scale, scale, 1];
   }

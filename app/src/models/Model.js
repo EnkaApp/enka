@@ -19,7 +19,9 @@ define(function(require, exports, methods) {
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS || Model.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
 
-    if (options) this.setOptions(options);
+    if (options) {
+      this.setOptions(options);
+    }
   }
 
   Model.DEFAULT_OPTIONS = {}; // no defaults

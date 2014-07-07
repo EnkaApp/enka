@@ -148,7 +148,9 @@ define(function(require, exports, module) {
 
     // Something is firing this with no info... so stop if there is no info
     // @TODO track down why
-    if (!stage || !level) return;
+    if (!stage || !level) {
+      return;
+    }
 
     var options = {
       latestStage: stage,
@@ -171,7 +173,8 @@ define(function(require, exports, module) {
     if (this.options.latestLevel === stageConfig.getLevelCount()) {
       level = 1;
       stage += 1;
-    } else {
+    }
+    else {
       level += 1;
     }
 

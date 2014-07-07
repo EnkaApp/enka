@@ -30,26 +30,26 @@ define(function(require, exports, module) {
     this.add(this.buttonMod).add(this.button);
   }
 
-  function _createTitle() {
-    var title = new Surface({
-      content: this.options.content,
-      properties: {
-        pointerEvents: 'none',
-        zIndex: 1
-      }
-    });
+  // function _createTitle() {
+  //   var title = new Surface({
+  //     content: this.options.content,
+  //     properties: {
+  //       pointerEvents: 'none',
+  //       zIndex: 1
+  //     }
+  //   });
 
-    var classes = ['btn-title'].concat(this.options.classes);
-    title.setClasses(classes);
+  //   var classes = ['btn-title'].concat(this.options.classes);
+  //   title.setClasses(classes);
 
-    var mod = new StateModifier({
-      origin: [0.5, 0.5],
-      align: [0.5,0.5],
-      size: [this.options.width, this.options.height]
-    });
+  //   var mod = new StateModifier({
+  //     origin: [0.5, 0.5],
+  //     align: [0.5,0.5],
+  //     size: [this.options.width, this.options.height]
+  //   });
 
-    this.add(mod).add(title);
-  }
+  //   this.add(mod).add(title);
+  // }
 
   function _setListeners() {
     this.button.on('click', function() {

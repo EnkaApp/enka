@@ -64,7 +64,9 @@ define(function(require, exports, module) {
 
     // The only time this._lastColor is falsy is when we are
     // placeing the first piece on the board
-    if (!this._lastColor) this._lastColor = backColor;
+    if (!this._lastColor) {
+      this._lastColor = backColor;
+    }
 
     // Create the piece before reassigning last color
     piece.updateOptions({
@@ -92,7 +94,9 @@ define(function(require, exports, module) {
 
     var level = this._gameController.getCurrentLevel();
 
-    if (!direction) direction = 'left';
+    if (!direction) {
+      direction = 'left';
+    }
 
     // Default to left for no particular reason
     var node = new RenderNode();
@@ -113,7 +117,9 @@ define(function(require, exports, module) {
 
     // The only time this._lastColor is falsy is when we are
     // placeing the first piece on the board
-    if (!this._lastColor) this._lastColor = backColor;
+    if (!this._lastColor) {
+      this._lastColor = backColor;
+    }
 
     var options = {
       width: this.options.pieceSize[0],
@@ -168,7 +174,8 @@ define(function(require, exports, module) {
     if (shift) {
       color = this.colorQueue.shift();
       this._eventOutput.emit('piece:colorRemoved');
-    } else {
+    }
+    else {
       color = this.colorQueue[0];
     }
 

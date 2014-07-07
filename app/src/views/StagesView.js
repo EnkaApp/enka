@@ -134,7 +134,9 @@ define(function(require, exports, module) {
     // close the expanded node
     activeNode.contract(function() {
       this.lightbox.hide();
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }.bind(this));
   };
 
@@ -412,7 +414,8 @@ define(function(require, exports, module) {
       // to Touch/Scroll Events
       if (this.scrollView._scroller.onEdge() !== -1) {
         this._eventOutput.emit('stagesView:scrollViewInContent');
-      } else {
+      }
+      else {
         this._eventOutput.emit('stagesView:scrollViewEdgeHit');
       }
     }.bind(this));
@@ -464,7 +467,9 @@ define(function(require, exports, module) {
 
     // if exactly equal we are looking at a situation where the very first visible node
     // is lined up exactly with the top of scrollview
-    if (firstHeight === svPos) return firstHeight;
+    if (firstHeight === svPos) {
+      return firstHeight;
+    }
 
     height = firstHeight - svPos;
 
@@ -538,14 +543,16 @@ define(function(require, exports, module) {
     // function to fire with each Engine 'prerender' event
     var prerender = function() {
       var move = transitionable.get() - prevMove;
-      prevMove = transitionable.get();
 
+      prevMove = transitionable.get();
       _shiftOrigin.call(this, move);
     }.bind(this);
 
     var complete = function() {
       Engine.removeListener('prerender', prerender);
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }.bind(this);
 
     Engine.on('prerender', prerender);

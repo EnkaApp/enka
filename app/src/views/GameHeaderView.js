@@ -92,7 +92,8 @@ define(function(require, exports, module) {
 
       if (i === 0) {
         surface._modifier.setTransform(transform, transition, callback.bind(surface));
-      } else {
+      }
+      else {
         surface._modifier.setTransform(transform, transition);
       }
     }

@@ -1,4 +1,6 @@
 /* globals define */
+/* eslint no-shadow:0 */
+
 define(function(require, exports, module) {
   var View           = require('famous/core/View');
   var Surface        = require('famous/core/Surface');
@@ -273,6 +275,7 @@ define(function(require, exports, module) {
     var matched = [];
     var connections = 0;
     var initialIndex = index;
+    // var i; // incrementor for seekAndDestroy
 
     matched[index] = true;
     seekAndDestroy.call(this, index);
@@ -295,6 +298,7 @@ define(function(require, exports, module) {
 
     if (connections > 1) {
       var pieces = [];
+
       for (var i = 0; i < matched.length; i++) {
         if (matched[i] && i !== initialIndex) {
           pieces.push(i);
@@ -303,10 +307,15 @@ define(function(require, exports, module) {
 
       this.deletePieces(pieces, false, function() {
         this._controller.doWinCheck();
-        if (callback) callback();
+        if (callback) {
+          callback();
+        }
       });
-    } else {
-      if (callback) callback();
+    }
+    else {
+      if (callback) {
+        callback();
+      }
     }
   }; // end deleteMatches
 
@@ -322,8 +331,9 @@ define(function(require, exports, module) {
     for (var direction in directions) {
       // starts with 4 checks to see if the neighbor position is in bounds
       if (this.isInBounds(direction)) {
-        if (directions[direction])
+        if (directions[direction]) {
           matches.push(directions[direction]);
+        }
       }
     }
 
@@ -344,7 +354,8 @@ define(function(require, exports, module) {
       isMatch = neighborColor === matchColor;
       isMatchAtIndex.push(neighborIndex, isMatch);
       return isMatchAtIndex;
-    } else {
+    }
+    else {
       isMatch = false;
       isMatchAtIndex.push(neighborIndex, isMatch);
       return isMatchAtIndex;
@@ -363,7 +374,8 @@ define(function(require, exports, module) {
 
     if (!index) {
       newIndexCoords = this._lastPiecePosition;
-    } else {
+    }
+    else {
       newIndexCoords = this._gridController.getXYCoordsFromIndex(index);
     }
 
@@ -498,8 +510,12 @@ define(function(require, exports, module) {
     var surface;
     var surfaces;
 
-    if (this._highlights && this._highlights.length) surfaces = this._highlights;
-    else surfaces = [];
+    if (this._highlights && this._highlights.length) {
+      surfaces = this._highlights;
+    }
+    else {
+      surfaces = [];
+    }
 
     // create surfaces if they have not been created yet
     if (!surfaces.length) {
@@ -556,17 +572,26 @@ define(function(require, exports, module) {
       var piece = this._state[i];
 
       if (piece && piece === lastPiece) {
-        if (!removeLastPiece) continue;
+        if (!removeLastPiece) {
+          continue;
+        }
       }
 
-      if (piece) pieces.push(i);
+      if (piece) {
+        pieces.push(i);
+      }
     }
 
     this.deletePieces(pieces, true, function() {
       _hidePossibleMoves.call(this);
 
-      if (initialize) _init.call(this);
-      if (callback) callback();
+      if (initialize) {
+        _init.call(this);
+      }
+
+      if (callback) {
+        callback();
+      }
     }.bind(this));
   }
 
@@ -626,7 +651,9 @@ define(function(require, exports, module) {
   function _checkIfTrapped(index) {
     var moves = _getPossibleMoves.call(this, index);
 
-    if (moves.length === 0) this._controller.gameOver();
+    if (moves.length === 0) {
+      this._controller.gameOver();
+    }
   }
 
   /*
@@ -686,15 +713,15 @@ define(function(require, exports, module) {
       direction = 'right';
     }
     // swipe left
-    if (xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd)) {
+    else if (xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd)) {
       direction = 'left';
     }
     // swipe down
-    if (yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)) {
+    else if (yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)) {
       direction = 'down';
     }
     // swipe up
-    if (yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd)) {
+    else if (yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd)) {
       direction = 'up';
     }
 

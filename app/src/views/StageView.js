@@ -72,7 +72,9 @@ define(function(require, exports, module) {
     // No need to animate if we are already at the expanded height.
     // @NOTE This will only happen when the stages are first initialized
     if (this.options.currentHeight === this.options.expandedHeight) {
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
       return;
     }
 
@@ -81,7 +83,9 @@ define(function(require, exports, module) {
       end: this.options.expandedHeight,
       axis: 'y'
     }, function() {
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }.bind(this));
   };
 
@@ -102,7 +106,9 @@ define(function(require, exports, module) {
       duration: 500,
       axis: 'y'
     }, function() {
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     });
   };
 
@@ -163,9 +169,11 @@ define(function(require, exports, module) {
 
       if (axis === 'x') {
         size = [pixels, undefined];
-      } else if (axis === 'y') {
+      }
+      else if (axis === 'y') {
         size = [undefined, pixels];
-      } else {
+      }
+      else {
         size = [pixels, pixels];
       }
 
@@ -178,7 +186,9 @@ define(function(require, exports, module) {
       // Update the currentHeight of the view
       this.options.currentHeight = end;
 
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }.bind(this);
 
     Engine.on('prerender', prerender);

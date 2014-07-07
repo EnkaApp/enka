@@ -54,7 +54,9 @@ define(function(require, exports, module) {
 
     // Execute callback after the animations have completed
     Timer.setTimeout(function() {
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }.bind(this), delay * (this._modifiers.length - 1));
   };
 
@@ -80,7 +82,9 @@ define(function(require, exports, module) {
 
     // Execute callback after the animations have completed
     Timer.setTimeout(function() {
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }.bind(this), delay * (this._modifiers.length - 1));
   };
 

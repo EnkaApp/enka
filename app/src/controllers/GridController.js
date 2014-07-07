@@ -37,7 +37,8 @@ define(function(require, exports, module) {
 
     if (wSize < hSize) {
       size = [wSize, wSize];
-    } else {
+    }
+    else {
       size = [hSize, hSize];
     }
 
@@ -83,7 +84,8 @@ define(function(require, exports, module) {
 
     if (pieceSize) {
       size = [pieceSize, pieceSize];
-    } else {
+    }
+    else {
       size = this._cellSize;
     }
 

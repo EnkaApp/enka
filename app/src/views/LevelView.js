@@ -293,7 +293,8 @@ define(function(require, exports, module) {
 
     if (this.options.locked) {
       this.backing.addClass('locked');
-    } else {
+    }
+    else {
       this.backing.addClass('unlocked');
     }
 

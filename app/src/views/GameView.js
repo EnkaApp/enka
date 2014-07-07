@@ -31,12 +31,10 @@ define(function(require, exports, module) {
   var MENU_HEIGHT = 220;
   var MESSAGES = {
     won: [
-      'Level Completed',
-      'Nothin but net'
+      'Level Completed'
     ],
     lost: [
-      'Better luck next time',
-      'My grandmother plays better than you'
+      'Better luck next time'
     ]
   };
 
@@ -68,7 +66,8 @@ define(function(require, exports, module) {
         this.layoutMod.setTransform(layoutTransform, transition);
         this.boardMenuView.rootMod.setTransform(menuTransform, transition);
         this.boardView.dim();
-      } else {
+      }
+      else {
         _closeMenu.call(this);
       }
     }.bind(this));
@@ -82,7 +81,8 @@ define(function(require, exports, module) {
 
       if (this._fromPage === 'stages') {
         this._eventOutput.emit('nav:loadStages');
-      } else {
+      }
+      else {
         this._eventOutput.emit('nav:loadHome');
       }
 
@@ -344,7 +344,9 @@ define(function(require, exports, module) {
     this._doneNode._backingMod.setSize([5, 5], {duration: dur});
     this._doneNode._backingMod.setOpacity(0.001, {duration: dur}, function() {
       this._doneNode._backingMod.setTransform(Transform.translate(0, 0, -1));
-      if (callback) callback();
+      if (callback) {
+        callback();
+      }
     }.bind(this));
   }
 
@@ -463,7 +465,8 @@ define(function(require, exports, module) {
     if (classes) {
       contentClasses = defaultContentClasses.concat(classes);
       backingClasses = defaultBackingClasses.concat(classes);
-    } else {
+    }
+    else {
       contentClasses = defaultContentClasses;
       backingClasses = defaultBackingClasses;
     }
@@ -488,7 +491,8 @@ define(function(require, exports, module) {
           classes: ['btn-next']
         }
       ];
-    } else {
+    }
+    else {
       buttons = [
         {
           label: 'restart',
