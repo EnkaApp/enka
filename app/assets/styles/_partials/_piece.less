@@ -7,17 +7,17 @@
   border: none;
 }
 
+.piece.level-done.backing {
+  background-color: white !important;
+  border-width: 30px;
+}
+
 // ------------------------------------------------------------
 // ------------------------------------------------------------
 // ------------------------------------------------------------
 // Stage Specific
 
 .stage-1 {
-
-  &.level-done {
-    background-color: white !important;
-    border-width: 30px;
-  }
 
   &.color-1 {
     &.piece {
@@ -58,35 +58,48 @@
       border-color: @cc1-color4;
     }
   }
-
-  // &.piece.color-2 {
-  //   background-color: @cc1-color2;
-  // }
-
-  // &.piece.color-3 {
-  //   background-color: @cc1-color3;
-  // }
-
-  // &.piece.color-4 {
-  //   background-color: @cc1-color4;
-  // }
 }
 
 .stage-2 {
-  &.piece.color-1 {
-    background-color: @cc2-color1;
+
+  &.color-1 {
+    &.piece {
+      background-color: @cc2-color1;
+    }
+
+    &.level-done {
+      border-color: @cc2-color1;
+    }
   }
 
-  &.piece.color-2 {
-    background-color: @cc2-color2;
+  &.color-2 {
+    &.piece {
+      background-color: @cc2-color2;
+    }
+
+    &.level-done {
+      border-color: @cc2-color2;
+    }
   }
 
-  &.piece.color-3 {
-    background-color: @cc2-color3;
+  &.color-3 {
+    &.piece {
+      background-color: @cc2-color3;
+    }
+
+    &.level-done {
+      border-color: @cc2-color3;
+    }
   }
 
-  &.piece.color-4 {
-    background-color: @cc2-color4;
+  &.color-4 {
+    &.piece {
+      background-color: @cc2-color4;
+    }
+
+    &.level-done {
+      border-color: @cc2-color4;
+    }
   }
 }
 

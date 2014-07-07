@@ -1815,7 +1815,7 @@ button {
 .piece-mini {
   border: none;
 }
-.stage-1.level-done {
+.piece.level-done.backing {
   background-color: white !important;
   border-width: 30px;
 }
@@ -1843,17 +1843,29 @@ button {
 .stage-1.color-4.level-done {
   border-color: #f55638;
 }
-.stage-2.piece.color-1 {
+.stage-2.color-1.piece {
   background-color: #429291;
 }
-.stage-2.piece.color-2 {
+.stage-2.color-1.level-done {
+  border-color: #429291;
+}
+.stage-2.color-2.piece {
   background-color: #71486a;
 }
-.stage-2.piece.color-3 {
+.stage-2.color-2.level-done {
+  border-color: #71486a;
+}
+.stage-2.color-3.piece {
   background-color: #e99b39;
 }
-.stage-2.piece.color-4 {
+.stage-2.color-3.level-done {
+  border-color: #e99b39;
+}
+.stage-2.color-4.piece {
   background-color: #eb422b;
+}
+.stage-2.color-4.level-done {
+  border-color: #eb422b;
 }
 .stage-levels .btn {
   border: none;

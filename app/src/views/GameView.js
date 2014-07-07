@@ -109,7 +109,7 @@ define(function(require, exports, module) {
       // as the one that the user has been playing... if not, update
       // the game controller with the new game data
       if (!this._controller.isSameGame(data)) {
-        
+
         // update the game controller with the new stage/level info
         this._controller.newGame({
           level: data.level,
@@ -136,9 +136,12 @@ define(function(require, exports, module) {
       if (action === 'next' || action === 'quit') {
         
         _resetDoneNode.call(this, 300, function() {
-          this._controller.resetGame();
           this._eventOutput.emit('nav:loadStages');
         }.bind(this));
+
+        Timer.setTimeout(function() {
+          this._controller.resetGame();
+        }.bind(this), 1500);
 
       } else if (action === 'replay' || action === 'restart') {
         this._controller.resetGame();
@@ -228,7 +231,6 @@ define(function(require, exports, module) {
     var message = _createMessageNode.call(this);
 
     var backing = new Surface({
-      classes: ['piece', 'level-done', 'level-done-backing'],
       properties: {
         borderRadius: '999em'
       }
@@ -358,7 +360,6 @@ define(function(require, exports, module) {
   }
 
   function _doDoneAnimation(type, data) {
-    console.log(data);
     var piece = data.piece;
     var backColor = piece._piece.getOption('backBgColor');
     var level = this._controller.getCurrentLevel();
@@ -373,8 +374,13 @@ define(function(require, exports, module) {
 
     this._doneNode._posMod.setTransform(posTransform);
 
-    this._doneNode._backing.addClass('stage-'+level.stage);
-    this._doneNode._backing.addClass(backColor);
+    this._doneNode._backing.setClasses([
+      'stage-'+level.stage,
+      backColor,
+      'piece',
+      'level-done',
+      'backing'
+    ]);
 
     var dur = 1000;
     var backingMod = this._doneNode._backingMod;
