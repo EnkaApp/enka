@@ -547,7 +547,7 @@ define(function(require, exports, module) {
 
     var complete = function() {
       Engine.removeListener('prerender', prerender);
-      if(callback) callback();
+      if (callback) callback();
     }.bind(this);
 
     Engine.on('prerender', prerender);

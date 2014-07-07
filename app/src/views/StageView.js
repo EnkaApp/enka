@@ -74,7 +74,7 @@ define(function(require, exports, module) {
     // No need to animate if we are already at the expanded height. 
     // @NOTE This will only happen when the stages are first initialized
     if (this.options.currentHeight === this.options.expandedHeight) {
-      if(callback) callback();
+      if (callback) callback();
       return;
     }
 
@@ -83,7 +83,7 @@ define(function(require, exports, module) {
       end: this.options.expandedHeight,
       axis: 'y'
     }, function() {
-      if(callback) callback();
+      if (callback) callback();
     }.bind(this));
   };
 

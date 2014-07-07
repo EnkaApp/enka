@@ -14,7 +14,7 @@ define(function(require, exports, module) {
 
   function PieceController(options) {
 
-    if(PieceController._instance){
+    if (PieceController._instance){
       return PieceController._instance;
     }
 
@@ -95,7 +95,7 @@ define(function(require, exports, module) {
 
     var level = this._gameController.getCurrentLevel();
 
-    if(!direction) direction = 'left';
+    if (!direction) direction = 'left';
 
     // Default to left for no particular reason
     var node = new RenderNode();
@@ -147,7 +147,7 @@ define(function(require, exports, module) {
     var node = null;
 
     // If this._deletedPieces.length === 0, create a new piece
-    if(this._deletedPieces.length === 0){
+    if (this._deletedPieces.length === 0){
       node = _createNewPiece.call(this, direction);
     }
 

@@ -97,7 +97,7 @@ define(function(require, exports, module) {
         // gets new index (2, 4, 15, etc) based off current index and swipe direction  
         var newIndex = _getNewIndex.call(this, this._currentIndex, direction);
         
-        if(this.isInBounds(direction) && !this._state[newIndex]) {
+        if (this.isInBounds(direction) && !this._state[newIndex]) {
           
           // generate new Piece
           var piece = this._pieceGenerator.getPiece(direction);
@@ -285,9 +285,9 @@ define(function(require, exports, module) {
 
       for(var i = 0; i < matches.length; i++){
         // matches has matches of all neighbors
-        if(matches[i]){
+        if (matches[i]){
           var newIndexToCheck = matches[i][0];
-          if(matches[i][1] === true && !matched[newIndexToCheck]){
+          if (matches[i][1] === true && !matched[newIndexToCheck]){
             matched[newIndexToCheck] = true;
             connections++;
             seekAndDestroy.call(this, newIndexToCheck);
@@ -296,10 +296,10 @@ define(function(require, exports, module) {
       }
     }
 
-    if(connections > 1){
+    if (connections > 1){
       var pieces = [];
       for(var i = 0; i < matched.length; i++){
-        if(matched[i] && i !== initialIndex){
+        if (matched[i] && i !== initialIndex){
           pieces.push(i);
         }
       }
@@ -324,8 +324,8 @@ define(function(require, exports, module) {
 
     for(var direction in directions){
       // starts with 4 checks to see if the neighbor position is in bounds
-      if(this.isInBounds(direction)){
-        if(directions[direction])
+      if (this.isInBounds(direction)){
+        if (directions[direction])
           matches.push(directions[direction]);
       }
     }
@@ -357,7 +357,7 @@ define(function(require, exports, module) {
   };
 
   BoardView.prototype.getColorFromIndex = function(index) {
-    if(this._state[index]){
+    if (this._state[index]){
       var color = _getPieceAtIndex.call(this, index).getOption('backBgColor');
       return color;
     }
@@ -366,7 +366,7 @@ define(function(require, exports, module) {
   BoardView.prototype.isInBounds = function(direction, index) {
     var newIndexCoords;
 
-    if(!index) {
+    if (!index) {
       newIndexCoords = this._lastPiecePosition;
     }else{
       newIndexCoords = this._gridController.getXYCoordsFromIndex(index);
@@ -379,19 +379,19 @@ define(function(require, exports, module) {
     var newXPosition = newIndexCoords[0] + pieceSize[0];
     var newYPosition = newIndexCoords[1] + pieceSize[1];
 
-    if(direction === 'left' && newIndexCoords[0] === 0){
+    if (direction === 'left' && newIndexCoords[0] === 0){
       res = false;
     }
 
-    if(direction === 'right' && newXPosition === boardWidth){
+    if (direction === 'right' && newXPosition === boardWidth){
       res = false;
     }
 
-    if(direction === 'up' && newIndexCoords[1] === 0){
+    if (direction === 'up' && newIndexCoords[1] === 0){
       res = false;
     }
 
-    if(direction === 'down' && newYPosition === boardHeight){
+    if (direction === 'down' && newYPosition === boardHeight){
       res = false;
     }
 
@@ -562,7 +562,7 @@ define(function(require, exports, module) {
       
       if (piece && piece === lastPiece) {
         lastPieceIndex = i;
-        if(!removeLastPiece) continue;
+        if (!removeLastPiece) continue;
       }
 
       if (piece) pieces.push(i);
@@ -669,16 +669,16 @@ define(function(require, exports, module) {
    * Calculates the index of the neighbor position relative to the current index
    */
   function _getNewIndex(index, direction) {
-    if(direction === 'left'){
+    if (direction === 'left'){
       return index - 1;
     }
-    if(direction === 'right'){
+    if (direction === 'right'){
       return index + 1;
     }
-    if(direction === 'up'){
+    if (direction === 'up'){
       return index - this.options.columns;
     }
-    if(direction === 'down'){
+    if (direction === 'down'){
       return index + this.options.columns;
     }
   }
@@ -690,19 +690,19 @@ define(function(require, exports, module) {
     var direction = '';
 
     // swipe right
-    if(xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)){
+    if (xStart < xEnd && (xEnd - xStart > yEnd - yStart) && (xEnd - xStart > yStart - yEnd)){
       direction = 'right';
     }
     // swipe left
-    if(xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd) ){
+    if (xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd) ){
       direction = 'left';
     }
     // swipe down
-    if(yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)){
+    if (yStart < yEnd && (yEnd - yStart > xEnd - xStart) && (yEnd - yStart > xStart - xEnd)){
       direction = 'down';
     }
     // swipe up
-    if(yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ){
+    if (yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ){
       direction = 'up';
     }
 

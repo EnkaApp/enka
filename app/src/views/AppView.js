@@ -180,7 +180,7 @@ define(function(require, exports, module) {
   //       // Show Stages
   //       if (this.showingHome) {
   //         // If threshold is met, trigger slideUp to show the stagesView
-  //         if(position > this.options.posThreshold) {
+  //         if (position > this.options.posThreshold) {
   //           this.slideUp();
   //           this.showingHome = false;
   //         }
@@ -191,7 +191,7 @@ define(function(require, exports, module) {
   //       }
   //       // Show Home
   //       else {
-  //         if(position < H - this.options.posThreshold) {
+  //         if (position < H - this.options.posThreshold) {
   //           this.slideDown();
   //           this.showingHome = true;
   //         } else {

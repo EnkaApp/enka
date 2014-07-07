@@ -39,7 +39,7 @@ define(function(require, exports, module) {
     var viewHeight = this.options.viewHeight;
     var hSize =  Math.floor(viewHeight / rows);
 
-    if(wSize < hSize){
+    if (wSize < hSize){
       size = [wSize, wSize];
     } else {
       size = [hSize, hSize];
