@@ -1,6 +1,7 @@
 // Colors
 
 @baige: #F4F0E4;
+@blue: #0093D9;
 @brick: #7C2D28;
 @orange: #F67E26;
 @bloodOrange: #F55638;
@@ -15,6 +16,7 @@
 @cc1-color4: @bloodOrange;
 
 @cc1-bg: @cc1-color4;
+@cc1-iconBg: #E32429;
 @cc1-activeBg: @baige;
 @cc1-textColor: @baige; // baige
 @cc1-btnBg: @cc1-bg;
@@ -56,7 +58,7 @@
 
 // Color Combination 5
 @cc5-color1: #1C7691; // teal
-@cc5-color2: #0093D9; // blue
+@cc5-color2: @blue; // blue
 @cc5-color3: #202833; // navy
 @cc5-color4: #FA4E64; // coral
 @cc5-color5: #798184; // gray
@@ -81,6 +83,8 @@
 
 // Color Assignments
 @bgHome: #FFFFFF;
-@home-btnBg: @navy;
+@home-btnBg: lighten(@bgLogo, 10%);
+@home-btnTextColor: @baige;
 @bgLogo: @navy;
 @btnSuccess: @green;
+@game-headerBg: @baige;

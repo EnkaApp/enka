@@ -211,7 +211,8 @@ define(function(require, exports, module) {
 
     this.rootMod = new StateModifier({
       origin: [0.5, 0.5],
-      align: [0.5, 0.5]
+      align: [0.5, 0.5],
+      transform: Transform.translate(0, 0, 1)
     });
 
     this.node = this.add(this.rootMod);
@@ -269,7 +270,7 @@ define(function(require, exports, module) {
     var pos = this._gridController.getXYCoordsFromIndex(this._currentIndex);
     
     piece._mod.setTransform(
-      Transform.translate(pos[0], pos[1], 0.001)
+      Transform.translate(pos[0], pos[1], 180)
     );
 
     // Update the current index to the index of the piece we just placed
@@ -456,7 +457,7 @@ define(function(require, exports, module) {
   };
 
   BoardView.prototype.dim = function() {
-    this.dimmer.setTransform(Transform.translate(0, 0, 5));
+    this.dimmer.setTransform(Transform.translate(0, 0, 200));
     this.dimmer.setOpacity(0.7, {
       curve: 'linear',
       duration: 300
@@ -493,10 +494,16 @@ define(function(require, exports, module) {
       }
     });
 
-    var mod = new StateModifier();
+    var backingMod = new StateModifier({
+      transform: Transform.translate(0, 0, 170)
+    });
 
-    this.add(this.backing);
-    this.node.add(mod).add(this.boardSurface);
+    var boardMod = new StateModifier({
+      transform: Transform.translate(0, 0, 175)
+    });
+
+    this.add(backingMod).add(this.backing);
+    this.node.add(boardMod).add(this.boardSurface);
   }
 
   /*
@@ -521,7 +528,8 @@ define(function(require, exports, module) {
         var mod = new StateModifier({
           origin: [0, 0],
           align: [0, 0],
-          opacity: 0.3
+          opacity: 0.3,
+          transform: Transform.translate(0, 0, 180)
         });
 
         var scaleMod = new StateModifier({
@@ -578,7 +586,7 @@ define(function(require, exports, module) {
         
         // surface.setProperties({backgroundColor: colorClass}); // TEMP... REMOVE
 
-        surface._mod.setTransform(Transform.translate(xy[0], xy[1], 1));
+        surface._mod.setTransform(Transform.translate(xy[0], xy[1], 180));
         surface._scaleMod.setTransform(Transform.scale(1, 1, 1), {duration: 300});
       }
     }
@@ -592,7 +600,7 @@ define(function(require, exports, module) {
     for (var i = this._highlights.length - 1; i >= 0; i--) {
       var surface = this._highlights[i];
       
-      surface._scaleMod.setTransform(Transform.scale(0.001, 0.001, 1), {
+      surface._scaleMod.setTransform(Transform.scale(0.001, 0.001, 180), {
         curve: 'linear',
         duration: dur
       });

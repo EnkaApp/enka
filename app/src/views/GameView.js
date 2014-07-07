@@ -330,21 +330,21 @@ define(function(require, exports, module) {
 
     // This transform calculates the position of the piece and put origamiView on top of it
     var vector = Transform.getTranslate(transform);
-    transform = Transform.moveThen(vector, Transform.translate(0, 0, 15));
+    transform = Transform.moveThen(vector, Transform.translate(0, 0, 185));
     this.origamiMod.setTransform(transform);
 
     // Remove the last piece now that we have its position
     this.boardView.deletePiece(lastPieceIndex);
 
     // Fade the overlay in
-    this.overlayMod.setTransform(Transform.translate(0,0,10));
+    this.overlayMod.setTransform(Transform.translate(0, 0, 200));
     this.overlayMod.setOpacity(0.999, {
       curve: 'linear',
       duration: 1500
     });
 
     // This transform moves origamiView to the middle of the view
-    transform = Transform.translate(centerX - width/2, centerY - height/2, 100);
+    transform = Transform.translate(centerX - width/2, centerY - height/2, 210);
     this.origamiMod.setTransform(transform, {
       curve: 'linear',
       duration: 500

@@ -113,13 +113,12 @@ define(function(require, exports, module) {
   function _createBackground() {
     this.bg = new Surface({
       size: [undefined, undefined],
+      classes: ['stage-bg', 'stage-'+this.options.stage]
     });
 
     this.bgMod = new StateModifier({
       transform: Transform.translate(0, 0, 0)
     });
-
-    this.bg.setClasses(['stage-bg', 'stage-'+this.options.stage]);
 
     this.node.add(this.bgMod).add(this.bg);
   }
@@ -129,6 +128,10 @@ define(function(require, exports, module) {
 
     this.icon = new ImageSurface({
       content: icon.url,
+      classes: [
+        'stage-' + this.options.stage,
+        'stage-icon'
+      ],
       properties: {
         pointerEvents: 'none'
       }

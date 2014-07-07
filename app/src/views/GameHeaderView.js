@@ -42,7 +42,7 @@ define(function(require, exports, module) {
     this.rootMod = new StateModifier({
       origin: [0.5, 0],
       align: [0.5, 0],
-      transform: Transform.translate(0, 0, 1)
+      transform: Transform.translate(0, 0, 200)
     });
     
     this._pieceController = new PieceController();
@@ -148,7 +148,7 @@ define(function(require, exports, module) {
       size: [70, 20],
       origin: [0, 0.5],
       align: [0, 0.5],
-      transform: Transform.translate(10, 0, 0)
+      transform: Transform.translate(10, 0, 1)
     });
 
     var node = this.node.add(mod);
@@ -162,7 +162,7 @@ define(function(require, exports, module) {
       var modifier = new StateModifier({
         origin: [0, 0.5],
         align: [0, 0.5],
-        transform: Transform.translate(i * (pw + 5), 0, 0)
+        transform: Transform.translate(i * (pw + 5), 0, 1)
       });
 
       // the fourth piece will be used to make the animation look better

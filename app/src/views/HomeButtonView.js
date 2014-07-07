@@ -47,7 +47,6 @@ define(function(require, exports, module) {
       origin: [0.5, 0.5],
       align: [0.5,0.5],
       size: [this.options.width, this.options.height],
-      // transform: Transform.translate(0, 0, 0)
     });
 
     this.add(mod).add(title);
@@ -75,7 +74,7 @@ define(function(require, exports, module) {
   HomeButtonView.DEFAULT_OPTIONS = {
     content: 'Click Me!',
     width: 190,
-    height: 30,
+    height: 40,
     classes: []
   };
 

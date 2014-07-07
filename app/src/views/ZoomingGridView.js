@@ -84,9 +84,9 @@ define(function (require, exports, module) {
     this.rootMod.setTransform(Transform.scale(1, 1, 1), transition);
   };
 
-  ZoomingGrid.prototype.closeCell = function() {
+  ZoomingGrid.prototype.closeCell = function(callback) {
     this.rootMod.setTransform(this._scale, transition);
-    this.gridMod.setTransform(Transform.translate(0, 0, 0), transition);
+    this.gridMod.setTransform(Transform.translate(0, 0, 0), transition, callback);
   };
 
   ZoomingGrid.prototype.showCells = function(transition, delay, callback) {

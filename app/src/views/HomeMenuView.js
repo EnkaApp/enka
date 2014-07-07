@@ -19,7 +19,7 @@ define(function(require, exports, module) {
   var W = utils.getViewportWidth();
   var H = utils.getViewportHeight();
 
-  var TOP_MARGIN = 40; // button top margin
+  var TOP_MARGIN = 10; // button top margin
   var DELAY = 300; // milliseconds between button intro animations
 
   // Button Intro Transition
@@ -50,7 +50,7 @@ define(function(require, exports, module) {
     View.apply(this, arguments);
 
     this.rootMod = new StateModifier({
-      size: [190, 110],
+      size: [190, 150],
       origin: [0.5, 0],
       align: [0.5, 0],
       transform: Transform.translate(0, 0, 0)
@@ -72,11 +72,15 @@ define(function(require, exports, module) {
   HomeMenuView.prototype = Object.create(View.prototype);
   HomeMenuView.prototype.constructor = HomeMenuView;
 
-  HomeMenuView.DEFAULT_OPTIONS = {};
+  HomeMenuView.DEFAULT_OPTIONS = {
+    buttonHeight: 50
+  };
 
   HomeMenuView.prototype.showButtons = function() {
+    var margin = this.options.buttonHeight + TOP_MARGIN;
+
     function _callback(i) {
-      this._modifiers[i].setTransform(Transform.translate(0, i*TOP_MARGIN, 0), spring);
+      this._modifiers[i].setTransform(Transform.translate(0, i*margin, 0), spring);
     }
 
     for (var i = 0; i < this._modifiers.length; i++) {
@@ -89,7 +93,8 @@ define(function(require, exports, module) {
   function _createResumeGameButton() {
     this.btnResumeGame = new HomeButtonView({
       content: 'Resume',
-      classes: ['btn-resume']
+      classes: ['btn-resume'],
+      height: this.options.buttonHeight
     });
 
     var mod = new StateModifier({
@@ -104,7 +109,8 @@ define(function(require, exports, module) {
   function _createPlayButton() {
     this.btnPlay = new HomeButtonView({
       content: 'Stages',
-      classes: ['btn-play']
+      classes: ['btn-play'],
+      height: this.options.buttonHeight
     });
 
     var mod = new StateModifier({
@@ -118,7 +124,8 @@ define(function(require, exports, module) {
   function _createAboutButton() {
     this.btnAbout = new HomeButtonView({
       content: 'About',
-      classes: ['btn-about']
+      classes: ['btn-about'],
+      height: this.options.buttonHeight
     });
 
     var mod = new StateModifier({

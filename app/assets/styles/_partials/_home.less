@@ -7,7 +7,7 @@
 }
 
 .logo.logo-brick {
-  background-color: white;
+  background-color: @baige;
 }
 
 .btn-play.btn-wrapper,
@@ -15,23 +15,17 @@
 .btn-resume.btn-wrapper {
 
   button {
-    background-color: fade(@home-btnBg, 70%);
-    border: 3px solid @home-btnBg;
+    background-color: @home-btnBg;
+    border: 5px solid lighten(@home-btnBg, 15%);
+    height: 100%;
+    font-weight: bold;
   }
 
   .btn-label {
-    color: white;
+    color: @home-btnTextColor;
     text-transform: uppercase;
-    line-height: 30px;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 0.9em;
   }
-}
-
-.btn-play.btn-title,
-.btn-about.btn-title,
-.btn-resume.btn-title {
-  color: white;
-  text-align: center;
-  text-transform: uppercase;
-  font-size: 0.9em;
-  font-style: italic;
 }

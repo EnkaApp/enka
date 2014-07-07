@@ -49,29 +49,28 @@ define(function(require, exports, module) {
       // Timer is being used to execute this after the animation has completed
       Timer.setTimeout(function() {
         this._eventOutput.emit('level:select', data);
-      }.bind(this), LEVEL_CLOSE_DURATION - 200);
+      }.bind(this), LEVEL_CLOSE_DURATION/2);
     }
 
     function levelClose(data) {
       this.openLevel = null;
-      this.showCloseBtn();
 
       // Timer is being used to execute this after the animation has completed
       Timer.setTimeout(function() {
+        this.showCloseBtn();
         this._backing.removeClass('level-open');
         this._eventOutput.emit('level:close', data);
-      }.bind(this), LEVEL_CLOSE_DURATION - 200);
+      }.bind(this), LEVEL_CLOSE_DURATION/2);
     }
 
     function play(data) {
-      this.closeOpenedLevels();
-      this.showCloseBtn();
+      this._eventOutput.emit('nav:loadGame', data);
 
-      // Timer is being used to execute this after the close levels animation has completed
+      // Timer is being used to execute this after the change page animation has completed
       Timer.setTimeout(function() {
         this._backing.removeClass('level-open');
-        this._eventOutput.emit('nav:loadGame', data);
-      }.bind(this), LEVEL_CLOSE_DURATION - 200);
+        this.closeOpenedLevels(this.showCloseBtn.bind(this));
+      }.bind(this), 1000);
     }
 
     this._closeButton.on('click', function() {
@@ -162,7 +161,7 @@ define(function(require, exports, module) {
   };
 
   LevelsView.prototype.showCloseBtn = function() {
-    var dur = 600;
+    var dur = 300;
     var transform = Transform.translate(0, 0, 1);
 
     this._closeButton._mod.setOpacity(0.999, {
@@ -191,10 +190,10 @@ define(function(require, exports, module) {
     });
   };
   
-  LevelsView.prototype.closeOpenedLevels = function() {
+  LevelsView.prototype.closeOpenedLevels = function(callback) {
     if (this.openLevel) {
       this.openLevel.flip();
-      this.grid.closeCell();
+      this.grid.closeCell(callback);
       this.openLevel = null;
     }
   };

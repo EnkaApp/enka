@@ -48,9 +48,10 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this._eventInput.on('nav:loadGame', function(data) {
-      this.showHeader(function() {
-        this._eventOutput.emit('nav:loadGame', data);
-      }.bind(this), 300);
+      this._eventOutput.emit('nav:loadGame', data);
+
+      // Delay execution until after the page transition completes
+      Timer.setTimeout(this.showHeader.bind(this), 1000);
     }.bind(this));
 
     this._eventInput.on('level:select', function(data) {
@@ -58,7 +59,9 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this._eventInput.on('level:close', function(data) {
-      this.showHeader();
+
+      // Delay execution until after the level close animation completes
+      Timer.setTimeout(this.showHeader.bind(this), 350);
     }.bind(this));
 
     this._eventInput.on('stage:select', function(data) {
@@ -162,18 +165,11 @@ define(function(require, exports, module) {
     }.bind(this));
   };
 
-  StagesView.prototype.showHeader = function(callback, delay) {
-    delay = delay || 600;
-
+  StagesView.prototype.showHeader = function(callback) {
     this.layout.header._mod.setTransform(Transform.translate(0, 0, 50), {
       curve: 'easeIn',
-      duration: 600
-    });
-
-    // This allows the callback to fire before the header has finished moving
-    if (callback) {
-      Timer.setTimeout(callback, delay);
-    }
+      duration: 300
+    }, callback);
   };
 
   StagesView.prototype.hideHeader = function() {

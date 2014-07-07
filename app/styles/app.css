@@ -1710,6 +1710,7 @@ i {
   font-family: "Helvetica-Neue", Arial, sans-serif;
 }
 button {
+  box-sizing: border-box;
   border: none;
   border-radius: 99em;
   background: black;
@@ -1733,10 +1734,10 @@ button {
   line-height: 24px;
 }
 .game-navbar {
-  background: black;
+  background: #ede6d2;
 }
 .game-navbar.game-navbar-button {
-  color: white;
+  color: #c8b477;
 }
 .gamemenu.gamemenu-description {
   text-align: center;
@@ -1760,6 +1761,9 @@ button {
 .gamemenu-buttons .btn-resume {
   background: #53b588;
   border-color: #77c4a1;
+}
+.gameboard-backing {
+  background: white;
 }
 .gameboard-board {
   background: #ffffff url('../images/tile-patterns/tile-gray-bg.png') 0 0 repeat;
@@ -1787,29 +1791,23 @@ button {
   background-color: rgba(32, 40, 51, 0.7);
 }
 .logo.logo-brick {
-  background-color: white;
+  background-color: #f4f0e4;
 }
 .btn-play.btn-wrapper button,
 .btn-about.btn-wrapper button,
 .btn-resume.btn-wrapper button {
-  background-color: rgba(32, 40, 51, 0.7);
-  border: 3px solid #202833;
+  background-color: #344152;
+  border: 5px solid #516581;
+  height: 100%;
+  font-weight: bold;
 }
 .btn-play.btn-wrapper .btn-label,
 .btn-about.btn-wrapper .btn-label,
 .btn-resume.btn-wrapper .btn-label {
-  color: white;
-  text-transform: uppercase;
-  line-height: 30px;
-}
-.btn-play.btn-title,
-.btn-about.btn-title,
-.btn-resume.btn-title {
-  color: white;
+  color: #f4f0e4;
   text-align: center;
   text-transform: uppercase;
   font-size: 0.9em;
-  font-style: italic;
 }
 .piece {
   border-radius: 99em;
@@ -1911,6 +1909,9 @@ button {
 .stage-1.stage-bg.active {
   border-color: #f44120;
 }
+.stage-1.stage-icon {
+  background-color: rgba(227, 36, 41, 0.7);
+}
 .stage-1.stage-levels-bg--active {
   background-color: #f4f0e4;
 }
@@ -1946,6 +1947,9 @@ button {
 }
 .stage-2.stage-bg.active {
   border-color: #e68f22;
+}
+.stage-2.stage-icon {
+  background-color: #d78218;
 }
 .stage-2.stage-levels-bg--active {
   background-color: #f4f0e4;
@@ -1983,6 +1987,9 @@ button {
 .stage-3.stage-bg.active {
   border-color: #83cfca;
 }
+.stage-3.stage-icon {
+  background-color: #70c8c2;
+}
 .stage-3.stage-levels-bg--active {
   background-color: #f4f0e4;
 }
@@ -2019,6 +2026,9 @@ button {
 .stage-4.stage-bg.active {
   border-color: #13b5e4;
 }
+.stage-4.stage-icon {
+  background-color: #11a3cc;
+}
 .stage-4.stage-levels-bg--active {
   background-color: #f4f0e4;
 }
@@ -2043,6 +2053,9 @@ button {
 .stage-5.stage-bg.active {
   border-color: #0082c0;
 }
+.stage-5.stage-icon {
+  background-color: #0070a6;
+}
 .stage-5.stage-levels-bg--active {
   background-color: #f4f0e4;
 }
@@ -2066,6 +2079,9 @@ button {
 }
 .stage-6.stage-bg.active {
   border-color: #8d7aae;
+}
+.stage-6.stage-icon {
+  background-color: #806aa5;
 }
 .stage-6.stage-levels-bg--active {
   background-color: #f4f0e4;
