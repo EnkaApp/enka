@@ -3,9 +3,8 @@ define(function(require, exports, module) {
   var Engine        = require('famous/core/Engine');
   var View          = require('famous/core/View');
   var Surface       = require('famous/core/Surface');
-  var CanvasSurface = require('famous/surfaces/CanvasSurface');
+  // var CanvasSurface = require('famous/surfaces/CanvasSurface');
   var Transform     = require('famous/core/Transform');
-  var StateModifier = require('famous/modifiers/StateModifier');
   var Modifier      = require('famous/core/Modifier');
   var Transitionable = require('famous/transitions/Transitionable');
   var Easing        = require('famous/transitions/Easing');
@@ -81,7 +80,7 @@ define(function(require, exports, module) {
   function _animateLetterSurface(node, options, duration) {
     var dur = duration || duration === 0 ? duration : 250;
 
-    Timer.setTimeout(function(i) {
+    Timer.setTimeout(function() {
       var transition = {duration: dur, curve: Easing.inOutQuad };
 
       var start = 0;
@@ -89,27 +88,26 @@ define(function(require, exports, module) {
 
       var transitionable = new Transitionable(start);
 
-      var prerender = function() {
+      function prerender() {
         var width = options.width || transitionable.get();
         var height = options.height || transitionable.get();
 
         node.setOptions({
           size: [width, height]
         });
-      };
+      }
 
-      var complete = function() {
-        Engine.removeListener('prerender', prerender);
-      };
+      function complete() {
+        Engine.removeListener('prerender', prerender.bind(this));
+      }
 
-      Engine.on('prerender', prerender);
+      Engine.on('prerender', prerender.bind(this));
 
-      transitionable.set(end, transition, complete);
+      transitionable.set(end, transition, complete.bind(this));
     }.bind(this, options.index), options.index * dur);
   }
 
   function _createLetter(letter) {
-    var nodes = [];
 
     // retrieve the letter definition
     letter = letters[letter];
@@ -126,7 +124,7 @@ define(function(require, exports, module) {
         options.height = 0;
         options.width = options.size[0];
       }
-      
+
       var surface = _createLetterSurface(options);
       var modifier = _createLetterModifier(options);
 
@@ -140,7 +138,7 @@ define(function(require, exports, module) {
   // @NOTE Keep this canvas code here as an example...
   // @TODO Figure out why canvas animations tied into the 'prerender'
   // event don't actually appear on the screen
-  // 
+
   // function _createLetter(letter) {
 
   //   var options = {
@@ -154,7 +152,7 @@ define(function(require, exports, module) {
   //   var canvas = new CanvasSurface({
   //     canvasSize: [190, 190]
   //   });
-    
+
   //   var context = canvas.getContext('2d');
 
   //   // Height Transitionable
@@ -168,8 +166,6 @@ define(function(require, exports, module) {
   //     context.clearRect(0, 0, canvas.width, canvas.height);
 
   //     var height = transitionable.get();
-
-  //     console.log(height);
 
   //     // draw the letter
   //     context.beginPath();
@@ -200,8 +196,6 @@ define(function(require, exports, module) {
     this._surfaces = [];
 
     _createLetter.call(this, this.options.letter);
-
-    // this.add(this.letter);
   }
 
   LetterView.prototype = Object.create(View.prototype);

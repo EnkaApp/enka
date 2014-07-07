@@ -10,9 +10,7 @@ define(function(require, exports, module) {
   var Transform         = require('famous/core/Transform');
   var Transitionable    = require('famous/transitions/Transitionable');
   var StateModifier     = require('famous/modifiers/StateModifier');
-  var Easing            = require('famous/transitions/Easing');
   var ContainerSurface  = require('famous/surfaces/ContainerSurface');
-  var RenderNode        = require('famous/core/RenderNode');
   var SpringTransition  = require('famous/transitions/SpringTransition');
   var SnapTransition    = require('famous/transitions/SnapTransition');
   var Lightbox          = require('famous/views/Lightbox');
@@ -36,7 +34,6 @@ define(function(require, exports, module) {
   var LivesController = require('controllers/LivesController');
 
   // ## Shared Variables
-  var W = utils.getViewportWidth();
   var H = utils.getViewportHeight();
 
   Transitionable.registerMethod('spring', SpringTransition);
@@ -116,9 +113,7 @@ define(function(require, exports, module) {
   };
 
   StagesView.prototype.scrollToStage = function(data) {
-    var e = data.event;
     var index = data.stage - 1;
-    var node = data.node;
 
     this.activeIndex = index;
 
@@ -191,7 +186,7 @@ define(function(require, exports, module) {
       showTransform: Transform.translate(0, 0, 1),
       outTransform: Transform.translate(0, 0, -100),
       inOpacity: 1,
-      outOpacity: 0,
+      outOpacity: 0
     });
 
     var mod = new StateModifier({
@@ -250,7 +245,7 @@ define(function(require, exports, module) {
     this.homeIcon = new Surface({
       size: [true, true],
       classes: ['header', 'navbar', 'nav-item'],
-      content: '<i class="fa fa-2x fa-angle-double-up"></i>',
+      content: '<i class="fa fa-2x fa-angle-double-up"></i>'
     });
 
     var homeIconMod = new StateModifier({
@@ -263,7 +258,7 @@ define(function(require, exports, module) {
     var livesIcon = new Surface({
       size: [true, true],
       classes: ['header'],
-      content: '<i class="fa fa-heart"></i>',
+      content: '<i class="fa fa-heart"></i>'
     });
 
     var livesIconMod = new StateModifier({
@@ -275,7 +270,7 @@ define(function(require, exports, module) {
     var livesCounter = new Surface({
       size: [true, true],
       classes: ['header', 'lives-count'],
-      content: livesController.get() || '0',
+      content: livesController.get() || '0'
     });
 
     var livesCounterMod = new StateModifier({
@@ -287,7 +282,7 @@ define(function(require, exports, module) {
     // Setup the lives timer
     var timer = new Surface({
       content: '',
-      classes: ['header', 'lives-timer'],
+      classes: ['header', 'lives-timer']
     });
 
     var timerMod = new StateModifier({
@@ -394,7 +389,7 @@ define(function(require, exports, module) {
         index: i,
         height: this.options.stageHeight,
         currentHeight: this.options.stageHeight,
-        expandedHeight: this.options.stageExpandedHeight,
+        expandedHeight: this.options.stageExpandedHeight
       };
 
       if (this.activeIndex === i) {
@@ -542,7 +537,6 @@ define(function(require, exports, module) {
 
     // function to fire with each Engine 'prerender' event
     var prerender = function() {
-      var size = [];
       var move = transitionable.get() - prevMove;
       prevMove = transitionable.get();
 
@@ -560,10 +554,6 @@ define(function(require, exports, module) {
 
   function _getStageAtIndex(index) {
     return this._stages[index];
-  }
-
-  function _getStageLevelsAtIndex(index) {
-    return this._stageLevels[index];
   }
 
   /*

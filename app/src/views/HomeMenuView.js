@@ -1,24 +1,20 @@
 /* globals define */
 
 define(function(require, exports, module) {
-  var View          = require('famous/core/View');
-  var Surface       = require('famous/core/Surface');
-  var Transform     = require('famous/core/Transform');
-  var StateModifier = require('famous/modifiers/StateModifier');
-  var Transitionable = require('famous/transitions/Transitionable');
-  var SpringTransition = require('famous/transitions/SpringTransition');
-  var Timer         = require('famous/utilities/Timer');
-  var Easing        = require('famous/transitions/Easing');
+  var View              = require('famous/core/View');
+  var Transform         = require('famous/core/Transform');
+  var StateModifier     = require('famous/modifiers/StateModifier');
+  var Transitionable    = require('famous/transitions/Transitionable');
+  var SpringTransition  = require('famous/transitions/SpringTransition');
+  var Timer             = require('famous/utilities/Timer');
 
   Transitionable.registerMethod('spring', SpringTransition);
 
   // ## App Dependencies
   var utils = require('utils');
 
-  // ## Shared Variables
-  var W = utils.getViewportWidth();
+  // ## Constants
   var H = utils.getViewportHeight();
-
   var TOP_MARGIN = 10; // button top margin
   var DELAY = 300; // milliseconds between button intro animations
 
@@ -116,7 +112,7 @@ define(function(require, exports, module) {
     var mod = new StateModifier({
       transform: Transform.translate(0, H, 0)
     });
-    
+
     this._modifiers.push(mod);
     this.node.add(mod).add(this.btnPlay);
   }

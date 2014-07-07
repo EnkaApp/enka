@@ -3,16 +3,13 @@
  * GameView contains all the gameplay views, i.e. GameHeaderView and BoardView
  */
 define(function(require, exports, module) {
-  var Engine              = require('famous/core/Engine');
   var View                = require('famous/core/View');
   var Surface             = require('famous/core/Surface');
   var Transform           = require('famous/core/Transform');
   var StateModifier       = require('famous/modifiers/StateModifier');
   var HeaderFooterLayout  = require('famous/views/HeaderFooterLayout');
   var Timer               = require('famous/utilities/Timer');
-  var ContainerSurface    = require('famous/surfaces/ContainerSurface');
   var RenderNode          = require('famous/core/RenderNode');
-  var Transitionable      = require('famous/transitions/Transitionable');
 
   // ## Utils
   var utils = require('utils');
@@ -26,14 +23,12 @@ define(function(require, exports, module) {
   var GameController = require('controllers/GameController');
 
   // ## Templates
-  var tplMsg = require('hbs!templates/msg');
+  // var tplMsg = require('hbs!templates/msg');
   var tplBtn = require('hbs!templates/btn');
 
-  // ## Shared
-  var W = utils.getViewportWidth();
+  // ## Constants
   var H = utils.getViewportHeight();
   var MENU_HEIGHT = 220;
-  
   var MESSAGES = {
     won: [
       'Level Completed',
@@ -64,7 +59,7 @@ define(function(require, exports, module) {
       this.boardMenuView.rootMod.setTransform(menuTransform, transition);
       this.boardView.show();
     }
-    
+
     this.gameHeaderView.on('game:toggleMenu', function(open) {
       if (open) {
         var layoutTransform = Transform.translate(0, MENU_HEIGHT, 1);
@@ -90,7 +85,7 @@ define(function(require, exports, module) {
       } else {
         this._eventOutput.emit('nav:loadHome');
       }
-      
+
       this.gameHeaderView._eventInput.emit('game:closeMenu');
 
       // Let the slide animation complete before closing the menu
@@ -131,9 +126,9 @@ define(function(require, exports, module) {
 
     this._eventInput.on('game:doneBtnClicked', function(data) {
       var action = data.action;
-      
+
       if (action === 'next' || action === 'quit') {
-        
+
         _resetDoneNode.call(this, 300, function() {
           this._eventOutput.emit('nav:loadStages');
         }.bind(this));
@@ -201,7 +196,6 @@ define(function(require, exports, module) {
     this.add(this.layoutMod).add(this.layout);
   }
 
-
   function _createBoardView() {
     this.boardView = new BoardView({
       rows: this._controller.getRows(),
@@ -238,7 +232,7 @@ define(function(require, exports, module) {
     var posMod = new StateModifier({
       size: [true, true],
       origin: [0, 0],
-      align: [0, 0],
+      align: [0, 0]
     });
 
     var backingMod = new StateModifier({
@@ -267,14 +261,12 @@ define(function(require, exports, module) {
 
     // create the buttons
     var buttons = _createButtons.call(this, 2);
-
     var backing = new Surface();
     var message = new Surface();
-    
     var rootMod = new StateModifier({
       size: [250, 150],
       origin: [0.5, 0.5],
-      align: [0.5, 0.5],
+      align: [0.5, 0.5]
     });
 
     var backingMod = new StateModifier();
@@ -306,7 +298,7 @@ define(function(require, exports, module) {
   }
 
   function _createButtons(count) {
-    
+
     count = count || count === 0 ? count : 2;
 
     var height = 50;
@@ -319,9 +311,7 @@ define(function(require, exports, module) {
     }
 
     for (var i = 0; i < count; i++) {
-      
       var node = new RenderNode();
-      
       var surface = new Surface({
         classes: wrapperClasses
       });
@@ -363,7 +353,6 @@ define(function(require, exports, module) {
     var backColor = piece._piece.getOption('backBgColor');
     var level = this._controller.getCurrentLevel();
     var vector = _getPieceTranslation.call(this, piece);
-    var height = piece._piece.getOption('height');
 
     // Place the win node on top of the piece
     var posTransform = Transform.thenMove(
@@ -381,11 +370,11 @@ define(function(require, exports, module) {
       'backing'
     ]);
 
-    var dur = 1000;
+    var dur = 600;
     var backingMod = this._doneNode._backingMod;
 
     backingMod.setOpacity(0.8, {duration: dur/2});
-    backingMod.setSize([H*1.25, H*1.25], {duration: dur}, function() {
+    backingMod.setSize([H*1.5, H*1.5], {duration: dur}, function() {
       _showMessageNode.call(this, type, 300);
     }.bind(this));
   }
@@ -397,7 +386,7 @@ define(function(require, exports, module) {
     var transform = piece._piece.reflector.backNode._matrix;
 
     // Adjust for the reflector
-    if (reflectionOrigin[0] == 0.5) {
+    if (reflectionOrigin[0] === 0.5) {
 
       // Adjust for 'Up' Reflection
       if (reflectionOrigin[1] === 0) {
@@ -408,7 +397,6 @@ define(function(require, exports, module) {
         // transform = Transform.thenMove(transform, [-width/2,height,2]);
         transform = Transform.thenMove(transform, [-width/2,0,1]);
       }
-      
     } else if (reflectionOrigin[1] === 0.5) {
       // Adjust for 'Left' Reflection
       if (reflectionOrigin[0] === 0) {
@@ -427,10 +415,9 @@ define(function(require, exports, module) {
 
     return Transform.getTranslate(transform);
   }
-  
+
   function _showMessageNode(type, duration) {
     duration = duration || duration === 0 ? duration : 300;
-
 
     // configure the message and buttons
     var content = utils.getRandomArrayItem(MESSAGES[type]);
@@ -467,11 +454,12 @@ define(function(require, exports, module) {
   }
 
   function _setMessage(content, classes) {
-    var contentClasses, backingClasses;
+    var contentClasses;
+    var backingClasses;
     var msg = this._doneNode.msg;
     var defaultBackingClasses = ['game', 'level-done', 'message', 'backing'];
     var defaultContentClasses = ['game', 'level-done', 'message', 'content'];
-    
+
     if (classes) {
       contentClasses = defaultContentClasses.concat(classes);
       backingClasses = defaultBackingClasses.concat(classes);

@@ -14,12 +14,10 @@ define(function(require, exports, module) {
 
   function _setListeners() {
     this.resumeBtn.on('click', function() {
-      console.log('game:closeMenu');
       this._eventOutput.emit('game:closeMenu');
     }.bind(this));
 
     this.quitBtn.on('click', function() {
-      console.log('game:quit');
       this._eventOutput.emit('game:quit');
     }.bind(this));
   }

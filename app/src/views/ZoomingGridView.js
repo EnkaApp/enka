@@ -1,28 +1,14 @@
 define(function(require, exports, module) {
-  var Engine        = require('famous/core/Engine');
   var View          = require('famous/core/View');
-  var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
-  var Modifier      = require('famous/core/Modifier');
   var StateModifier = require('famous/modifiers/StateModifier');
   var Easing        = require('famous/transitions/Easing');
   var Timer         = require('famous/utilities/Timer');
   var GridLayout    = require('famous/views/GridLayout');
-  var Transitionable = require('famous/transitions/Transitionable');
-  var SpringTransition = require('famous/transitions/SpringTransition');
-
-  Transitionable.registerMethod('spring', SpringTransition);
 
   var transition = {
     curve: 'easeOut',
     duration: 500
-  };
-
-  // Button Intro Transition
-  var spring = {
-    method: 'spring',
-    period: 1000,
-    dampingRatio: 0.5
   };
 
   function _setListeners() {
@@ -38,7 +24,7 @@ define(function(require, exports, module) {
     this._eventInput.pipe(this._eventOutput);
   }
 
-  var ZoomingGrid = function() {
+  function ZoomingGrid() {
     View.apply(this, arguments);
 
     this._scale = Transform.scale(
@@ -61,7 +47,7 @@ define(function(require, exports, module) {
     this.node = this.add(this.rootMod);
 
     _setListeners.call(this);
-  };
+  }
 
   ZoomingGrid.prototype = Object.create(View.prototype);
   ZoomingGrid.prototype.constructor = ZoomingGrid;
@@ -72,7 +58,7 @@ define(function(require, exports, module) {
     gutterSize: [0, 0],
     scale: [0.1, 0.1, 1],
     openEvent: 'cell:select',
-    closeEvent: 'cell:close',
+    closeEvent: 'cell:close'
   };
 
   ZoomingGrid.prototype.openCell = function(data) {
@@ -132,7 +118,7 @@ define(function(require, exports, module) {
     transition = transition !== undefined ? transition : ease;
     delay = delay || delay === 0 ? delay : 100;
 
-    var animate = function() {
+    function animate() {
 
       if (this.visible) {
         this.rootMod.halt();
@@ -143,7 +129,7 @@ define(function(require, exports, module) {
       }
 
       this.visible = !this.visible;
-    };
+    }
 
     for (var i = 0; i < cells.length; i++) {
       var cell = cells[i];
@@ -161,7 +147,6 @@ define(function(require, exports, module) {
   function _indexToGridCoord(index) {
     var grid = this.options.grid;
     var cols = grid[0];
-    var rows = grid[1];
     var row = Math.floor(index / cols) + 1;
     var col = index % cols + 1;
 

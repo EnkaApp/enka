@@ -1,6 +1,5 @@
 define(function(require, exports, module) {
   var StateModifier   = require('famous/modifiers/StateModifier');
-  var Transform       = require('famous/core/Transform');
   var RenderNode      = require('famous/core/RenderNode');
 
   // ## Controllers
@@ -9,8 +8,6 @@ define(function(require, exports, module) {
 
   // ## Import Views
   var PieceView = require('views/PieceView');
-
-  var colorArray = ['blue', 'green', 'red'];
 
   function PieceController(options) {
 
@@ -26,10 +23,10 @@ define(function(require, exports, module) {
     this._gameController = new GameController();
 
     // initializes this.colorQueue with 3 colors
-    for(var i = 0; i < 3; i++) {
+    for (var i = 0; i < 3; i++) {
       this.addColorToQueue();
     }
-    
+
     PieceController._instance = this;
   }
 
@@ -68,7 +65,7 @@ define(function(require, exports, module) {
     // The only time this._lastColor is falsy is when we are
     // placeing the first piece on the board
     if (!this._lastColor) this._lastColor = backColor;
-    
+
     // Create the piece before reassigning last color
     piece.updateOptions({
       direction: direction,
@@ -82,7 +79,7 @@ define(function(require, exports, module) {
     mod.setOpacity(0.999);
     mod.setSize(this.options.pieceSize);
 
-    // Save the last used back color. This will be used as the 
+    // Save the last used back color. This will be used as the
     // front color of the next played piece
     this._lastColor = backColor;
 
@@ -110,7 +107,7 @@ define(function(require, exports, module) {
 
     // save a reference to the modifier so we can access it easily later
     node._mod = modifier;
-    
+
     var backColor = this.getNextColorFromQueue();
     this.addColorToQueue();
 
@@ -128,7 +125,7 @@ define(function(require, exports, module) {
       stage: level.stage
     };
 
-    piece = new PieceView(options);
+    var piece = new PieceView(options);
 
     // save a reference to the piece so we can access it easily later
     node._piece = piece;
@@ -136,7 +133,7 @@ define(function(require, exports, module) {
     // add modifier and piece to node
     node.add(node._mod).add(node._piece);
 
-    // Save the last used back color. This will be used as the 
+    // Save the last used back color. This will be used as the
     // front color of the next played piece
     this._lastColor = backColor;
 
@@ -187,10 +184,6 @@ define(function(require, exports, module) {
   };
 
   // ## Utility Functions
-  function _getRandomColor (min, max) {
-    var num = Math.floor(Math.random() * (max - min + 1)) + min;
-    return colorArray[num];
-  }
 
   function _getRandomIntInRange(min, max) {
     var num = Math.floor(Math.random() * (max - min + 1)) + min;

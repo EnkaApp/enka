@@ -1,5 +1,5 @@
 /* globals define */
-
+/* eslint no-unused-vars:0 */
 define(function(require, exports, module) {
   var View          = require('famous/core/View');
   var Surface       = require('famous/core/Surface');

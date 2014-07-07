@@ -7,9 +7,7 @@
 define(function(require, exports, module) {
   var View          = require('famous/core/View');
   var Surface       = require('famous/core/Surface');
-  var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
-  var ImageSurface  = require('famous/surfaces/ImageSurface');
   var Timer         = require('famous/utilities/Timer');
 
   function BackgroundView() {
@@ -19,7 +17,7 @@ define(function(require, exports, module) {
 
     var rootModifier = new StateModifier({
       origin: [0, 0],
-      align: [0, 0],
+      align: [0, 0]
     });
 
     this.node = this.add(rootModifier);
@@ -43,13 +41,15 @@ define(function(require, exports, module) {
     transition = transition || ease;
     delay = delay || delay === 0 ? delay : 300;
 
+    function setMod(mod) {
+      mod.setOpacity(0.999, transition);
+    }
+
     // Animate the background in
     for (var i = 0; i < this._modifiers.length; i++) {
       var mod = this._modifiers[i];
 
-      Timer.setTimeout(function(mod) {
-        mod.setOpacity(0.999, transition);
-      }.bind(this, mod), i * delay);
+      Timer.setTimeout(setMod.bind(this, mod), i * delay);
     }
 
     // Execute callback after the animations have completed
@@ -67,16 +67,21 @@ define(function(require, exports, module) {
     transition = transition || ease;
     delay = delay || delay === 0 ? delay : 0;
 
+    function setMod(mod) {
+      mod.setOpacity(0.001, transition);
+    }
+
     // Animate the background out
     for (var i = 0; i < this._modifiers.length; i++) {
       var mod = this._modifiers[i];
 
-      Timer.setTimeout(function(mod) {
-        mod.setOpacity(0.001, transition, function() {
-          if (callback) callback();
-        });
-      }.bind(this, mod), i * delay);
+      Timer.setTimeout(setMod.bind(this, mod), i * delay);
     }
+
+    // Execute callback after the animations have completed
+    Timer.setTimeout(function() {
+      if (callback) callback();
+    }.bind(this), delay * (this._modifiers.length - 1));
   };
 
   // Shared Between the Splash page and the Home page

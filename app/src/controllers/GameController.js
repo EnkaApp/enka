@@ -1,5 +1,5 @@
 define(function(require, exports, module) {
-  
+
   // ## Controller Base
   var Controller = require('controllers/Controller');
 
@@ -9,18 +9,6 @@ define(function(require, exports, module) {
   // ## Models
   var UserModel = require('models/UserModel');
   var GameModel = require('models/GameModel');
-
-  function _setListeners() {
-    this.on('game:turn++', function() {
-      this.addTurn();
-    }.bind(this));
-
-    this.on('game:destroyed++', function() {
-      this.addDestroyed();
-    }.bind(this));
-
-    this.pipe(this._model);
-  }
 
   function _init() {
 
@@ -34,10 +22,9 @@ define(function(require, exports, module) {
 
     // Do our setup
     var stage = new StageConfig(this.options.stage);
-    
+
     this._stage = stage;
     this._config = stage.getLevelConfig(this.options.level);
-    
   }
 
   function GameController() {
@@ -141,7 +128,7 @@ define(function(require, exports, module) {
 
   GameController.prototype.addTurn = function() {
     this.options.turns++;
-    
+
     // check win condition
     if (_hasWon.call(this)) this.won();
 
@@ -182,14 +169,14 @@ define(function(require, exports, module) {
   };
 
   GameController.prototype.resume = function() {
-    // retrieve game state from the model
+    // @TODO retrieve game state from the model
 
     // send 'resume' event
     this._eventOutput.emit('game:resume');
   };
 
   GameController.prototype.save = function() {
-    // save game state to model
+    // @TODO save game state to model
 
     // send 'paused' event
     this._eventOutput.emit('game:saved');
@@ -197,13 +184,6 @@ define(function(require, exports, module) {
 
   // ## Private Helpers
 
-  function _reset() {
-    this.setOptions({
-      destroyed: 0,
-      turns: 0,
-    });
-  }
-  
   function _hasWon() {
     var won = false;
     var gametype = this._config.gametype;
@@ -215,7 +195,6 @@ define(function(require, exports, module) {
       if (this.options.destroyed >= goal) won = true;
     }
 
-    // console.log(won);
     return won;
   }
 

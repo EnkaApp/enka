@@ -1,18 +1,18 @@
 define(function(require, exports, module) {
   var Engine = require('famous/core/Engine');
-  var EventHandler = require('famous/core/EventHandler');
-  var OptionsManager = require('famous/core/OptionsManager');
   var Timer = require('famous/utilities/Timer');
 
   // ## Controller Base
   var Controller = require('controllers/Controller');
 
-  var MAX_LIVES = 5;
-  var RECHARGE_TIME = 1 * 60 * 1000; // 15 mins
-  
+  // ## Shared
   var db = require('localforage');
   var isActive = false;
-  
+
+  // ## Constants
+  var MAX_LIVES = 5;
+  var RECHARGE_TIME = 1 * 60 * 1000; // 15 mins
+
   function LivesController() {
     if (LivesController._instance) {
       return LivesController._instance;
@@ -31,7 +31,7 @@ define(function(require, exports, module) {
   LivesController.DEFAULT_OPTIONS = {
     lives: 5,
     lastDeath: '',
-    lastRecharge: '',
+    lastRecharge: ''
   };
 
   LivesController.prototype.get = function() {
@@ -39,7 +39,6 @@ define(function(require, exports, module) {
   };
 
   LivesController.prototype.add = function() {
-    
     this.options.lives++;
 
     // save to the database
@@ -83,7 +82,6 @@ define(function(require, exports, module) {
     return this.options.lives > 0;
   };
 
-
   // ## Private Helper Functions
 
   function _startTimer() {
@@ -119,7 +117,6 @@ define(function(require, exports, module) {
     }
   }
 
-
   // ## Utility Functions
 
   function _msToMin(ms) {
@@ -133,7 +130,6 @@ define(function(require, exports, module) {
 
     return mins + ':' + seconds;
   }
-  
 
   module.exports = LivesController;
 });

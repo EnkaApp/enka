@@ -5,11 +5,8 @@
  */
 define(function(require, exports, module) {
   var View          = require('famous/core/View');
-  var Surface       = require('famous/core/Surface');
   var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
-  var Modifier      = require('famous/core/Modifier');
-  var Timer         = require('famous/utilities/Timer');
 
   // ## App Dependencies
   var utils         = require('utils');
@@ -21,7 +18,6 @@ define(function(require, exports, module) {
 
   // ## Shared Variables
   var W = utils.getViewportWidth();
-  var H = utils.getViewportHeight();
 
   function HomeView() {
     View.apply(this, arguments);
@@ -63,7 +59,7 @@ define(function(require, exports, module) {
     this.bg = new BackgroundView();
 
     this.node.add(this.bg);
-    
+
     this.bg.show(null, 300, function() {
       this.logo.showLogo();
     }.bind(this));
@@ -71,11 +67,11 @@ define(function(require, exports, module) {
 
   function _createLogo() {
     this.logo = new LogoView();
-    
+
     var mod = new StateModifier({
       size: [W/5 * 3, W/5 * 3],
       origin: [0.5, 0.5],
-      align: [0.5, 0.5],
+      align: [0.5, 0.5]
     });
 
     this.logo._mod = mod;

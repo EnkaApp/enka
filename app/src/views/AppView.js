@@ -4,11 +4,9 @@
 define(function(require, exports, module) {
   var Engine            = require('famous/core/Engine');
   var View              = require('famous/core/View');
-  var Surface           = require('famous/core/Surface');
   var Transform         = require('famous/core/Transform');
-  var Modifier          = require('famous/core/Modifier');
   var StateModifier     = require('famous/modifiers/StateModifier');
-  var Transitionable    = require('famous/transitions/Transitionable');
+  // var Transitionable    = require('famous/transitions/Transitionable');
   var Lightbox          = require('famous/views/Lightbox');
   var Timer             = require('famous/utilities/Timer');
 
@@ -21,17 +19,15 @@ define(function(require, exports, module) {
   var GameController  = require('controllers/GameController');
 
   // ## Views
-  var BackgroundView  = require('views/BackgroundView');
   var GameView        = require('views/GameView');
   var HomeView        = require('views/HomeView');
   var StagesView      = require('views/StagesView');
   var FpsMeterView    = require('views/FpsMeterView');
-  var LogoView        = require('views/LogoView');
 
   // ## EventSyncs
-  var GenericSync   = require('famous/inputs/GenericSync');
-  var MouseSync     = require('famous/inputs/MouseSync');
-  var TouchSync     = require('famous/inputs/TouchSync');
+  // var GenericSync   = require('famous/inputs/GenericSync');
+  // var MouseSync     = require('famous/inputs/MouseSync');
+  // var TouchSync     = require('famous/inputs/TouchSync');
 
   // ## Shared
   var PAGE_CHANGE_DURATION = 750;
@@ -55,9 +51,9 @@ define(function(require, exports, module) {
     }.bind(this));
 
     this.stagesView.on('nav:loadGame', function(data) {
-      
+
       data.fromPage = 'stages';
-      
+
       _slideLeft.call(this);
       this.gameView._eventInput.emit('game:load', data);
       this.showPage('game');
@@ -121,7 +117,7 @@ define(function(require, exports, module) {
 
     // Setup the rest of the application once both game and user have loaded
 
-    Engine.on('game:loaded', function(savedGame) {
+    Engine.on('game:loaded', function() {
       gameIsLoaded = true;
       if (userIsLoaded) _setupGame.call(this);
     }.bind(this));
@@ -137,12 +133,10 @@ define(function(require, exports, module) {
   AppView.prototype = Object.create(View.prototype);
   AppView.prototype.constructor = AppView;
 
-
   // ## Event Handlers/Listeners
 
-  // @TODO 
+  // @TODO
   // Enable this back in and get it working so you can swipe between pages
-  
 
   // function _handleSwipe() {
   //   var sync = new GenericSync(
@@ -176,7 +170,7 @@ define(function(require, exports, module) {
   //     if (!this.delegateToScrollView) {
   //       var velocity = data.velocity;
   //       var position = this.homeViewYPos.get();
-      
+
   //       // Show Stages
   //       if (this.showingHome) {
   //         // If threshold is met, trigger slideUp to show the stagesView
@@ -225,7 +219,6 @@ define(function(require, exports, module) {
     this._currentPage = page;
   };
 
-
   AppView.prototype.showHomePage = function() {
     var options = {
       inTransform: Transform.translate(0, 0, 0)
@@ -243,8 +236,6 @@ define(function(require, exports, module) {
 
     // Initialize Controllers
     this.gameController = new GameController();
-
-    console.log(this.gameController.getOptions());
 
     _createStagesView.call(this);
     _createGameView.call(this);
@@ -292,14 +283,10 @@ define(function(require, exports, module) {
 
   // ## Private Helpers
 
-  function _getPageIndex(page) {
-    return this._pagesMap[page];
-  }
-
   function _slideLeft() {
     var options = {
       inTransform: Transform.translate(W, 0, 0),
-      outTransform: Transform.translate(-W, 0, 0),
+      outTransform: Transform.translate(-W, 0, 0)
     };
 
     this.lightbox.setOptions(options);
@@ -308,7 +295,7 @@ define(function(require, exports, module) {
   function _slideRight() {
     var options = {
       inTransform: Transform.translate(-W, 0, 0),
-      outTransform: Transform.translate(W, 0, 0),
+      outTransform: Transform.translate(W, 0, 0)
     };
 
     this.lightbox.setOptions(options);
@@ -317,7 +304,7 @@ define(function(require, exports, module) {
   function _slideUp() {
     var options = {
       inTransform: Transform.translate(0, H, 0),
-      outTransform: Transform.translate(0, -H, 0),
+      outTransform: Transform.translate(0, -H, 0)
     };
 
     this.lightbox.setOptions(options);
@@ -326,7 +313,7 @@ define(function(require, exports, module) {
   function _slideDown() {
     var options = {
       inTransform: Transform.translate(0, -H, 0),
-      outTransform: Transform.translate(0, H, 0),
+      outTransform: Transform.translate(0, H, 0)
     };
 
     this.lightbox.setOptions(options);

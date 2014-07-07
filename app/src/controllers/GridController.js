@@ -1,8 +1,4 @@
 define(function(require, exports, module) {
-  var StateModifier   = require('famous/modifiers/StateModifier');
-  var Transform       = require('famous/core/Transform');
-  var Surface         = require('famous/core/Surface');
-  var OptionsManager  = require('famous/core/OptionsManager');
 
   // ## Controllers
   var Controller = require('controllers/Controller');
@@ -75,7 +71,7 @@ define(function(require, exports, module) {
     return this.getXYCoords(index);
   };
 
-  /**
+  /*
    * @param {number} index
    * @param {number} pieceSize DEPRECATED
    */
@@ -84,10 +80,6 @@ define(function(require, exports, module) {
 
     // return xy coords
     var xyCoords = [];
-    var coords = {
-      x: _getX.call(this, index),
-      y: _getY.call(this, index)
-    };
 
     if (pieceSize) {
       size = [pieceSize, pieceSize];
@@ -95,8 +87,8 @@ define(function(require, exports, module) {
       size = this._cellSize;
     }
 
-    xPix = _getX.call(this, index) * size[0];
-    yPix = _getY.call(this, index) * size[1];
+    var xPix = _getX.call(this, index) * size[0];
+    var yPix = _getY.call(this, index) * size[1];
     xyCoords.push(xPix, yPix);
 
     return xyCoords;
@@ -115,7 +107,7 @@ define(function(require, exports, module) {
     for (var row = 0; row < rows; row++) {
       if (index < columns) {
         return row;
-      } else if ((index >= (columns * row)) && index < ( columns * (row + 1))) {
+      } else if ((index >= (columns * row)) && index < (columns * (row + 1))) {
         return row;
       }
     }

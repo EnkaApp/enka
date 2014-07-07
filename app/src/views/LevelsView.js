@@ -1,26 +1,17 @@
 /* globals define */
 
 define(function(require, exports, module) {
-  var Engine          = require('famous/core/Engine');
   var View            = require('famous/core/View');
   var Surface         = require('famous/core/Surface');
   var Transform       = require('famous/core/Transform');
   var StateModifier   = require('famous/modifiers/StateModifier');
-  var Modifier        = require('famous/core/Modifier');
-  var Easing          = require('famous/transitions/Easing');
-  var Transitionable  = require('famous/transitions/Transitionable');
   var Timer           = require('famous/utilities/Timer');
-  var ImageSurface    = require('famous/surfaces/ImageSurface');
-  var RenderNode      = require('famous/core/RenderNode');
 
   // ## Utils
   var utils = require('utils');
 
   // ## Stage Configuration
   var StageConfig = require('StageConfig');
-
-  // ## Layout
-  var GridLayout = require('famous/views/GridLayout');
 
   // ## Controllers
   var GameController = require('controllers/GameController');
@@ -37,7 +28,8 @@ define(function(require, exports, module) {
   var H = utils.getViewportHeight();
   var LEVEL_CLOSE_DURATION = 700;
 
-  // ## Event Handlers/Listeners    
+  // ## Event Handlers/Listeners
+
   function _setListeners() {
 
     function levelSelect(data) {
@@ -110,7 +102,7 @@ define(function(require, exports, module) {
 
     this.rootMod = new StateModifier({
       size: [undefined, this.options.expandedHeight],
-      transform: Transform.translate(0, 0, 1),
+      transform: Transform.translate(0, 0, 1)
     });
 
     this.node = this.add(this.rootMod);
@@ -128,10 +120,8 @@ define(function(require, exports, module) {
   LevelsView.DEFAULT_OPTIONS = {
     stage: 1,
     bgColor: '',
-    // height: 100,
-    // currentHeight: 100,
     expandedHeight: 600,
-    grid: [5,5],
+    grid: [5,5]
   };
 
   LevelsView.prototype.show = function(transition, delay, callback) {
@@ -140,7 +130,7 @@ define(function(require, exports, module) {
     this._backing._mod.setTransform(Transform.identity);
     this._backing._mod.setOpacity(0.999, {duration: 300});
     this._backing.addClass('stage-levels-bg--active');
-    
+
     this.grid.showCells(transition, delay, function() {
       this.showCloseBtn();
       if (callback) callback();
@@ -189,7 +179,7 @@ define(function(require, exports, module) {
       duration: 100
     });
   };
-  
+
   LevelsView.prototype.closeOpenedLevels = function(callback) {
     if (this.openLevel) {
       this.openLevel.flip();
@@ -216,7 +206,7 @@ define(function(require, exports, module) {
       classes: [
         'stage-' + this.options.stage,
         'stage-levels',
-        'stage-levels-bg',
+        'stage-levels-bg'
       ]
     });
 
@@ -240,7 +230,7 @@ define(function(require, exports, module) {
       content: content,
       classes: [
         'stage-levels',
-        'stage-' + this.options.stage,
+        'stage-' + this.options.stage
       ]
     });
 
@@ -261,7 +251,6 @@ define(function(require, exports, module) {
     var gridSize = [4,5];
     var gutterSize = [20,20];
     var cellSize = [250,250];
-
     var scale = _getScale.call(this, gridSize, cellSize, gutterSize, 70, 44);
 
     this.grid = new ZoomingGridView({
@@ -294,6 +283,7 @@ define(function(require, exports, module) {
    * @param {number} buttonHeight - Height of the close button. Should also include any top or bottom margin.
    */
   function _getScale(gridSize, cellSize, gutter, buttonHeight, headerHeight) {
+    var scale;
     var h = H - headerHeight - buttonHeight;
     var cols = gridSize[0];
     var rows = gridSize[1];
@@ -308,22 +298,22 @@ define(function(require, exports, module) {
 
     if (scaleByWidth < scaleByHeight) scale = scaleByWidth;
     else scale = scaleByHeight;
-    
+
     return [scale, scale, 1];
   }
 
-  function _createCells(grid) {
+  function _createCells() {
     var cells = [];
     var cellCount = this.options.grid[0] * this.options.grid[1];
 
     for (var i = 0; i < cellCount; i++) {
-      
+
       var options = {
         index: i,
         level: i+1,
         colors: 3,
         duration: LEVEL_CLOSE_DURATION,
-        stage: this.options.stage,
+        stage: this.options.stage
       };
 
       var cell = new LevelView(options);

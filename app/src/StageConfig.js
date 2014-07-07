@@ -4,8 +4,8 @@ define(function(require, exports, module) {
   // Each 'coords' array contains the grid positions of a level view.
   // Each level view will be animated in using the order that they are declared
 
-  GAMETYPE_SURVIVAL = 1;
-  GAMETYPE_DESTROY = 2;
+  var GAMETYPE_SURVIVAL = 1;
+  var GAMETYPE_DESTROY = 2;
 
   // Possible grid configurations.
   // To be used by levels
@@ -14,12 +14,12 @@ define(function(require, exports, module) {
     'standard': [5,8],
     'large': [6,10],
     'xlarge': [10,10],
-    
+
     'wide': [8,4],
     'fat': [8,3],
 
     'tall': [4,8],
-    'skinny': [3,8],
+    'skinny': [3,8]
   };
 
   /*
@@ -38,7 +38,7 @@ define(function(require, exports, module) {
     } else if (Array.isArray(grid)) {
       grid = grid;
     } else {
-      grid = GRID_TYPES['standard'];
+      grid = GRID_TYPES.standard;
     }
 
     startIndex = startIndex || Math.floor((grid[0] * grid[1])/2);
@@ -70,27 +70,27 @@ define(function(require, exports, module) {
         _getLevelDef(null, 'standard', 4),
         _getLevelDef(null, 'standard', 6),
         _getLevelDef(null, 'standard', 8),
-        
+
         _getLevelDef(GAMETYPE_SURVIVAL, 'standard', 8),
         _getLevelDef(null, 'tall', 6),
         _getLevelDef(null, 'tall', 6),
         _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 5),
-        
+
         _getLevelDef(GAMETYPE_SURVIVAL, null, 5),
         _getLevelDef(null, null, 30),
         _getLevelDef(null, 'wide', 10),
         _getLevelDef(null, 'large', 15),
-        
+
         _getLevelDef(GAMETYPE_SURVIVAL, null, 15),
         _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 10),
         _getLevelDef(null, 'skinny', 10),
         _getLevelDef(null, 'wide', 15),
-        
+
         _getLevelDef(GAMETYPE_SURVIVAL, null, 10),
         _getLevelDef(null, null, 10),
         _getLevelDef(GAMETYPE_SURVIVAL, 'tall', 15),
-        _getLevelDef(null, 'skinny', 10),
-      ],
+        _getLevelDef(null, 'skinny', 10)
+      ]
     },
 
     // ## Stage 2
@@ -107,9 +107,12 @@ define(function(require, exports, module) {
         _getLevelDef(null, 'xlarge', 10),
         _getLevelDef(GAMETYPE_SURVIVAL, 'small', 10),
         _getLevelDef(null, 'tall', 10),
-        
+
         _getLevelDef(null, 'skinny', 10),
-      ],
+        _getLevelDef(null, 'xlarge', 6),
+        _getLevelDef(GAMETYPE_SURVIVAL, 'small', 15),
+        _getLevelDef(null, 'tall', 8)
+      ]
     },
 
     // ## Stage 3
@@ -120,7 +123,7 @@ define(function(require, exports, module) {
       },
 
       // grid to lay out the levels
-      grid: [4, 5],
+      grid: [4, 5]
     },
 
     // ## Stage 4
@@ -131,7 +134,7 @@ define(function(require, exports, module) {
       },
 
       // grid to lay out the levels
-      grid: [4, 5],
+      grid: [4, 5]
     },
 
     // ## Stage 5
@@ -140,7 +143,7 @@ define(function(require, exports, module) {
         url: '/images/mayan-5.png',
         size: [150,65]
       },
-      grid: [4, 5],
+      grid: [4, 5]
     },
 
     // ## Stage 6
@@ -151,7 +154,7 @@ define(function(require, exports, module) {
       },
 
       // grid to lay out the levels
-      grid: [4, 5],
+      grid: [4, 5]
     }
   ];
 
@@ -180,7 +183,6 @@ define(function(require, exports, module) {
     return STAGES.length;
   };
 
-
   // ## Instance Methods
 
   StageConfig.prototype.getLevelCount = function() {
@@ -205,7 +207,7 @@ define(function(require, exports, module) {
       type = levelDef.gametype;
       goal = levelDef.goal;
     }
-    
+
     return _getGameTypeDesc(type, goal);
   };
 

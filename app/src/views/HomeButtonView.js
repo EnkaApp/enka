@@ -31,7 +31,6 @@ define(function(require, exports, module) {
   }
 
   function _createTitle() {
-    
     var title = new Surface({
       content: this.options.content,
       properties: {
@@ -46,7 +45,7 @@ define(function(require, exports, module) {
     var mod = new StateModifier({
       origin: [0.5, 0.5],
       align: [0.5,0.5],
-      size: [this.options.width, this.options.height],
+      size: [this.options.width, this.options.height]
     });
 
     this.add(mod).add(title);

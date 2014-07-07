@@ -1,24 +1,34 @@
+/* eslint func-style:0 no-return-assign:0 */
+
 define(function(require, exports, module) {
+  var Engine = require('famous/core/Engine');
+  var View = require('famous/core/View');
+  var Surface = require('famous/core/Surface');
+  var Modifier = require('famous/core/Modifier');
+  var Timer = require('famous/utilities/Timer');
+  var Transform = require('famous/core/Transform');
 
-  var Engine, FpsMeter, Modifier, Surface, Timer, Transform, View,
-    __bind = function(fn, me) { return function() { return fn.apply(me, arguments); }; },
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+  var __bind = function(fn, me) {
+    return function() {
+      return fn.apply(me, arguments);
+    };
+  };
 
-  // require('./scss/fpsmeter.scss');
-  View = require('famous/core/View');
+  var __hasProp = {}.hasOwnProperty;
 
-  Surface = require('famous/core/Surface');
+  var __extends = function(child, parent) {
+    for (var key in parent) {
+      if (__hasProp.call(parent, key)) child[key] = parent[key];
+    }
 
-  Modifier = require('famous/core/Modifier');
+    function ctor() {
+      this.constructor = child;
+    }
 
-  Engine = require('famous/core/Engine');
+    ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child;
+  };
 
-  Timer = require('famous/utilities/Timer');
-
-  Transform = require('famous/core/Transform');
-
-  FpsMeter = (function(_super) {
+  var FpsMeter = (function(_super) {
     __extends(FpsMeter, _super);
 
     FpsMeter.prototype.currTime = 0;
@@ -57,7 +67,9 @@ define(function(require, exports, module) {
     }
 
     FpsMeter.prototype.initTime = function() {
-      var perf, perfNow;
+      var perf;
+      var perfNow;
+
       perf = window.performance;
       if (perf && (perf.now || perf.webkitNow)) {
         perfNow = perf.now ? 'now' : 'webkitNow';
@@ -94,7 +106,7 @@ define(function(require, exports, module) {
     };
 
     FpsMeter.prototype.update = function() {
-      return this.surface.setContent("" + ((1000 / this.frameTime).toFixed(1)) + " fps");
+      return this.surface.setContent('' + ((1000 / this.frameTime).toFixed(1)) + ' fps');
     };
 
     FpsMeter.prototype.getTime = function() {

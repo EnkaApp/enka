@@ -1,9 +1,8 @@
+/* global console */
+/* eslint no-console:0 */
+
 define(function(require, exports, module) {
-  
-  // ## Famous Dependencies
   var Engine = require('famous/core/Engine');
-  var OptionsManager = require('famous/core/OptionsManager');
-  var Timer = require('famous/utilities/Timer');
 
   // ## Dependencies
   var _ = require('lodash');
@@ -11,7 +10,6 @@ define(function(require, exports, module) {
 
   // ## App Dependencies
   var Model = require('models/Model');
-  var LivesController = require('controllers/LivesController');
 
   // ## StageConfig
   var StageConfig = require('StageConfig');
@@ -19,7 +17,6 @@ define(function(require, exports, module) {
   function _init() {
 
     db.ready().then(function() {
-      
       db.getItem('user').then(function(user) {
 
         // if user exists in the db, load him/her
@@ -157,7 +154,7 @@ define(function(require, exports, module) {
       latestStage: stage,
       latestLevel: level
     };
-    
+
     // update options
     this.setOptions(options);
 

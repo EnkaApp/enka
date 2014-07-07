@@ -6,10 +6,8 @@ define(function(require, exports, module) {
   var Surface         = require('famous/core/Surface');
   var Transform       = require('famous/core/Transform');
   var StateModifier   = require('famous/modifiers/StateModifier');
-  var Modifier        = require('famous/core/Modifier');
   var Easing          = require('famous/transitions/Easing');
   var Transitionable  = require('famous/transitions/Transitionable');
-  var Timer           = require('famous/utilities/Timer');
   var ImageSurface    = require('famous/surfaces/ImageSurface');
 
   // ## Stage Configuration

@@ -1,4 +1,4 @@
-/**
+/*
  * Model should not be used directly. It should be extended by subclasses.
  */
 
@@ -11,7 +11,6 @@ define(function(require, exports, methods) {
   function Model(options) {
 
     this._db = db;
-    
     this._eventInput = new EventHandler();
     this._eventOutput = new EventHandler();
     EventHandler.setInputHandler(this, this._eventInput);

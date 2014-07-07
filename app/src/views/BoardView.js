@@ -1,18 +1,12 @@
 /* globals define */
 define(function(require, exports, module) {
-
-  var Engine         = require('famous/core/Engine');
   var View           = require('famous/core/View');
   var Surface        = require('famous/core/Surface');
   var Transform      = require('famous/core/Transform');
   var StateModifier  = require('famous/modifiers/StateModifier');
-  var EventHandler   = require('famous/core/EventHandler');
-  var MouseSync      = require('famous/inputs/MouseSync');
   var TouchSync      = require('famous/inputs/TouchSync');
   var GenericSync    = require('famous/inputs/GenericSync');
-  var Transitionable = require('famous/transitions/Transitionable');
   var Timer          = require('famous/utilities/Timer');
-  var OptionsManager = require('famous/core/OptionsManager');
 
   // ## Controllers
   var GridController = require('controllers/GridController');
@@ -28,13 +22,12 @@ define(function(require, exports, module) {
 
   var sync = new GenericSync({
     'mouse'  : {},
-    'touch'  : {},
-    // "scroll" : {scale : .5}
+    'touch'  : {}
   });
 
   function _stateInit() {
     var length = this.options.rows * this.options.columns;
-    
+
     this._state = [];
     for (var i = 0; i < length; i++) {
       this._state.push(null);
@@ -50,7 +43,28 @@ define(function(require, exports, module) {
   }
 
   function _setListeners() {
-    var xStart, yStart, xEnd, yEnd;
+    var xStart;
+    var yStart;
+    var xEnd;
+    var yEnd;
+
+    /*
+     * Callback used to delete all legal matches. If no matches, check if we are trapped.
+     */
+    function onReflected(newIndex) {
+
+      // We need to check if the piece is trapped after deleteMatches has
+      // executed otherwise it will mistakingly check pieces that are in queue
+      // to be deleted but have not yet been deleted
+      this.deleteMatches(newIndex, function() {
+        _checkIfTrapped.call(this, newIndex);
+
+        // Display the possible moves for the next piece
+        var colorClass = this._pieceGenerator.getNextColorFromQueue(false);
+        _showPossibleMoves.call(this, this._currentIndex, colorClass);
+
+      }.bind(this));
+    }
 
     // Win Event
     this._controller.on('game:won', function() {
@@ -64,7 +78,7 @@ define(function(require, exports, module) {
     // Lose Event
     this._controller.on('game:lost', function() {
       this._eventOutput.emit('game:lost', {
-        piece: lastPiece,
+        piece: lastPiece
       });
     }.bind(this));
 
@@ -86,51 +100,35 @@ define(function(require, exports, module) {
     sync.on('end', function(data) {
       xEnd = data.clientX;
       yEnd = data.clientY;
-      
+
       var direction = _getSwipeDirection.call(this, xStart, yStart, xEnd, yEnd);
-      
+
       if (direction) {
-        
+
         this._turns++;
         this._controller.addTurn();
-        
-        // gets new index (2, 4, 15, etc) based off current index and swipe direction  
+
+        // gets new index (2, 4, 15, etc) based off current index and swipe direction
         var newIndex = _getNewIndex.call(this, this._currentIndex, direction);
-        
+
         if (this.isInBounds(direction) && !this._state[newIndex]) {
-          
+
           // generate new Piece
           var piece = this._pieceGenerator.getPiece(direction);
           this.placePiece(piece, newIndex);
-          
+
           this._state[newIndex] = piece;
 
           piece._piece.reflect();
 
-          // delete all legal matches. if no matches, check if we are trapped
-          var onReflected = function() {
-
-            // We need to check if the piece is trapped after deleteMatches has
-            // executed otherwise it will mistakingly check pieces that are in queue
-            // to be deleted but have not yet been deleted
-            this.deleteMatches(newIndex, function() {
-              _checkIfTrapped.call(this, newIndex);
-
-              // Display the possible moves for the next piece
-              var colorClass = this._pieceGenerator.getNextColorFromQueue(false);
-              _showPossibleMoves.call(this, this._currentIndex, colorClass);
-
-            }.bind(this));
-          };
-
-          // @NOTE 
+          // @NOTE
           // Previously the piece.on('reflected') event was being used to trigger
           // the onReflected function; however this was causing problems because the
           // 'reflected' event was being emitted multiple times instead of the expected
           // one time. Timer.setTimeout is a workaround for this.
           //
           // @TODO Figure out what is wrong with the piece.on('reflected') event
-          Timer.setTimeout(onReflected.bind(this), 500);
+          Timer.setTimeout(onReflected.bind(this, newIndex), 500);
         }
       }
     }.bind(this)); // <---- END SYNC.ON('END')
@@ -163,7 +161,7 @@ define(function(require, exports, module) {
     // create the surfaces used to highlight the players next move
     _createPositionHighlights.call(this, this._pieceSize);
 
-    // The pieceGenerator is a singleton instance and is created by 
+    // The pieceGenerator is a singleton instance and is created by
     // the header first so we need to explicitly set the options
     // otherwise the piece size and other calculations will be wrong
     this._pieceGenerator = new PieceController();
@@ -191,7 +189,7 @@ define(function(require, exports, module) {
 
     this._state[this._currentIndex] = firstPiece;
   }
-   
+
   function BoardView() {
     View.apply(this, arguments);
 
@@ -257,7 +255,7 @@ define(function(require, exports, module) {
 
   BoardView.prototype.placePiece = function(piece, newIndex) {
     var pos = this._gridController.getXYCoordsFromIndex(this._currentIndex);
-    
+
     piece._mod.setTransform(
       Transform.translate(pos[0], pos[1], 180)
     );
@@ -281,9 +279,8 @@ define(function(require, exports, module) {
 
     function seekAndDestroy(index) {
       var matches = this.checkIfAnyNeighborHasMatch(index);
-      // console.log('The following indices have matches: ', matches);
 
-      for(var i = 0; i < matches.length; i++) {
+      for (var i = 0; i < matches.length; i++) {
         // matches has matches of all neighbors
         if (matches[i]) {
           var newIndexToCheck = matches[i][0];
@@ -298,7 +295,7 @@ define(function(require, exports, module) {
 
     if (connections > 1) {
       var pieces = [];
-      for(var i = 0; i < matched.length; i++) {
+      for (var i = 0; i < matched.length; i++) {
         if (matched[i] && i !== initialIndex) {
           pieces.push(i);
         }
@@ -322,7 +319,7 @@ define(function(require, exports, module) {
       down: this.checkIfDirectionHasMatch(index, 'down')
     };
 
-    for(var direction in directions) {
+    for (var direction in directions) {
       // starts with 4 checks to see if the neighbor position is in bounds
       if (this.isInBounds(direction)) {
         if (directions[direction])
@@ -334,24 +331,22 @@ define(function(require, exports, module) {
   };
 
   BoardView.prototype.checkIfDirectionHasMatch = function(index, direction) {
+    var isMatch;
     var isMatchAtIndex = [];
     var matchColor = this.getColorFromIndex(index); // color to match to
     var neighborIndex = _getNewIndex.call(this, index, direction);
-
     var inBounds  = this.isInBounds(direction, index);
     var neighborExists = this._state[neighborIndex];
-    
-    if (neighborExists && inBounds ) {
+
+    if (neighborExists && inBounds) {
       var neighborColor = this.getColorFromIndex(neighborIndex);
-      
+
       isMatch = neighborColor === matchColor;
       isMatchAtIndex.push(neighborIndex, isMatch);
       return isMatchAtIndex;
     } else {
-
       isMatch = false;
       isMatchAtIndex.push(neighborIndex, isMatch);
-
       return isMatchAtIndex;
     }
   };
@@ -368,7 +363,7 @@ define(function(require, exports, module) {
 
     if (!index) {
       newIndexCoords = this._lastPiecePosition;
-    }else{
+    } else {
       newIndexCoords = this._gridController.getXYCoordsFromIndex(index);
     }
 
@@ -422,11 +417,11 @@ define(function(require, exports, module) {
     this._pieceGenerator.addDeletedPiece(this._state[index]);
 
     var mod = _getModifierAtIndex.call(this, index);
-    
-    var callback = function() {
+
+    function callback() {
       mod.setTransform(Transform.translate(2000, 2000, 0));
       mod.setOpacity(0.999);
-    };
+    }
 
     mod.setOpacity(0.001, {
       curve: 'easeOut',
@@ -472,7 +467,7 @@ define(function(require, exports, module) {
 
   function _createBacking() {
     this.backing = new Surface({
-      classes: ['gameboard-backing'],
+      classes: ['gameboard-backing']
     });
 
     this.boardSurface = new Surface({
@@ -500,7 +495,8 @@ define(function(require, exports, module) {
    * These are to be reused after each piece is placed.
    */
   function _createPositionHighlights(size) {
-    var surface, surfaces;
+    var surface;
+    var surfaces;
 
     if (this._highlights && this._highlights.length) surfaces = this._highlights;
     else surfaces = [];
@@ -535,7 +531,7 @@ define(function(require, exports, module) {
         this.node.add(surface._mod).add(surface._scaleMod).add(surface);
       }
     }
-    
+
     for (var j = surfaces.length - 1; j >= 0; j--) {
       surface = surfaces[j];
       surface._mod.setSize(size);
@@ -555,13 +551,11 @@ define(function(require, exports, module) {
 
     // Delete all pieces except the winner
     var pieces = [];
-    var lastPieceIndex;
 
     for (var i = 0; i < this._state.length; i++) {
       var piece = this._state[i];
-      
+
       if (piece && piece === lastPiece) {
-        lastPieceIndex = i;
         if (!removeLastPiece) continue;
       }
 
@@ -600,8 +594,6 @@ define(function(require, exports, module) {
           'level-' + level.level,
           colorClass
         ]);
-        
-        // surface.setProperties({backgroundColor: colorClass}); // TEMP... REMOVE
 
         surface._mod.setTransform(Transform.translate(xy[0], xy[1], 180));
         surface._scaleMod.setTransform(Transform.scale(1, 1, 1), {duration: 300});
@@ -616,7 +608,7 @@ define(function(require, exports, module) {
 
     for (var i = this._highlights.length - 1; i >= 0; i--) {
       var surface = this._highlights[i];
-      
+
       surface._scaleMod.setTransform(Transform.scale(0.001, 0.001, 180), {
         curve: 'linear',
         duration: dur
@@ -694,7 +686,7 @@ define(function(require, exports, module) {
       direction = 'right';
     }
     // swipe left
-    if (xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd) ) {
+    if (xStart > xEnd && (xStart - xEnd > yEnd - yStart) && (xStart - xEnd > yStart - yEnd)) {
       direction = 'left';
     }
     // swipe down
@@ -702,7 +694,7 @@ define(function(require, exports, module) {
       direction = 'down';
     }
     // swipe up
-    if (yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd) ) {
+    if (yStart > yEnd && (yStart - yEnd > xEnd - xStart) && (yStart - yEnd > xStart - xEnd)) {
       direction = 'up';
     }
 

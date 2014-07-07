@@ -1,4 +1,4 @@
-/**
+/*
  * Controller should not be used directly. It should be extended by subclasses.
  */
 
@@ -7,7 +7,6 @@ define(function(require, exports, methods) {
   var OptionsManager = require('famous/core/OptionsManager');
 
   function Controller(options) {
-    
     this._eventInput = new EventHandler();
     this._eventOutput = new EventHandler();
     EventHandler.setInputHandler(this, this._eventInput);
@@ -21,7 +20,7 @@ define(function(require, exports, methods) {
 
   Controller.DEFAULT_OPTIONS = {}; // no defaults
 
-  /**
+  /*
    * Set internal options.
    *
    * @method setOptions
@@ -31,7 +30,7 @@ define(function(require, exports, methods) {
     this._optionsManager.patch(options);
   };
 
-  /**
+  /*
    * Look up options value by key
    * @method getOptions
    *
@@ -39,7 +38,7 @@ define(function(require, exports, methods) {
    * @return {Object} associated object
    */
   Controller.prototype.getOptions = function getOptions() {
-      return this._optionsManager.value();
+    return this._optionsManager.value();
   };
 
   Controller.prototype.getOption = function(key) {

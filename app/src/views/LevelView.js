@@ -9,10 +9,6 @@ define(function(require, exports, module) {
   var Transform     = require('famous/core/Transform');
   var Modifier      = require('famous/core/Modifier');
   var StateModifier = require('famous/modifiers/StateModifier');
-  var Lightbox      = require('famous/views/Lightbox');
-  var Easing        = require('famous/transitions/Easing');
-  var Transitionable = require('famous/transitions/Transitionable');
-  var SpringTransition = require('famous/transitions/SpringTransition');
 
   // ## Utils
   var utils = require('utils');
@@ -46,7 +42,6 @@ define(function(require, exports, module) {
   function _createListeners() {
 
     function play(e) {
-      
       // Tell downstream listeners that a user wants to play
       this._eventOutput.emit('level:play', {
         index: this.options.level - 1,
@@ -56,7 +51,7 @@ define(function(require, exports, module) {
         event: e
       });
     }
-    
+
     function select(e) {
 
       // Flip the card
@@ -92,7 +87,7 @@ define(function(require, exports, module) {
       this.back.playButton.on('click', play.bind(this));
       this.back.backing.on('click', close.bind(this));
     }
-    
+
     this.front.pipe(this._eventOutput);
   }
 
@@ -124,7 +119,6 @@ define(function(require, exports, module) {
     this.node = this.add(this.rootMod);
 
     _createFlipper.call(this);
-
     _createListeners.call(this);
   }
 
@@ -157,13 +151,13 @@ define(function(require, exports, module) {
   };
 
   LevelView.prototype.show = function(transition) {
-    
+
     spring.period = this.options.duration;
     transition = transition !== undefined ? transition : spring;
-    
+
     this.rootMod.setOpacity(0.999, transition);
 
-    // The Z translation is needed to prevent flickering that occurs when the 
+    // The Z translation is needed to prevent flickering that occurs when the
     // flip transition is executed, and also to put it above the header. To prevent
     // the flickering the Z must be ~100 greater than its background surface
     this.rootMod.setTransform(Transform.translate(0,0,150), transition);
@@ -188,7 +182,7 @@ define(function(require, exports, module) {
 
     var flipperMod = new Modifier({
       origin: [0.5, 0.5],
-      align: [0.5, 0.5],
+      align: [0.5, 0.5]
     });
 
     _createFront.call(this);
@@ -221,6 +215,7 @@ define(function(require, exports, module) {
   // ------------------------------------------------------------
   // ------------------------------------------------------------
   // ------------------------------------------------------------
+  // Level Front View
 
   function _setLFVListeners() {
     this.backing.pipe(this._eventOutput);
@@ -242,7 +237,7 @@ define(function(require, exports, module) {
     this.rootModifier = new StateModifier({
       size: [this.options.width, this.options.height],
       origin: [0.5, 0.5],
-      align: [0.5, 0.5],
+      align: [0.5, 0.5]
     });
 
     this.node = this.add(this.rootModifier);
@@ -308,6 +303,7 @@ define(function(require, exports, module) {
   // ------------------------------------------------------------
   // ------------------------------------------------------------
   // ------------------------------------------------------------
+  // Level Back View
 
   function _setLBVListeners() {
     this.backing.pipe(this._eventOutput);
@@ -322,7 +318,7 @@ define(function(require, exports, module) {
     this.rootModifier = new StateModifier({
       size: [this.options.width, this.options.height],
       origin: [0.5, 0.5],
-      align: [0.5, 0.5],
+      align: [0.5, 0.5]
     });
 
     this.node = this.add(this.rootModifier);
@@ -375,7 +371,7 @@ define(function(require, exports, module) {
       'stage-level-back',
       'stage-level-backing',
       'stage-'+this.options.stage,
-      'stage-level--color'+this.options.color,
+      'stage-level--color'+this.options.color
     ]);
 
     if (this.options.current) {
@@ -397,7 +393,7 @@ define(function(require, exports, module) {
     });
 
     this.playButton = new Surface({
-      content: content,
+      content: content
     });
 
     this.playButton.setClasses([

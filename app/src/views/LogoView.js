@@ -92,7 +92,6 @@ define(function(require, exports, module) {
     });
 
     var initialTime = Date.now();
-    
     var posMod = new StateModifier({
       size: [35, 35],
       origin: [0.5, 0.5],
@@ -109,8 +108,6 @@ define(function(require, exports, module) {
     });
 
     this.famousIcon._mod = posMod;
-
-    // this.add(posMod).add(centerSpinMod).add(this.famousIcon);
     this.node.add(posMod).add(centerSpinMod).add(this.famousIcon);
   }
 
@@ -134,15 +131,6 @@ define(function(require, exports, module) {
   }
 
   function _createLogoBrand() {
-    // var letterF = new LetterView('F');
-    
-    // var fModifier = new StateModifier({
-    //   size: [80, 125],
-    //   origin: [0.5, 0.5]
-    // });
-
-    // this.add(fModifier).add(letterF);
-
     var brand = new LetterView({
       letter: this.options.brand
     });
@@ -153,7 +141,6 @@ define(function(require, exports, module) {
     });
 
     this.brandView = brand;
-    // this.add(mod).add(brand);
     this.node.add(mod).add(brand);
   }
 
@@ -167,20 +154,20 @@ define(function(require, exports, module) {
 
     var transitionable = new Transitionable(start);
 
-    var prerender = function() {
+    function prerender() {
       this.bg.setOptions({
         size: [transitionable.get(), this._height]
       });
-    }.bind(this);
+    }
 
-    var complete = function() {
-      Engine.removeListener('prerender', prerender);
+    function complete() {
+      Engine.removeListener('prerender', prerender.bind(this));
       if (callback) callback();
-    };
+    }
 
-    Engine.on('prerender', prerender);
+    Engine.on('prerender', prerender.bind(this));
 
-    transitionable.set(end, transition, complete);
+    transitionable.set(end, transition, complete.bind(this));
   }
 
   module.exports = LogoView;

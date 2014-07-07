@@ -5,11 +5,8 @@
  */
 define(function(require, exports, module) {
   var View          = require('famous/core/View');
-  var RenderNode    = require('famous/core/RenderNode');
   var Surface       = require('famous/core/Surface');
-  var Transform     = require('famous/core/Transform');
   var StateModifier = require('famous/modifiers/StateModifier');
-  var Modifier      = require('famous/core/Modifier');
 
   // ## App Dependencies
   var Reflector = require('views/Reflector');
@@ -21,7 +18,7 @@ define(function(require, exports, module) {
     right: Reflector.DIRECTION_RIGHT,
     left: Reflector.DIRECTION_LEFT,
     up: Reflector.DIRECTION_UP,
-    down: Reflector.DIRECTION_DOWN,
+    down: Reflector.DIRECTION_DOWN
   };
 
   function PieceView() {
@@ -34,7 +31,7 @@ define(function(require, exports, module) {
     this.reflector = new Reflector({
       direction: DIRECTIONS[this.options.direction]
     });
-  
+
     this.reflector.setFront(this.front);
     this.reflector.setBack(this.back);
 
@@ -72,7 +69,7 @@ define(function(require, exports, module) {
     this.front.setClasses(_getFrontClasses.call(this));
 
     _initReflectionModifier.call(this);
-    
+
     this.reflector.updateOptions({
       direction: DIRECTIONS[this.options.direction]
     });
@@ -112,9 +109,9 @@ define(function(require, exports, module) {
    // ## Modifiers
 
   function _initReflectionModifier() {
+    var align;
+    var origin;
 
-    var origin, align;
-      
     if (this.options.direction === 'up') {
       origin = [0.5, 0];
       align = [0.5, 0];
@@ -157,7 +154,6 @@ define(function(require, exports, module) {
   }
 
   function _createFront() {
-    // console.log(size)
     var front = new Surface({
       content: '',
       classes: _getFrontClasses.call(this),

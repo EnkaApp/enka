@@ -1,8 +1,10 @@
-/**
- * GameModel is a singleton and serves as an aggregation point for 
+/* global console */
+/* eslint no-console:0 */
+
+/*
+ * GameModel is a singleton and serves as an aggregation point for
  * information about the game the user is currently playing.
  */
-
  define(function(require, exports, module) {
   var Engine = require('famous/core/Engine');
 
@@ -17,7 +19,7 @@
   function _init() {
     db.ready().then(function() {
       db.getItem('savedGame').then(function(savedGame) {
-        
+
         console.info('Loading Saved Game');
         this.setOptions(savedGame);
         Engine.emit('game:loaded', savedGame);
@@ -41,7 +43,6 @@
     if (GameModel._instance) {
       return GameModel._instance;
     }
-
 
     Model.apply(this, arguments);
 
@@ -81,7 +82,7 @@
   // ## Database Operations
 
   GameModel.prototype.save = function(data) {
-    
+
     this.setOptions(data);
 
     db.ready().then(function() {
@@ -90,7 +91,6 @@
       });
     }.bind(this));
   };
-
 
   GameModel.prototype.delete = function() {
     db.ready().then(function() {

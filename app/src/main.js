@@ -2,7 +2,7 @@
 
 define(function(require, exports, module) {
   var Engine = require('famous/core/Engine');
-  
+
   // ## App Dependencies
   var db = require('localforage');
 

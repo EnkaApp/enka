@@ -10,13 +10,10 @@ define(function(require, exports, module) {
   var Transform       = require('famous/core/Transform');
   var Easing          = require('famous/transitions/Easing');
   var StateModifier   = require('famous/modifiers/StateModifier');
-  
+
   // ## Controllers
   var PieceController  = require('controllers/PieceController');
   var GameController   = require('controllers/GameController');
-
-  // ## Views
-  var BoardView = require('views/BoardView');
 
   // ## Shared
   var open = true;
@@ -44,7 +41,7 @@ define(function(require, exports, module) {
       align: [0.5, 0],
       transform: Transform.translate(0, 0, 200)
     });
-    
+
     this._pieceController = new PieceController();
     this._gameController = new GameController();
 
@@ -57,7 +54,7 @@ define(function(require, exports, module) {
     _initPieces.call(this);
     _setListeners.call(this);
   }
-  
+
   GameHeaderView.prototype = Object.create(View.prototype);
   GameHeaderView.prototype.constructor = GameHeaderView;
 
@@ -67,15 +64,11 @@ define(function(require, exports, module) {
     var pw = this.options.pieceSize[0];
 
     var transition = {
-      // curve: 'easeOut',
       curve: Easing.inExpo,
       duration: 300
     };
 
-    // remove the first piece
     var first = this.upcomingColors[0];
-    var second = this.upcomingColors[1];
-    var third = this.upcomingColors[2];
     var fourth = this.upcomingColors[3];
 
     // set the color of the last piece to the latest color
@@ -88,15 +81,17 @@ define(function(require, exports, module) {
       duration: 1000
     });
 
+    function callback() {
+      this._modifier.setTransform(Transform.translate(90, 0, 0));
+    }
+
     // shift all the colors
     for (var i = 0; i < this.upcomingColors.length; i++) {
       var surface = this.upcomingColors[i];
       var transform = Transform.translate((i-1) * (pw + 5), 0, 0);
 
       if (i === 0) {
-        surface._modifier.setTransform(transform, transition, function() {
-          this._modifier.setTransform(Transform.translate(90, 0, 0));
-        }.bind(surface));
+        surface._modifier.setTransform(transform, transition, callback.bind(surface));
       } else {
         surface._modifier.setTransform(transform, transition);
       }
@@ -114,7 +109,7 @@ define(function(require, exports, module) {
   function _createBacking() {
 
     this.backing = new Surface({
-      classes: ['header', 'navbar', 'game-navbar'],
+      classes: ['header', 'navbar', 'game-navbar']
     });
 
      var backingMod = new StateModifier({
@@ -128,7 +123,7 @@ define(function(require, exports, module) {
     this.menuButton = new Surface({
       size: [true, true],
       classes: ['header', 'navbar', 'game-navbar', 'game-navbar-button'],
-      content: '<i class="fa fa-2x fa-angle-double-up"></i>',
+      content: '<i class="fa fa-2x fa-angle-double-up"></i>'
     });
 
     var mod = new StateModifier({
@@ -153,8 +148,8 @@ define(function(require, exports, module) {
 
     var node = this.node.add(mod);
 
-    for(var i = 0; i < 4; i++) {
-
+    for (var i = 0; i < 4; i++) {
+      var classes;
       var properties = {};
       var pw = this.options.pieceSize[0];
 
