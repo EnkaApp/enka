@@ -11,6 +11,13 @@ define(function(require, exports, module) {
   var GenericSync    = require('famous/inputs/GenericSync');
   var Timer          = require('famous/utilities/Timer');
 
+  // @NOTE 
+  // Order here matters... if TouchSync is declared before MouseSync you will not get mouseevents
+  GenericSync.register({
+    mouse: MouseSync,
+    touch: TouchSync
+  });
+
   // ## Controllers
   var GridController = require('controllers/GridController');
   var GameController = require('controllers/GameController');
@@ -18,11 +25,6 @@ define(function(require, exports, module) {
 
   // ## Shared Variables
   var lastPiece = null;
-
-  GenericSync.register({
-    'touch': TouchSync,
-    'mouse': MouseSync
-  });
 
   function _stateInit() {
     var length = this.options.rows * this.options.columns;
@@ -47,9 +49,7 @@ define(function(require, exports, module) {
     var xEnd;
     var yEnd;
 
-    var sync = new GenericSync(
-      ['touch', 'mouse']
-    );
+    var sync = new GenericSync(['touch', 'mouse']);
 
     /*
      * Callback used to delete all legal matches. If no matches, check if we are trapped.
