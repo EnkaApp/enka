@@ -79,7 +79,7 @@ define(function(require, exports, module) {
         _getLevelDef(GAMETYPE_SURVIVAL, 'skinny', 5),
 
         _getLevelDef(GAMETYPE_SURVIVAL, null, 5),
-        _getLevelDef(null, null, 30),
+        _getLevelDef(null, null, 6),
         _getLevelDef(null, 'wide', 10),
         _getLevelDef(null, 'large', 15),
 
