@@ -22,7 +22,6 @@ define(function(require, exports, module) {
   var GameView        = require('views/GameView');
   var HomeView        = require('views/HomeView');
   var StagesView      = require('views/StagesView');
-  var FpsMeterView    = require('views/FpsMeterView');
 
   // ## EventSyncs
   // var GenericSync   = require('famous/inputs/GenericSync');
@@ -92,8 +91,8 @@ define(function(require, exports, module) {
     this.gameModel = new GameModel();
     this.userModel = new UserModel();
 
-    // For testing
-    // this.userModel.setLatestLevel(1,20);
+    // For testing / demo
+    this.userModel.setLatestLevel(1,10);
 
     this._currentPage = '';
     this._pages = {};
@@ -111,7 +110,6 @@ define(function(require, exports, module) {
 
     _createLightbox.call(this);
     _createHomeView.call(this);
-    _createFPSView.call(this);
 
     this.showHomePage();
 
@@ -277,16 +275,6 @@ define(function(require, exports, module) {
   function _createGameView() {
     this.gameView = new GameView();
     this._pages.game = this.gameView;
-  }
-
-  function _createFPSView() {
-    this.fpsView = new FpsMeterView();
-
-    var mod = new StateModifier({
-      transform: Transform.translate(0, 0, 1000)
-    });
-
-    this.node.add(mod).add(this.fpsView);
   }
 
   // ## Private Helpers
