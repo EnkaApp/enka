@@ -6,6 +6,7 @@ define(function(require, exports, module) {
   var Surface        = require('famous/core/Surface');
   var Transform      = require('famous/core/Transform');
   var StateModifier  = require('famous/modifiers/StateModifier');
+  var MouseSync      = require('famous/inputs/MouseSync');
   var TouchSync      = require('famous/inputs/TouchSync');
   var GenericSync    = require('famous/inputs/GenericSync');
   var Timer          = require('famous/utilities/Timer');
@@ -19,12 +20,8 @@ define(function(require, exports, module) {
   var lastPiece = null;
 
   GenericSync.register({
-    'touch': TouchSync
-  });
-
-  var sync = new GenericSync({
-    'mouse'  : {},
-    'touch'  : {}
+    'touch': TouchSync,
+    'mouse': MouseSync
   });
 
   function _stateInit() {
@@ -49,6 +46,10 @@ define(function(require, exports, module) {
     var yStart;
     var xEnd;
     var yEnd;
+
+    var sync = new GenericSync(
+      ['touch', 'mouse']
+    );
 
     /*
      * Callback used to delete all legal matches. If no matches, check if we are trapped.
@@ -95,6 +96,7 @@ define(function(require, exports, module) {
     this.backing.pipe(sync);
 
     sync.on('start', function(data) {
+      console.log('start');
       xStart = data.clientX;
       yStart = data.clientY;
     });
@@ -102,6 +104,7 @@ define(function(require, exports, module) {
     sync.on('end', function(data) {
       xEnd = data.clientX;
       yEnd = data.clientY;
+      console.log('end');
 
       var direction = _getSwipeDirection.call(this, xStart, yStart, xEnd, yEnd);
 
