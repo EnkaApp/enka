@@ -11,7 +11,7 @@ define(function(require, exports, module) {
   var GenericSync    = require('famous/inputs/GenericSync');
   var Timer          = require('famous/utilities/Timer');
 
-  // @NOTE 
+  // @NOTE
   // Order here matters... if TouchSync is declared before MouseSync you will not get mouseevents
   GenericSync.register({
     mouse: MouseSync,
@@ -96,7 +96,6 @@ define(function(require, exports, module) {
     this.backing.pipe(sync);
 
     sync.on('start', function(data) {
-      console.log('start');
       xStart = data.clientX;
       yStart = data.clientY;
     });
@@ -104,7 +103,6 @@ define(function(require, exports, module) {
     sync.on('end', function(data) {
       xEnd = data.clientX;
       yEnd = data.clientY;
-      console.log('end');
 
       var direction = _getSwipeDirection.call(this, xStart, yStart, xEnd, yEnd);
 
