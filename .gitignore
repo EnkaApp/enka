@@ -16,3 +16,4 @@ dist
 app
 app/lib
 .yo-rc.json
+CNAME
